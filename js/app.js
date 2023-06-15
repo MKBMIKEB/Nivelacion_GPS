@@ -1,4 +1,12 @@
-
+// (async () => {
+//     try {
+//         const datos = await fetch('./../json/estaciones.json');
+//         const res = await datos.json();
+//         console.log(res);
+//     } catch (error) {
+//         console.log(error);
+//     }
+// })();
 
 
 document.querySelector('#cargarTexto').addEventListener('change', (e) => {
@@ -33,6 +41,20 @@ document.querySelector('#cargarHtml').addEventListener('change', (e) => {
     
 });
 
+
+
+document.getElementById("cargarCarpeta").addEventListener("change",function(ev){
+  //console.log(ev.target.files);
+
+  for(let i of ev.target.files){
+    console.log(i);
+  }
+//   for (i = 0; i < ev.target.files.length; i++) {
+//       let file = ev.files[i];
+//       console.log(file.name, file.webkitRelativePath, file.size);
+//   }
+
+});
 
 
 

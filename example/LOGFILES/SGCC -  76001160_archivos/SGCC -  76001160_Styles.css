@@ -1,0 +1,42 @@
+a:link   { font-weight:bold; color:windowtext; text-align:left; text-decoration:none }
+a:visited{ font-weight:bold; color:windowtext; text-align:left; text-decoration:none }
+a:hover  { font-weight:bold; color:#ff0031;    text-align:left; text-decoration:none }
+a:active { font-weight:bold; color:windowtext; text-align:left; text-decoration:underline }
+a:focus  { font-weight:bold; color:windowtext; text-align:left; text-decoration:none }
+h1,.mhd{text-align:center;
+font-family:"Arial";
+font-size:16pt;
+font-style:normal;
+font-weight:bold;
+color:#000000;}
+body,.body{text-align:left;
+font-family:"Arial";
+font-size:10pt;
+font-style:normal;
+font-weight:normal;
+color:#000000;}
+th,.th{text-align:left;
+font-family:"Arial";
+font-size:10pt;
+font-style:normal;
+font-weight:bold;
+color:#000000;}
+td,.td{text-align:left;
+font-family:"Arial";
+font-size:10pt;
+font-style:normal;
+font-weight:normal;
+color:#000000;}
+h2,h3,.heading{text-align:left;
+font-family:"Arial";
+font-size:12pt;
+font-style:normal;
+font-weight:bold;
+color:#000000;
+background-color:#dfdfdf;}
+.FileCreated{text-align:center;
+font-family:"Arial";
+font-size:10pt;
+font-style:normal;
+font-weight:normal;
+color:#000000;}
