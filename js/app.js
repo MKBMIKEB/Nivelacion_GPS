@@ -20,6 +20,21 @@ function calcularDiaDelAno(fecha) {
   return diaDelAño;
 }
 
+function convertirCoordenadasITRF2020aITRF2014(x, y, z) {
+  // Parámetros de transformación
+  var dx = -0.0100;
+  var dy = -0.0040;
+  var dz = -0.0060;
+
+  // Aplicar la transformación
+  var xITRF2014 = x + dx;
+  var yITRF2014 = y + dy;
+  var zITRF2014 = z + dz;
+
+  return [xITRF2014, yITRF2014, zITRF2014];
+}
+
+
 
 
 
@@ -43,7 +58,9 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
     let reader = new FileReader();
     reader.onload = (e) => {        
         console.log(e.target.result);
-        console.log(e.target.result.split("\n")[0]);
+        const lineaVertice = e.target.result.split('\n')[3];
+        const cordenadas = lineaVertice.split('      ');
+        console.log(cordenadas);
     };
     reader.readAsText(file);
     
