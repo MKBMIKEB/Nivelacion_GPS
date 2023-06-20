@@ -21,15 +21,15 @@ function calcularDiaDelAno(fecha) {
 }
 
 function convertirCoordenadasITRF2020aITRF2014(x, y, z) {
+
+  console.log("entrada", parseFloat(x), y, z);
   // Parámetros de transformación
-  var dx = -0.0100;
-  var dy = -0.0040;
-  var dz = -0.0060;
+  
 
   // Aplicar la transformación
-  var xITRF2014 = parseFloat(x) + dx;
-  var yITRF2014 = parseFloat(y) + dy;
-  var zITRF2014 = parseFloat(z) + dz;
+  let xITRF2014 = parseFloat(x) - 0.0020955586417640;
+  let yITRF2014 = parseFloat(y) + 0.001150857060808;
+  let zITRF2014 = parseFloat(z) + 0.001926575214432;
 
   return [xITRF2014, yITRF2014, zITRF2014];
 }
@@ -67,59 +67,105 @@ function eliminarEspacios(linea){
 
 
 
-document.querySelector('#cargarTexto').addEventListener('change', (e) => {
-    
-    let file = e.target.files[0];
-    //console.log(file);    
 
+
+document.querySelector('#cargarTexto').addEventListener('change', (e) => {  
+   
+
+    let file = e.target.files[0];
+        //console.log(file);    
 
     let reader = new FileReader();
     reader.onload = (e) => {        
+
+        let vertices = e.target.result.split('\n');
+        console.log(vertices)
         console.log(e.target.result);
-        const lineaVertice = e.target.result.split('\n')[3];
-        // const cordenadas = lineaVertice.split('      ');
-        //console.log(cordenadas);
-        const coordenadas = eliminarEspacios(lineaVertice);
-        console.log(convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z));
+        let verticesArray = [];
+        for(let i=3; i < vertices.length-1; i++) {
+          verticesArray.push(eliminarEspacios(vertices[i]));
+        }
+        // console.log(verticesArray)
+        // const lineaVertice = e.target.result.split('\n')[3];        
+        // const coordenadas = eliminarEspacios(lineaVertice);
+        let intervaloEpoca = 2018 - parseFloat(document.getElementById('anoEpoca').innerHTML);
+        console.log('ano epoca', intervaloEpoca);
+        let datosTabla = "";
+        for(let coordenadas of verticesArray) {
+          if(coordenadas.nombre.length > 4){
+            let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
+            console.log(coordenadas.nombre);
+            datosTabla += `
+              <tr>
+                <th scope="row">${coordenadas.nombre}</th>
+                <td>${coordenadaAjustada[0] + (0.00460 * intervaloEpoca)}</td>
+                <td>${coordenadaAjustada[1] + (0.00313 * intervaloEpoca)}</td>
+                <td>${coordenadaAjustada[2] + (0.01348 * intervaloEpoca)}</td>
+              </tr> 
+            `;
+            console.log();
+          }
+        }
+        document.getElementById('tablaEntrada').innerHTML = datosTabla;
     };
     reader.readAsText(file);
+    
     
     
 });
 
 
-document.querySelector('#cargarHtml').addEventListener('change', (e) => {
-    
-    let file = e.target.files[0];    
-    //console.log(file);   
+document.getElementById("cargarCarpeta").addEventListener("change",function(ev){
+  
 
-    let reader = new FileReader();
-    reader.onload = (e) => {                
+  
+  for(let i of ev.target.files){
+    if(i.name.indexOf("html") !== -1){
+      console.log(i);
 
+        let reader = new FileReader();
+        reader.onload = (e) => {      
 
-        // arreglo con <tr>
-        //console.log(e.target.result.split("<tr>"));
+        
         for(let element of e.target.result.split("</tr>")){
           
-          if(element.indexOf("Intervalo de observación:") !== -1){
-            // console.log(element)
-            // console.log(element.substring(85, 96));
-
-            
+          if(element.indexOf("Intervalo de observación:") !== -1){            
             
             const fecha = element.substring(85, 96);
+            const ano = fecha.substring(6,10);
+            const mes = fecha.substring(3,5);
+            const dia = fecha.substring(0,2);
+            console.log(ano, mes, dia);            
+
+            
+            var fechaEjemplo = new Date(ano, mes-1, dia);
+            var diaDelAno = calcularDiaDelAno(fechaEjemplo);
+            console.log(ano)
+            let anoEpoca = parseInt(ano) + (diaDelAno/365);
+            document.getElementById('anoEpoca').innerHTML = anoEpoca;
+            console.log(diaDelAno, anoEpoca);            
+            
+            
+            break;
+          }
+
+          if(element.indexOf("Hora Inicio - Hora Fin:") !== -1){            
+            
+            const fecha = element.substring(90, 100);
+            console.log(fecha);
             const ano = fecha.substring(6,10);
             const mes = fecha.substring(3,5);
             const dia = fecha.substring(0,2);
             console.log(ano, mes, dia);
             
 
-            // Ejemplo de uso:
+            
             var fechaEjemplo = new Date(ano, mes-1, dia);
             var diaDelAno = calcularDiaDelAno(fechaEjemplo);
             console.log(ano)
             let anoEpoca = parseInt(ano) + (diaDelAno/365);
-            console.log(diaDelAno, anoEpoca);
+            document.getElementById('anoEpoca').innerHTML = anoEpoca;
+            console.log(diaDelAno, anoEpoca);            
             
             
             break;
@@ -127,25 +173,12 @@ document.querySelector('#cargarHtml').addEventListener('change', (e) => {
         }        
         
     };
-    reader.readAsText(file);
-    
-    
-});
-
-
-
-document.getElementById("cargarCarpeta").addEventListener("change",function(ev){
-  //console.log(ev.target.files);
-
-  for(let i of ev.target.files){
-    if(i.name.indexOf("html") !== -1){
-      console.log(i.name);
+    reader.readAsText(i);
+    break;
+      
     }
   }
-//   for (i = 0; i < ev.target.files.length; i++) {
-//       let file = ev.files[i];
-//       console.log(file.name, file.webkitRelativePath, file.size);
-//   }
+
 
 });
 

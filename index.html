@@ -9,31 +9,76 @@
   <body>    
 
     <div class="container p-4">
-        <h3>texto</h3>
+        <h3>texto y carpeta</h3>
         <div class="row">
-            <div class="col-sm-12">
+            <div class="col-sm-6">
                 <input type="file" id="cargarTexto">
             </div>
-        </div>
-    </div>
-
-    <div class="container p-4">
-        <h3>html</h3>
-        <div class="row">
-            <div class="col-sm-12">
-                <input type="file" id="cargarHtml">
+            <div class="col-sm-6">
+              <input type="file" name="files" webkitdirectory directory id="cargarCarpeta" multiple />
             </div>
         </div>
     </div>
 
-    <div class="container p-4">
-      <h3>Carpeta</h3>
+    
+            <!-- <div class="col-sm-12">
+                <input type="file" id="cargarHtml">
+            </div> -->
+
+    <div class="container p-4">      
       <div class="row">
-          <div class="col-sm-12">
-            <input type="file" name="files" webkitdirectory directory id="cargarCarpeta" multiple />
-          </div>
+        <div class="col-sm-6">
+          <label for="anoEpoca"></label>
+          <p type="text" >Año epoca: <span id="anoEpoca"></span></p>
+      </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6">
+
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th scope="col">Estacion</th>
+                <th scope="col">X</th>
+                <th scope="col">Y</th>
+                <th scope="col">Z</th>
+              </tr>
+            </thead>
+            <tbody id="tablaEntrada">
+                     
+            </tbody>
+          </table>
+        </div>
+
+        <!-- <div class="col-sm-6">
+
+          <table class="table table-striped">
+            <thead>
+              <tr>                
+                <th scope="col">X</th>
+                <th scope="col">Y</th>
+                <th scope="col">Z</th>
+              </tr>
+            </thead>
+            <tbody id="tablaSalida">
+              <tr>                
+                <td>Mark</td>
+                <td>Otto</td>
+                <td>@mdo</td>
+              </tr>         
+            </tbody>
+          </table>
+        </div> -->
+          
+          
+          
       </div>
   </div>
+
+    
+        
+
+    
 
 
 
