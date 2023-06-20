@@ -27,22 +27,40 @@ function convertirCoordenadasITRF2020aITRF2014(x, y, z) {
   var dz = -0.0060;
 
   // Aplicar la transformación
-  var xITRF2014 = x + dx;
-  var yITRF2014 = y + dy;
-  var zITRF2014 = z + dz;
+  var xITRF2014 = parseFloat(x) + dx;
+  var yITRF2014 = parseFloat(y) + dy;
+  var zITRF2014 = parseFloat(z) + dz;
 
   return [xITRF2014, yITRF2014, zITRF2014];
 }
 
 
+function eliminarEspacios(linea){
+    let arreglo = [];
+    let palabra = "";
+    let estado = true;
+    for(let letra of linea){
+        if(letra == ' '){
+            if(estado){
+                arreglo.push(palabra);
+                palabra = '';
+            }
+            estado = false;
+        }else{
+            palabra += letra;
+            estado = true;            
+        }
+    }
 
+    let objeto = {
+        nombre:arreglo[0].substring(2, arreglo[0].length),
+        x:arreglo[1],
+        y:arreglo[2],
+        z:arreglo[3]
+    }
 
-
-
-
-
-
-
+    return objeto;
+}
 
 
 
@@ -59,8 +77,10 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
     reader.onload = (e) => {        
         console.log(e.target.result);
         const lineaVertice = e.target.result.split('\n')[3];
-        const cordenadas = lineaVertice.split('      ');
-        console.log(cordenadas);
+        // const cordenadas = lineaVertice.split('      ');
+        //console.log(cordenadas);
+        const coordenadas = eliminarEspacios(lineaVertice);
+        console.log(convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z));
     };
     reader.readAsText(file);
     
