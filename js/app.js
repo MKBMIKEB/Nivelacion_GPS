@@ -13,7 +13,7 @@ proj4.defs('EPSG:ITRF2014', '+proj=longlat +ellps=GRS80 +datum=GRS80 +towgs84=-0
 
 function convertirCoordenadasITRF2020aITRF20142(longitud, latitud, altura) {
   // Crear objeto de coordenadas en ITRF 2020
-  console.log(longitud, latitud, altura);
+  //console.log(longitud, latitud, altura);
   const coordenadasITRF2020 = {
     x: parseFloat( longitud ),
     y: parseFloat( latitud ),
@@ -51,9 +51,9 @@ function calcularDiaDelAno(fecha) {
 
 function convertirCoordenadasITRF2020aITRF2014(x, y, z) { 
     
-  let xITRF2014 = parseFloat(x) - 0.0020955586417640;
-  let yITRF2014 = parseFloat(y) + 0.001150857060808;
-  let zITRF2014 = parseFloat(z) + 0.001926575214432;
+  let xITRF2014 = parseFloat(x) - 0.002021242273358;
+  let yITRF2014 = parseFloat(y) + 0.001201393921252;
+  let zITRF2014 = parseFloat(z) + 0.0022414856769;
 
   return [xITRF2014, yITRF2014, zITRF2014];
 }
@@ -88,11 +88,6 @@ function eliminarEspacios(linea){
 
 
 
-
-
-
-
-
 document.querySelector('#cargarTexto').addEventListener('change', (e) => {  
    
 
@@ -118,8 +113,8 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
         for(let coordenadas of verticesArray) {
           if(coordenadas.nombre.length > 4){
             let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
-            console.log(coordenadaAjustada);
-            console.log(convertirCoordenadasITRF2020aITRF20142(coordenadas.x, coordenadas.y, coordenadas.z));
+            console.log('coordenadas itrf2014', coordenadaAjustada);
+            console.log('Proj4', convertirCoordenadasITRF2020aITRF20142(coordenadas.x, coordenadas.y, coordenadas.z));
             console.log(coordenadas.nombre);
             datosTabla += `
               <tr>
