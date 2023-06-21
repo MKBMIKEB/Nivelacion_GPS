@@ -8,6 +8,35 @@
 //     }
 // })();
 
+proj4.defs('EPSG:ITRF2020', '+proj=longlat +ellps=GRS80 +datum=GRS80 +no_defs');
+proj4.defs('EPSG:ITRF2014', '+proj=longlat +ellps=GRS80 +datum=GRS80 +towgs84=-0.0100,-0.0040,-0.0060,0,0,0,0 +no_defs');
+
+function convertirCoordenadasITRF2020aITRF20142(longitud, latitud, altura) {
+  // Crear objeto de coordenadas en ITRF 2020
+  console.log(longitud, latitud, altura);
+  const coordenadasITRF2020 = {
+    x: parseFloat( longitud ),
+    y: parseFloat( latitud ),
+    z: parseFloat( altura ),
+    srid: 'EPSG:ITRF2020'
+  };
+
+  // Realizar la conversión a ITRF 2014
+  const coordenadasITRF2014 = proj4('EPSG:ITRF2020', 'EPSG:ITRF2014', coordenadasITRF2020);
+
+  // Extraer las coordenadas convertidas
+  const longitudITRF2014 = coordenadasITRF2014.x;
+  const latitudITRF2014 = coordenadasITRF2014.y;
+  const alturaITRF2014 = coordenadasITRF2014.z;
+
+  // Retornar las coordenadas convertidas
+  return {
+    longitud: longitudITRF2014,
+    latitud: latitudITRF2014,
+    altura: alturaITRF2014
+  };
+}
+
 
 
 function calcularDiaDelAno(fecha) {
@@ -20,13 +49,8 @@ function calcularDiaDelAno(fecha) {
   return diaDelAño;
 }
 
-function convertirCoordenadasITRF2020aITRF2014(x, y, z) {
-
-  console.log("entrada", parseFloat(x), y, z);
-  // Parámetros de transformación
-  
-
-  // Aplicar la transformación
+function convertirCoordenadasITRF2020aITRF2014(x, y, z) { 
+    
   let xITRF2014 = parseFloat(x) - 0.0020955586417640;
   let yITRF2014 = parseFloat(y) + 0.001150857060808;
   let zITRF2014 = parseFloat(z) + 0.001926575214432;
@@ -94,6 +118,8 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
         for(let coordenadas of verticesArray) {
           if(coordenadas.nombre.length > 4){
             let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
+            console.log(coordenadaAjustada);
+            console.log(convertirCoordenadasITRF2020aITRF20142(coordenadas.x, coordenadas.y, coordenadas.z));
             console.log(coordenadas.nombre);
             datosTabla += `
               <tr>
