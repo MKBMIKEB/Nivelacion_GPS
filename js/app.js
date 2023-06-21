@@ -86,7 +86,11 @@ function eliminarEspacios(linea){
 
 
 
+
+
 document.querySelector('#cargarTexto').addEventListener('change', (e) => {  
+
+
    
 
     let file = e.target.files[0];
@@ -98,30 +102,25 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
         let vertices = e.target.result.split('\n');
         console.log(vertices)
         console.log(e.target.result);
-        let verticesArray = [];
+        let verticesArrayObjetos = [];
         for(let i=3; i < vertices.length-1; i++) {
-          verticesArray.push(eliminarEspacios(vertices[i]));
-        }
-        // console.log(verticesArray)
-        // const lineaVertice = e.target.result.split('\n')[3];        
-        // const coordenadas = eliminarEspacios(lineaVertice);
-        let intervaloEpoca = 2018 - parseFloat(document.getElementById('anoEpoca').innerHTML);
-        console.log('ano epoca', intervaloEpoca);
+          verticesArrayObjetos.push(eliminarEspacios(vertices[i]));
+        }       
+        
         let datosTabla = "";
-        for(let coordenadas of verticesArray) {
+        for(let coordenadas of verticesArrayObjetos) {
           if(coordenadas.nombre.length > 4){
-            let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
-            console.log('coordenadas itrf2014', coordenadaAjustada);            
-            console.log(coordenadas.nombre);
+                      
+            console.log(coordenadas);
             datosTabla += `
               <tr>
                 <th scope="row">${coordenadas.nombre}</th>
-                <td>${coordenadaAjustada[0] + (0.00460 * intervaloEpoca)}</td>
-                <td>${coordenadaAjustada[1] + (0.00313 * intervaloEpoca)}</td>
-                <td>${coordenadaAjustada[2] + (0.01348 * intervaloEpoca)}</td>
+                <td>${coordenadas.x}</td>
+                <td>${coordenadas.y}</td>
+                <td>${coordenadas.z}</td>
               </tr> 
             `;
-            console.log();
+            
           }
         }
         document.getElementById('tablaEntrada').innerHTML = datosTabla;
@@ -131,6 +130,8 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
     
     
 });
+
+
 
 
 document.getElementById("cargarCarpeta").addEventListener("change",function(ev){
@@ -205,6 +206,45 @@ document.getElementById("cargarCarpeta").addEventListener("change",function(ev){
 
 document.querySelector('#calcular').addEventListener('click', function(){
   console.log('Calcular clicked');
-  console.log(document.querySelector('#cargarTexto').files);
-  console.log(document.querySelector('#cargarTexto').files);
+  let archivoPlano = document.querySelector('#cargarTexto').files;
+  console.log(document.querySelector('#cargarCarpeta').files);
+
+  let file = archivoPlano[0];
+        //console.log(file);    
+
+    let reader = new FileReader();
+    reader.onload = (e) => {        
+
+        let vertices = e.target.result.split('\n');
+        console.log(vertices)
+        console.log(e.target.result);
+        let verticesArray = [];
+        for(let i=3; i < vertices.length-1; i++) {
+          verticesArray.push(eliminarEspacios(vertices[i]));
+        }
+        // console.log(verticesArray)
+        // const lineaVertice = e.target.result.split('\n')[3];        
+        // const coordenadas = eliminarEspacios(lineaVertice);
+        let intervaloEpoca = 2018 - parseFloat(document.getElementById('anoEpoca').innerHTML);
+        console.log('ano epoca', intervaloEpoca);
+        let datosTabla = "";
+        for(let coordenadas of verticesArray) {
+          if(coordenadas.nombre.length > 4){
+            let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
+            console.log('coordenadas itrf2014', coordenadaAjustada);            
+            console.log(coordenadas.nombre);
+            datosTabla += `
+              <tr>
+                <th scope="row">${coordenadas.nombre}</th>
+                <td>${coordenadaAjustada[0] + (0.00460 * intervaloEpoca)}</td>
+                <td>${coordenadaAjustada[1] + (0.00313 * intervaloEpoca)}</td>
+                <td>${coordenadaAjustada[2] + (0.01348 * intervaloEpoca)}</td>
+              </tr> 
+            `;
+            console.log();
+          }
+        }
+        document.getElementById('tablaEntrada').innerHTML = datosTabla;
+    };
+    reader.readAsText(file);
 });
