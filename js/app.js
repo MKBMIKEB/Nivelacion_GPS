@@ -74,44 +74,35 @@ function eliminarEspacios(linea){
         }
     }
 
+    console.log(arreglo);
     let objeto = {
         nombre:arreglo[0].substring(2, arreglo[0].length),
         x:arreglo[1],
         y:arreglo[2],
-        z:arreglo[3]
+        z:arreglo[3],
+        tipo:arreglo[4]
     }
 
     return objeto;
 }
 
 
+function leerArchivoPlano(file){
 
-
-
-document.querySelector('#cargarTexto').addEventListener('change', (e) => {  
-
-
-   
-
-    let file = e.target.files[0];
-        //console.log(file);    
-
+    let verticesArrayObjetos = [];
     let reader = new FileReader();
     reader.onload = (e) => {        
 
         let vertices = e.target.result.split('\n');
         console.log(vertices)
         console.log(e.target.result);
-        let verticesArrayObjetos = [];
-        for(let i=3; i < vertices.length-1; i++) {
-          verticesArrayObjetos.push(eliminarEspacios(vertices[i]));
+        for(let i=3; i < vertices.length; i++) {
+          verticesArrayObjetos.push(eliminarEspacios(vertices[i]));    
         }       
-        
         let datosTabla = "";
         for(let coordenadas of verticesArrayObjetos) {
-          if(coordenadas.nombre.length > 4){
-                      
-            console.log(coordenadas);
+          if(coordenadas.tipo != 'CTRL'){                      
+            //console.log(coordenadas);
             datosTabla += `
               <tr>
                 <th scope="row">${coordenadas.nombre}</th>
@@ -127,7 +118,91 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
     };
     reader.readAsText(file);
     
-    
+    return verticesArrayObjetos;
+}
+
+function leerCarpetaLogFiles(file){
+
+  let anosPorHtml = [];
+
+  for(let i of file){
+    let obj = {};
+    if(i.name.indexOf("html") !== -1){
+      //console.log(i.name);
+      obj.name = i.name;
+
+        let reader = new FileReader();
+        reader.onload = (e) => {      
+
+        
+        for(let element of e.target.result.split("</tr>")){
+          //console.log(element)
+          
+          if(element.indexOf("Intervalo de observación:") !== -1){            
+            
+            const fecha = element.substring(85, 96);
+            const ano = fecha.substring(6,10);
+            const mes = fecha.substring(3,5);
+            const dia = fecha.substring(0,2);
+            //console.log(ano, mes, dia);            
+
+            
+            var fechaEjemplo = new Date(ano, mes-1, dia);
+            var diaDelAno = calcularDiaDelAno(fechaEjemplo);
+            //console.log(ano)
+            let anoEpoca = parseInt(ano) + (diaDelAno/365);
+            document.getElementById('anoEpoca').innerHTML = anoEpoca;
+            obj.anoEpoca = anoEpoca;
+            //console.log(diaDelAno, anoEpoca);            
+            
+            
+            break;
+          }
+
+          if(element.indexOf("Hora Inicio - Hora Fin:") !== -1){            
+            
+            const fecha = element.substring(90, 100);
+            //console.log(fecha);
+            const ano = fecha.substring(6,10);
+            const mes = fecha.substring(3,5);
+            const dia = fecha.substring(0,2);
+            //console.log(ano, mes, dia);
+            
+
+            
+            var fechaEjemplo = new Date(ano, mes-1, dia);
+            var diaDelAno = calcularDiaDelAno(fechaEjemplo);
+            //console.log(ano)
+            let anoEpoca = parseInt(ano) + (diaDelAno/365);
+            document.getElementById('anoEpoca').innerHTML = anoEpoca;
+            //console.log(diaDelAno, anoEpoca);       
+            obj.anoEpoca = anoEpoca;     
+            
+            
+            break;
+          }
+        }        
+
+        anosPorHtml.push(obj);
+        
+    };
+    reader.readAsText(i);
+    // break;
+      
+    }
+  }
+  //console.log(anosPorHtml)
+  return anosPorHtml;
+}
+
+
+
+
+document.querySelector('#cargarTexto').addEventListener('change', (e) => {     
+
+    // let file = e.target.files[0];   
+    // const arreglo = leerArchivoPlano(file);
+    // console.log('resultado de leeer el plano', arreglo);      
     
 });
 
@@ -137,66 +212,10 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
 document.getElementById("cargarCarpeta").addEventListener("change",function(ev){
   
 
+  // let file = ev.target.files;
+  // const logsArray = leerCarpetaLogFiles(file);
+  // console.log(logsArray);
   
-  for(let i of ev.target.files){
-    if(i.name.indexOf("html") !== -1){
-      console.log(i);
-
-        let reader = new FileReader();
-        reader.onload = (e) => {      
-
-        
-        for(let element of e.target.result.split("</tr>")){
-          
-          if(element.indexOf("Intervalo de observación:") !== -1){            
-            
-            const fecha = element.substring(85, 96);
-            const ano = fecha.substring(6,10);
-            const mes = fecha.substring(3,5);
-            const dia = fecha.substring(0,2);
-            console.log(ano, mes, dia);            
-
-            
-            var fechaEjemplo = new Date(ano, mes-1, dia);
-            var diaDelAno = calcularDiaDelAno(fechaEjemplo);
-            console.log(ano)
-            let anoEpoca = parseInt(ano) + (diaDelAno/365);
-            document.getElementById('anoEpoca').innerHTML = anoEpoca;
-            console.log(diaDelAno, anoEpoca);            
-            
-            
-            break;
-          }
-
-          if(element.indexOf("Hora Inicio - Hora Fin:") !== -1){            
-            
-            const fecha = element.substring(90, 100);
-            console.log(fecha);
-            const ano = fecha.substring(6,10);
-            const mes = fecha.substring(3,5);
-            const dia = fecha.substring(0,2);
-            console.log(ano, mes, dia);
-            
-
-            
-            var fechaEjemplo = new Date(ano, mes-1, dia);
-            var diaDelAno = calcularDiaDelAno(fechaEjemplo);
-            console.log(ano)
-            let anoEpoca = parseInt(ano) + (diaDelAno/365);
-            document.getElementById('anoEpoca').innerHTML = anoEpoca;
-            console.log(diaDelAno, anoEpoca);            
-            
-            
-            break;
-          }
-        }        
-        
-    };
-    reader.readAsText(i);
-    break;
-      
-    }
-  }
 
 
 });
@@ -205,11 +224,16 @@ document.getElementById("cargarCarpeta").addEventListener("change",function(ev){
 
 
 document.querySelector('#calcular').addEventListener('click', function(){
-  console.log('Calcular clicked');
-  let archivoPlano = document.querySelector('#cargarTexto').files;
-  console.log(document.querySelector('#cargarCarpeta').files);
+  
+  let archivoPlano = document.querySelector('#cargarTexto').files[0];
+  let logsFiles = document.querySelector('#cargarCarpeta').files;
+  
+  
+  const coordenadasArray = leerArchivoPlano(archivoPlano);
+   
+  const logsArray = leerCarpetaLogFiles(logsFiles);
 
-  let file = archivoPlano[0];
+
         //console.log(file);    
 
     let reader = new FileReader();
@@ -228,6 +252,12 @@ document.querySelector('#calcular').addEventListener('click', function(){
         let intervaloEpoca = 2018 - parseFloat(document.getElementById('anoEpoca').innerHTML);
         console.log('ano epoca', intervaloEpoca);
         let datosTabla = "";
+        console.log('vertices a recorrer', verticesArray)
+
+
+
+
+
         for(let coordenadas of verticesArray) {
           if(coordenadas.nombre.length > 4){
             let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
@@ -246,5 +276,5 @@ document.querySelector('#calcular').addEventListener('click', function(){
         }
         document.getElementById('tablaEntrada').innerHTML = datosTabla;
     };
-    reader.readAsText(file);
+    reader.readAsText(archivoPlano);
 });
