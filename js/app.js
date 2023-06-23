@@ -230,6 +230,7 @@ document.querySelector('#calcular').addEventListener('click', function(){
   
   
   const coordenadasArray = leerArchivoPlano(archivoPlano);
+  console.log(coordenadasArray)
    
   const logsArray = leerCarpetaLogFiles(logsFiles);
 
@@ -278,3 +279,60 @@ document.querySelector('#calcular').addEventListener('click', function(){
     };
     reader.readAsText(archivoPlano);
 });
+
+
+
+
+// ======== DESCARGAR ITRF 2014 =================
+// ==============================================
+
+const descargarItrf2014 = async (coordenada) => {        
+  
+  let archivoPlano = document.querySelector('#cargarTexto').files[0];   
+
+
+    let reader = new FileReader();
+    reader.onload = (e) => {        
+
+        let vertices = e.target.result.split('\n');
+        
+        let verticesArray = [];
+        for(let i=3; i < vertices.length; i++) {
+          verticesArray.push(eliminarEspacios(vertices[i]));
+        }      
+        
+        let datosTabla = `${vertices[0]}\n${vertices[1]}\n${vertices[2]}\n`;
+        
+        for(let coordenadas of verticesArray) {
+          console.log(coordenadas)
+          if(coordenadas.tipo != 'CTRL'){
+            let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);             
+            
+            datosTabla += `@#${coordenadas.nombre} \t ${coordenadaAjustada[0]} \t ${coordenadaAjustada[1]} \t ${coordenadaAjustada[2]} \t ${coordenadas.tipo} \n`;
+            
+          }else {
+            datosTabla += `@#${coordenadas.nombre} \t  ${coordenadas.x} \t  ${coordenadas.y} \t  ${coordenadas.z} \t ${coordenadas.tipo} \n`;
+          }
+        }
+        console.log( datosTabla );
+    };
+    reader.readAsText(archivoPlano);
+
+  // var blob = new Blob([coordenada], {
+  //   type: 'text/txt'
+  // });
+
+  // var link = document.createElement("a");    
+  // link.href = window.URL.createObjectURL(blob);        
+  // link.download = coordenada+".asc";
+  // document.body.appendChild(link);
+  // link.click();
+  
+
+
+}
+
+
+document.querySelector('#descargar').addEventListener('click', function(e) {
+  descargarItrf2014('hollaaaa');
+} );
