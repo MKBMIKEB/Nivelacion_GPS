@@ -74,7 +74,7 @@ function eliminarEspacios(linea){
         }
     }
 
-    console.log(arreglo);
+    //console.log(arreglo);    
     let objeto = {
         nombre:arreglo[0].substring(2, arreglo[0].length),
         x:arreglo[1],
@@ -298,7 +298,10 @@ const descargarItrf2014 = async (coordenada) => {
         
         let verticesArray = [];
         for(let i=3; i < vertices.length; i++) {
-          verticesArray.push(eliminarEspacios(vertices[i]));
+          // console.log(vertices[i].length);
+          if(vertices[i].length > 0){
+            verticesArray.push(eliminarEspacios(vertices[i]));
+          }
         }      
         
         let datosTabla = `${vertices[0]}\n${vertices[1]}\n${vertices[2]}\n`;
@@ -306,12 +309,13 @@ const descargarItrf2014 = async (coordenada) => {
         for(let coordenadas of verticesArray) {
           console.log(coordenadas)
           if(coordenadas.tipo != 'CTRL'){
-            let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);             
+            let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);                         
             
-            datosTabla += `@#${coordenadas.nombre} \t ${coordenadaAjustada[0]} \t ${coordenadaAjustada[1]} \t ${coordenadaAjustada[2]} \t ${coordenadas.tipo} \n`;
+            datosTabla += `@#${coordenadas.nombre} \t ${coordenadaAjustada[0].toFixed(5)} \t ${coordenadaAjustada[1].toFixed(5)} \t ${coordenadaAjustada[2].toFixed(5)} \t ${coordenadas.tipo} \n`;
             
-          }else {
-            datosTabla += `@#${coordenadas.nombre} \t  ${coordenadas.x} \t  ${coordenadas.y} \t  ${coordenadas.z} \t ${coordenadas.tipo} \n`;
+          }else {            
+            let nombreAjustado = espacioEstasdar(coordenadas.nombre);
+            datosTabla += `@#${nombreAjustado} \t  ${coordenadas.x} \t  ${coordenadas.y} \t  ${coordenadas.z} \t ${coordenadas.tipo} \n`;
           }
         }
         console.log( datosTabla );
@@ -336,3 +340,12 @@ const descargarItrf2014 = async (coordenada) => {
 document.querySelector('#descargar').addEventListener('click', function(e) {
   descargarItrf2014('hollaaaa');
 } );
+
+
+function espacioEstasdar(cadena){
+  console.log(cadena.length);
+  for(let i=cadena.length; i<6; i++) {
+    cadena += ' ';
+  }
+  return cadena;
+}
