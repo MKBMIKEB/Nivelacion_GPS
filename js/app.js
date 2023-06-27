@@ -49,7 +49,7 @@ function calcularDiaDelAno(fecha) {
 
 function convertirCoordenadasITRF2020aITRF2014(x, y, z) { 
     
-  let xITRF2014 = parseFloat(x) - 0.002021242273358;
+  let xITRF2014 = parseFloat(x) - 0.0020961219814019;
   let yITRF2014 = parseFloat(y) + 0.001201393921252;
   let zITRF2014 = parseFloat(z) + 0.0022414856769;
 
@@ -94,10 +94,12 @@ function leerArchivoPlano(file){
     reader.onload = (e) => {        
 
         let vertices = e.target.result.split('\n');
-        console.log(vertices)
+        // console.log(vertices)
         console.log(e.target.result);
         for(let i=3; i < vertices.length; i++) {
-          verticesArrayObjetos.push(eliminarEspacios(vertices[i]));    
+          if(vertices[i].length > 0){
+            verticesArrayObjetos.push(eliminarEspacios(vertices[i]));    
+          }
         }       
         let datosTabla = "";
         for(let coordenadas of verticesArrayObjetos) {
@@ -151,7 +153,7 @@ function leerCarpetaLogFiles(file){
             var diaDelAno = calcularDiaDelAno(fechaEjemplo);
             //console.log(ano)
             let anoEpoca = parseInt(ano) + (diaDelAno/365);
-            document.getElementById('anoEpoca').innerHTML = anoEpoca;
+            // document.getElementById('anoEpoca').innerHTML = anoEpoca;
             obj.anoEpoca = anoEpoca;
             //console.log(diaDelAno, anoEpoca);            
             
@@ -174,7 +176,7 @@ function leerCarpetaLogFiles(file){
             var diaDelAno = calcularDiaDelAno(fechaEjemplo);
             //console.log(ano)
             let anoEpoca = parseInt(ano) + (diaDelAno/365);
-            document.getElementById('anoEpoca').innerHTML = anoEpoca;
+            // document.getElementById('anoEpoca').innerHTML = anoEpoca;
             //console.log(diaDelAno, anoEpoca);       
             obj.anoEpoca = anoEpoca;     
             
@@ -193,6 +195,14 @@ function leerCarpetaLogFiles(file){
   }
   //console.log(anosPorHtml)
   return anosPorHtml;
+}
+
+function buscarAnoDeCoordenada(coordenada, logsArray){  
+  for(let i=0; i<logsArray.length; i++){    
+    if(logsArray[i].name.indexOf(coordenada.nombre) !== -1){      
+      return logsArray[i].anoEpoca;
+    }
+  }
 }
 
 
@@ -230,28 +240,30 @@ document.querySelector('#calcular').addEventListener('click', function(){
   
   
   const coordenadasArray = leerArchivoPlano(archivoPlano);
-  console.log(coordenadasArray)
+  // console.log(coordenadasArray)
    
   const logsArray = leerCarpetaLogFiles(logsFiles);
 
 
-        //console.log(file);    
+  
+  
+  let reader = new FileReader();
+  reader.onload = (e) => {        
+    
+    let vertices = e.target.result.split('\n');
+    console.log(e.target.result);
+    let verticesArray = [];
+    for(let i=3; i < vertices.length-1; i++) {
+      if(vertices[i].length > 0){
+         verticesArray.push(eliminarEspacios(vertices[i]));
+      }
+    }
+    // console.log(logsArray);    
+    // console.log(verticesArray)
+        
 
-    let reader = new FileReader();
-    reader.onload = (e) => {        
-
-        let vertices = e.target.result.split('\n');
-        console.log(vertices)
-        console.log(e.target.result);
-        let verticesArray = [];
-        for(let i=3; i < vertices.length-1; i++) {
-          verticesArray.push(eliminarEspacios(vertices[i]));
-        }
-        // console.log(verticesArray)
-        // const lineaVertice = e.target.result.split('\n')[3];        
-        // const coordenadas = eliminarEspacios(lineaVertice);
-        let intervaloEpoca = 2018 - parseFloat(document.getElementById('anoEpoca').innerHTML);
-        console.log('ano epoca', intervaloEpoca);
+        
+        
         let datosTabla = "";
         console.log('vertices a recorrer', verticesArray)
 
@@ -259,17 +271,20 @@ document.querySelector('#calcular').addEventListener('click', function(){
 
 
 
-        for(let coordenadas of verticesArray) {
-          if(coordenadas.nombre.length > 4){
+        for(let coordenadas of verticesArray) {          
+          let intervaloEpoca = buscarAnoDeCoordenada(coordenadas, logsArray);
+          intervaloEpoca = 2018 - intervaloEpoca;
+          
+          if(coordenadas.tipo == 'MEAN'){
             let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
-            console.log('coordenadas itrf2014', coordenadaAjustada);            
-            console.log(coordenadas.nombre);
+            
             datosTabla += `
               <tr>
                 <th scope="row">${coordenadas.nombre}</th>
                 <td>${coordenadaAjustada[0] + (0.00460 * intervaloEpoca)}</td>
                 <td>${coordenadaAjustada[1] + (0.00313 * intervaloEpoca)}</td>
                 <td>${coordenadaAjustada[2] + (0.01348 * intervaloEpoca)}</td>
+                <td>${intervaloEpoca}</td>
               </tr> 
             `;
             console.log();
@@ -289,6 +304,7 @@ document.querySelector('#calcular').addEventListener('click', function(){
 const descargarItrf2014 = async (coordenada) => {        
   
   let archivoPlano = document.querySelector('#cargarTexto').files[0];   
+    
 
 
     let reader = new FileReader();
@@ -307,7 +323,7 @@ const descargarItrf2014 = async (coordenada) => {
         let datosTabla = `${vertices[0]}\n${vertices[1]}\n${vertices[2]}\n`;
         
         for(let coordenadas of verticesArray) {
-          console.log(coordenadas)
+          // console.log(coordenadas)
           if(coordenadas.tipo != 'CTRL'){
             let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);                         
             
@@ -319,18 +335,20 @@ const descargarItrf2014 = async (coordenada) => {
           }
         }
         console.log( datosTabla );
+
+        var blob = new Blob([datosTabla], {
+          type: 'text/txt'
+        });
+    
+        var link = document.createElement("a");    
+        link.href = window.URL.createObjectURL(blob);        
+        link.download = archivoPlano.name.replace("20","14");
+        document.body.appendChild(link);
+        link.click();
     };
     reader.readAsText(archivoPlano);
 
-  // var blob = new Blob([coordenada], {
-  //   type: 'text/txt'
-  // });
-
-  // var link = document.createElement("a");    
-  // link.href = window.URL.createObjectURL(blob);        
-  // link.download = coordenada+".asc";
-  // document.body.appendChild(link);
-  // link.click();
+    
   
 
 

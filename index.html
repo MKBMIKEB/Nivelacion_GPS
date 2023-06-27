@@ -18,23 +18,24 @@
         </div>
         </nav>
 
-    <div class="container p-4">
-        <h3>texto y carpeta</h3>
+    <div class="container p-4">        
         <div class="row">
             <div class="col-sm-6">
+              <label for="cargarTexto">Archivo .asc</label><br>
                 <input type="file" id="cargarTexto">
             </div>
             <div class="col-sm-6">
+              <label for="cargarCarpeta">Carpeta  LOGFILES</label><br>
               <input type="file" name="files" webkitdirectory directory id="cargarCarpeta" multiple />
             </div>            
         </div>
         <hr>
         <div class="row mt-3">
           <div class="col-sm-4">
-            <button class="btn btn-success" id="calcular">Calcular</button>
+            <button class="btn btn-primary" id="descargar">Descargar ITRF2014</button>
           </div>
           <div class="col-sm-4">
-            <button class="btn btn-primary" id="descargar">Descargar ITRF2014</button>
+            <button class="btn btn-success" id="calcular">Calcular</button>
           </div>
         </div>
     </div>
@@ -48,7 +49,7 @@
       <div class="row">
         <div class="col-sm-6">
           <label for="anoEpoca"></label>
-          <p type="text" >Año epoca: <span id="anoEpoca"></span></p>
+          
       </div>
       </div>
       <div class="row">
@@ -61,6 +62,7 @@
                 <th scope="col">X</th>
                 <th scope="col">Y</th>
                 <th scope="col">Z</th>
+                <th scope="col">epoca</th>
               </tr>
             </thead>
             <tbody id="tablaEntrada">
