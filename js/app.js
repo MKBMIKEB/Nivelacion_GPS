@@ -8,33 +8,6 @@
 //     }
 // })();
 
-proj4.defs('EPSG:ITRF2020', '+proj=longlat +ellps=GRS80 +datum=GRS80 +no_defs');
-proj4.defs('EPSG:ITRF2014', '+proj=longlat +ellps=GRS80 +datum=GRS80 +towgs84=-0.0100,-0.0040,-0.0060,0,0,0,0 +no_defs');
-
-// function convertirCoordenadasITRF2020aITRF20142(longitud, latitud, altura) {  
-//   const coordenadasITRF2020 = {
-//     x: parseFloat( longitud ),
-//     y: parseFloat( latitud ),
-//     z: parseFloat( altura ),
-//     srid: 'EPSG:ITRF2020'
-//   };
-
-//   // Realizar la conversión a ITRF 2014
-//   const coordenadasITRF2014 = proj4('EPSG:ITRF2020', 'EPSG:ITRF2014', coordenadasITRF2020);
-
-//   // Extraer las coordenadas convertidas
-//   const longitudITRF2014 = coordenadasITRF2014.x;
-//   const latitudITRF2014 = coordenadasITRF2014.y;
-//   const alturaITRF2014 = coordenadasITRF2014.z;
-
-//   // Retornar las coordenadas convertidas
-//   return {
-//     longitud: longitudITRF2014,
-//     latitud: latitudITRF2014,
-//     altura: alturaITRF2014
-//   };
-// }
-
 
 
 function calcularDiaDelAno(fecha) {
@@ -73,8 +46,7 @@ function eliminarEspacios(linea){
             estado = true;            
         }
     }
-
-    //console.log(arreglo);    
+    
     let objeto = {
         nombre:arreglo[0].substring(2, arreglo[0].length),
         x:arreglo[1],
@@ -94,7 +66,7 @@ function leerArchivoPlano(file){
     reader.onload = (e) => {        
 
         let vertices = e.target.result.split('\n');
-        // console.log(vertices)
+        
         console.log(e.target.result);
         for(let i=3; i < vertices.length; i++) {
           if(vertices[i].length > 0){
@@ -104,7 +76,7 @@ function leerArchivoPlano(file){
         let datosTabla = "";
         for(let coordenadas of verticesArrayObjetos) {
           if(coordenadas.tipo != 'CTRL'){                      
-            //console.log(coordenadas);
+        
             datosTabla += `
               <tr>
                 <th scope="row">${coordenadas.nombre}</th>
@@ -130,7 +102,7 @@ function leerCarpetaLogFiles(file){
   for(let i of file){
     let obj = {};
     if(i.name.indexOf("html") !== -1){
-      //console.log(i.name);
+      
       obj.name = i.name;
 
         let reader = new FileReader();
@@ -138,7 +110,7 @@ function leerCarpetaLogFiles(file){
 
         
         for(let element of e.target.result.split("</tr>")){
-          //console.log(element)
+      
           
           if(element.indexOf("Intervalo de observación:") !== -1){            
             
@@ -146,16 +118,16 @@ function leerCarpetaLogFiles(file){
             const ano = fecha.substring(6,10);
             const mes = fecha.substring(3,5);
             const dia = fecha.substring(0,2);
-            //console.log(ano, mes, dia);            
+      
 
             
             var fechaEjemplo = new Date(ano, mes-1, dia);
             var diaDelAno = calcularDiaDelAno(fechaEjemplo);
-            //console.log(ano)
+      
             let anoEpoca = parseInt(ano) + (diaDelAno/365);
-            // document.getElementById('anoEpoca').innerHTML = anoEpoca;
+      
             obj.anoEpoca = anoEpoca;
-            //console.log(diaDelAno, anoEpoca);            
+      
             
             
             break;
@@ -164,20 +136,19 @@ function leerCarpetaLogFiles(file){
           if(element.indexOf("Hora Inicio - Hora Fin:") !== -1){            
             
             const fecha = element.substring(90, 100);
-            //console.log(fecha);
+            
             const ano = fecha.substring(6,10);
             const mes = fecha.substring(3,5);
             const dia = fecha.substring(0,2);
-            //console.log(ano, mes, dia);
+            
             
 
             
             var fechaEjemplo = new Date(ano, mes-1, dia);
             var diaDelAno = calcularDiaDelAno(fechaEjemplo);
-            //console.log(ano)
+            
             let anoEpoca = parseInt(ano) + (diaDelAno/365);
-            // document.getElementById('anoEpoca').innerHTML = anoEpoca;
-            //console.log(diaDelAno, anoEpoca);       
+            
             obj.anoEpoca = anoEpoca;     
             
             
@@ -189,11 +160,11 @@ function leerCarpetaLogFiles(file){
         
     };
     reader.readAsText(i);
-    // break;
+    
       
     }
   }
-  //console.log(anosPorHtml)
+  
   return anosPorHtml;
 }
 
@@ -203,6 +174,72 @@ function buscarAnoDeCoordenada(coordenada, logsArray){
       return logsArray[i].anoEpoca;
     }
   }
+}
+
+
+function espacioEstasdar(cadena){
+  console.log(cadena.length);
+  for(let i=cadena.length; i<6; i++) {
+    cadena += ' ';
+  }
+  return cadena;
+}
+
+
+// ======== DESCARGAR ITRF 2014 =================
+// ==============================================
+
+const descargarItrf2014 = async (coordenada) => {        
+  
+  let archivoPlano = document.querySelector('#cargarTexto').files[0];   
+    
+
+
+    let reader = new FileReader();
+    reader.onload = (e) => {        
+
+        let vertices = e.target.result.split('\n');
+        
+        let verticesArray = [];
+        for(let i=3; i < vertices.length; i++) {
+          
+          if(vertices[i].length > 0){
+            verticesArray.push(eliminarEspacios(vertices[i]));
+          }
+        }      
+        
+        let datosTabla = `${vertices[0]}\n${vertices[1]}\n${vertices[2]}\n`;
+        
+        for(let coordenadas of verticesArray) {
+          
+          if(coordenadas.tipo != 'CTRL'){
+            let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);                         
+            
+            datosTabla += `@#${coordenadas.nombre} \t ${coordenadaAjustada[0].toFixed(5)} \t ${coordenadaAjustada[1].toFixed(5)} \t ${coordenadaAjustada[2].toFixed(5)} \t ${coordenadas.tipo} \n`;
+            
+          }else {            
+            let nombreAjustado = espacioEstasdar(coordenadas.nombre);
+            datosTabla += `@#${nombreAjustado} \t  ${coordenadas.x} \t  ${coordenadas.y} \t  ${coordenadas.z} \t ${coordenadas.tipo} \n`;
+          }
+        }
+        console.log( datosTabla );
+
+        var blob = new Blob([datosTabla], {
+          type: 'text/txt'
+        });
+    
+        var link = document.createElement("a");    
+        link.href = window.URL.createObjectURL(blob);        
+        link.download = archivoPlano.name.replace("20","14");
+        document.body.appendChild(link);
+        link.click();
+    };
+    reader.readAsText(archivoPlano);
+
+    
+  
+
+
 }
 
 
@@ -258,9 +295,7 @@ document.querySelector('#calcular').addEventListener('click', function(){
          verticesArray.push(eliminarEspacios(vertices[i]));
       }
     }
-    // console.log(logsArray);    
-    // console.log(verticesArray)
-        
+          
 
         
         
@@ -298,72 +333,17 @@ document.querySelector('#calcular').addEventListener('click', function(){
 
 
 
-// ======== DESCARGAR ITRF 2014 =================
-// ==============================================
-
-const descargarItrf2014 = async (coordenada) => {        
-  
-  let archivoPlano = document.querySelector('#cargarTexto').files[0];   
-    
-
-
-    let reader = new FileReader();
-    reader.onload = (e) => {        
-
-        let vertices = e.target.result.split('\n');
-        
-        let verticesArray = [];
-        for(let i=3; i < vertices.length; i++) {
-          // console.log(vertices[i].length);
-          if(vertices[i].length > 0){
-            verticesArray.push(eliminarEspacios(vertices[i]));
-          }
-        }      
-        
-        let datosTabla = `${vertices[0]}\n${vertices[1]}\n${vertices[2]}\n`;
-        
-        for(let coordenadas of verticesArray) {
-          // console.log(coordenadas)
-          if(coordenadas.tipo != 'CTRL'){
-            let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);                         
-            
-            datosTabla += `@#${coordenadas.nombre} \t ${coordenadaAjustada[0].toFixed(5)} \t ${coordenadaAjustada[1].toFixed(5)} \t ${coordenadaAjustada[2].toFixed(5)} \t ${coordenadas.tipo} \n`;
-            
-          }else {            
-            let nombreAjustado = espacioEstasdar(coordenadas.nombre);
-            datosTabla += `@#${nombreAjustado} \t  ${coordenadas.x} \t  ${coordenadas.y} \t  ${coordenadas.z} \t ${coordenadas.tipo} \n`;
-          }
-        }
-        console.log( datosTabla );
-
-        var blob = new Blob([datosTabla], {
-          type: 'text/txt'
-        });
-    
-        var link = document.createElement("a");    
-        link.href = window.URL.createObjectURL(blob);        
-        link.download = archivoPlano.name.replace("20","14");
-        document.body.appendChild(link);
-        link.click();
-    };
-    reader.readAsText(archivoPlano);
-
-    
-  
-
-
-}
-
-
 document.querySelector('#descargar').addEventListener('click', function(e) {
   descargarItrf2014('hollaaaa');
 } );
 
 
-function espacioEstasdar(cadena){
-  console.log(cadena.length);
-  for(let i=cadena.length; i<6; i++) {
-    cadena += ' ';
-  }
-  return cadena;
-}
+
+
+
+
+
+
+
+
+
