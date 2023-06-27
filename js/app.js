@@ -310,7 +310,7 @@ document.querySelector('#calcular').addEventListener('click', function(){
           let intervaloEpoca = buscarAnoDeCoordenada(coordenadas, logsArray);
           intervaloEpoca = 2018 - intervaloEpoca;
           
-          if(coordenadas.tipo == 'MEAN'){
+          if(coordenadas.tipo != 'CTRL'){
             let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
             
             datosTabla += `
