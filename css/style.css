@@ -1,0 +1,41 @@
+body {
+    background: linear-gradient(to bottom right, #618fa3,  #308690);
+}
+
+.navbar {
+   background: linear-gradient(217deg, rgba(69, 61, 114, 0.8), rgba(255,0,0,0) 70.71%),
+               linear-gradient(127deg, rgba(47, 66, 47, 0.8), rgba(0,255,0,0) 70.71%),            
+               linear-gradient(336deg, rgba(24, 24, 138, 0.8), rgba(0,0,255,0) 70.71%);               
+}
+.container {
+    margin-top: 25vh;
+}
+.row {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+}
+
+.card {
+    padding: 20px;
+    width: 28rem;
+    /* From https://css.glass */
+    background: rgba(255, 255, 255, 0.24);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 8px 8px 15px rgba(0, 0, 255, .2);
+    backdrop-filter: blur(4.5px);
+    -webkit-backdrop-filter: blur(4.5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+input {
+    /* From https://css.glass */
+    background-color: #3f87a6;
+    background: rgba(255, 255, 255, 0.24);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(4.5px);
+    -webkit-backdrop-filter: blur(4.5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
