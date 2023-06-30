@@ -242,6 +242,23 @@ const descargarItrf2014 = async (coordenada) => {
 
 }
 
+function promedioVertices(vertices){
+  let promedio = {x:0, y:0, z:0};
+  let contador = 0;
+  for(let vertice of vertices){
+    if(vertice.tipo != 'CTRL'){
+      promedio.x += parseFloat( vertice.x );
+      promedio.y += parseFloat( vertice.y );
+      promedio.z += parseFloat( vertice.z );
+      contador++;
+    }
+  }
+  promedio.x = promedio.x / contador;
+  promedio.y = promedio.y / contador;
+  promedio.z = promedio.z / contador;
+  console.log(promedio, contador);
+  return promedio;
+}
 
 
 
@@ -302,6 +319,8 @@ document.querySelector('#calcular').addEventListener('click', function(){
         let datosTabla = "";
         console.log('vertices a recorrer', verticesArray)
 
+        promedioVertices(verticesArray);
+
 
 
 
@@ -311,6 +330,7 @@ document.querySelector('#calcular').addEventListener('click', function(){
           intervaloEpoca = 2018 - intervaloEpoca;
           
           if(coordenadas.tipo != 'CTRL'){
+            
             let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
             
             datosTabla += `
