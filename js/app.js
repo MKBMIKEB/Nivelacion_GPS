@@ -269,20 +269,6 @@ function promedioVertices(vertices){
 
 
 
-document.querySelector('#cargarTexto').addEventListener('change', (e) => {     
-
-    // let file = e.target.files[0];   
-    // const arreglo = leerArchivoPlano(file);
-    // console.log('resultado de leeer el plano', arreglo);      
-    
-});
-
-
-
-
-
-
-
 
 
 document.querySelector('#calcular').addEventListener('click',async function(){
@@ -359,7 +345,25 @@ document.querySelector('#descargar').addEventListener('click', function(e) {
 
 
 
+
+document.querySelector('#cargarTexto').addEventListener('change', (e) => {    
+  if(e.target.files.length)  {
+    document.getElementById('icono-archivo').className = 'bi bi-file-check-fill';
+    document.getElementById('texto-archivo').innerText = `${e.target.files[0].name}`;  
+  }
+});
+
+
+
+
+
 document.getElementById("cargarCarpeta").addEventListener("change",function(ev){
+  // === css styles ====
+  if(ev.target.files.length)  {
+    document.getElementById('icono-carpeta').className = 'bi bi-folder-fill';
+    document.getElementById('texto-carpeta').innerText = ` Carpeta de LOGFILES cargada.`;
+  }
+  // ===================
   
 
   let file = ev.target.files;
