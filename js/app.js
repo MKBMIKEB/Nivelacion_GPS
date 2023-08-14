@@ -50,7 +50,8 @@ function eliminarEspacios(linea){
             estado = true;            
         }
     }
-    
+
+
     let objeto = {
         nombre:arreglo[0].substring(2, arreglo[0].length),
         x:arreglo[1],
@@ -58,6 +59,7 @@ function eliminarEspacios(linea){
         z:arreglo[3],
         tipo:arreglo[4]
     }
+
 
     return objeto;
 }
@@ -312,12 +314,23 @@ document.querySelector('#calcular').addEventListener('click',async function(){
             
             let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
             
+            
+            // datosTabla += `
+            //   <tr>
+            //     <th scope="row">${coordenadas.nombre}</th>
+            //     <td>${coordenadaAjustada[0] + (0.00460 * deltaDeTiempo)}</td>
+            //     <td>${coordenadaAjustada[1] + (0.00313 * deltaDeTiempo)}</td>
+            //     <td>${coordenadaAjustada[2] + (0.01348 * deltaDeTiempo)}</td>
+            //     <td>${deltaDeTiempo}</td>
+            //   </tr> 
+            // `;
+            console.log(coordenadas)
             datosTabla += `
               <tr>
                 <th scope="row">${coordenadas.nombre}</th>
-                <td>${coordenadaAjustada[0] + (0.00460 * deltaDeTiempo)}</td>
-                <td>${coordenadaAjustada[1] + (0.00313 * deltaDeTiempo)}</td>
-                <td>${coordenadaAjustada[2] + (0.01348 * deltaDeTiempo)}</td>
+                <td>${coordenadaAjustada[0] + (0.00880 * deltaDeTiempo)}</td>
+                <td>${coordenadaAjustada[1] + (0.00440 * deltaDeTiempo)}</td>
+                <td>${coordenadaAjustada[2] + (0.01290 * deltaDeTiempo)}</td>
                 <td>${deltaDeTiempo}</td>
               </tr> 
             `;
@@ -351,6 +364,50 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
     document.getElementById('icono-archivo').className = 'bi bi-file-check-fill';
     document.getElementById('texto-archivo').innerText = `${e.target.files[0].name}`;  
   }
+
+
+  let archivoPlano = document.querySelector('#cargarTexto').files[0];   
+  
+  
+  let reader = new FileReader();
+  reader.onload = async (e) => {       
+    
+    
+    let vertices = e.target.result.split('\n');
+    //console.log(e.target.result);
+    let verticesArray = [];
+    for(let i=3; i < vertices.length-1; i++) {
+      if(vertices[i].length > 0){
+         verticesArray.push(eliminarEspacios(vertices[i]));
+      }
+    }      
+    
+    
+    // espacio para traer velocidades
+    // let velocidades = obtenerVelocidades();
+    let arregloRedPasiva = [];
+    try {
+      const res = await fetch('./../json/Red pasiva GNSS.json');
+      arregloRedPasiva = await res.json();
+      console.log(arregloRedPasiva)
+    } catch (error) {
+      console.error(error)
+    }
+      
+    let result = [];
+    for(let vertice of verticesArray){
+       result.push(arregloRedPasiva.find((verArry) => verArry.Nomenc.toString() === vertice.nombre));    
+    }
+    console.log('filter', result)
+        
+        console.log('vertices a recorrer', verticesArray)
+
+        //promedioVertices(verticesArray);
+       
+        
+        
+    };
+    reader.readAsText(archivoPlano);
 });
 
 
