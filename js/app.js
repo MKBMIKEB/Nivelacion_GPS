@@ -396,7 +396,12 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
       
     let result = [];
     for(let vertice of verticesArray){
-       result.push(arregloRedPasiva.find((verArry) => verArry.Nomenc.toString() === vertice.nombre));    
+       let res = arregloRedPasiva.find((verArry) => verArry.Nomenc.toString() === vertice.nombre );  
+       if(res){
+         result.push({nombre: vertice.nombre, x: vertice.x, y:vertice.y, z:vertice.z, tipo:vertice.tipo, velx:res.VelX, vely:res.VelY, velz:res.VelZ});
+       }else{
+        result.push({nombre: vertice.nombre, x: vertice.x, y:vertice.y, z:vertice.z, tipo:vertice.tipo});
+       }  
     }
     console.log('filter', result)
         
@@ -415,12 +420,7 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
 
 
 document.getElementById("cargarCarpeta").addEventListener("change",function(ev){
-  // === css styles ====
-  if(ev.target.files.length)  {
-    document.getElementById('icono-carpeta').className = 'bi bi-folder-fill';
-    document.getElementById('texto-carpeta').innerText = ` Carpeta de LOGFILES cargada.`;
-  }
-  // ===================
+  
   
 
   let file = ev.target.files;
@@ -503,6 +503,13 @@ document.getElementById("cargarCarpeta").addEventListener("change",function(ev){
       
     }
   }
+
+  // === css styles ====
+  if(ev.target.files.length)  {
+    document.getElementById('icono-carpeta').className = 'bi bi-folder-fill';
+    document.getElementById('texto-carpeta').innerText = ` Carpeta de LOGFILES cargada.`;
+  }
+  // ===================
     
   return anosPorHtml;
   
