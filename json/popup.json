@@ -1,0 +1,61 @@
+{
+  "popup": [
+    {
+      "type": "fields",
+      "fieldInfos": [
+        {
+          "fieldName": "numero_domo_iers",
+          "label": "Número DOMO IERS"
+        },
+        {
+          "fieldName": "identificador",
+          "label": "Identificador"
+        },
+        {
+          "fieldName": "codigo_departamento",
+          "label": "Código departamento"
+        },
+        {
+          "fieldName": "nombre_departamento",
+          "label": "Departamento"
+        },
+        {
+          "fieldName": "codigo_municipio",
+          "label": "Código municipio"
+        },
+        {
+          "fieldName": "codigo_municipio",
+          "label": "Código municipio"
+        },
+        {
+          "fieldName": "nombre_municipio",
+          "label": "Municipio"
+        },
+        {
+          "fieldName": "estado",
+          "label": "Estado"
+        },
+        {
+          "fieldName": "orden_precision",
+          "label": "Orden presicion"
+        },
+        {
+          "fieldName": "fecha_materializacion",
+          "label": "Fecha de materialización"
+        },
+        {
+          "fieldName": "lugar_materializacion",
+          "label": "Lugar de materializacion"
+        },
+        {
+          "fieldName": "agencia_sigla",
+          "label": "Agencia"
+        },
+        {
+          "fieldName": "redes",
+          "label": "Red"
+        }
+      ]
+    }
+  ]
+}
