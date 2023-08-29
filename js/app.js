@@ -355,10 +355,6 @@ document.querySelector('#descargar').addEventListener('click', function(e) {
 
 
 
-
-
-
-
 document.querySelector('#cargarTexto').addEventListener('change', (e) => {    
   if(e.target.files.length)  {
     document.getElementById('icono-archivo').className = 'bi bi-file-check-fill';
@@ -389,7 +385,7 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
     try {
       const res = await fetch('./../json/Red pasiva GNSS.json');
       arregloRedPasiva = await res.json();
-      console.log(arregloRedPasiva)
+      //console.log(arregloRedPasiva)
     } catch (error) {
       console.error(error)
     }
@@ -398,16 +394,48 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
     for(let vertice of verticesArray){
        let res = arregloRedPasiva.find((verArry) => verArry.Nomenc.toString() === vertice.nombre );  
        if(res){
-         result.push({nombre: vertice.nombre, x: vertice.x, y:vertice.y, z:vertice.z, tipo:vertice.tipo, velx:res.VelX, vely:res.VelY, velz:res.VelZ});
+         result.push({
+          nombre: vertice.nombre, x: vertice.x, y:vertice.y, z:vertice.z, tipo:vertice.tipo, 
+          velx:res.VelX, vely:res.VelY, velz:res.VelZ, altelips:res.AltElips, ondula:res.Ondula,
+          lat:res.Lat, long: res.Long
+        });
+         //console.log(res)
        }else{
-        result.push({nombre: vertice.nombre, x: vertice.x, y:vertice.y, z:vertice.z, tipo:vertice.tipo});
+
+        // ====== CONVERTIR CORDENADAS GEOCENTRICAS A LAT Y LONG =========
+
+        let x  = parseFloat(vertice.x);
+        let y = parseFloat(vertice.y);
+        let z = parseFloat(vertice.z);
+
+        var a = 6378137.0; // Semieje mayor de la Tierra en metros
+        var f = 1.0 / 298.257223563; // Factor de achatamiento
+        var e2 = 2 * f - f * f; // Excentricidad al cuadrado
+
+        var lon = Math.atan2(y, x);
+        var p = Math.sqrt(x * x + y * y);
+        var lat = Math.atan2(z, p * (1 - e2));
+        var v = a / Math.sqrt(1 - e2 * Math.sin(lat) * Math.sin(lat));
+
+        var latDec = lat * 180 / Math.PI;
+        var lonDec = lon * 180 / Math.PI;
+
+        // ====== FIN =========
+
+        result.push({
+          nombre: vertice.nombre, x: vertice.x, y:vertice.y, z:vertice.z, tipo:vertice.tipo,
+          lat: latDec, long:lonDec
+        });
+
+
        }  
     }
+
+    
     console.log('filter', result)
         
-        console.log('vertices a recorrer', verticesArray)
-
-        //promedioVertices(verticesArray);
+        
+    
        
         
         
