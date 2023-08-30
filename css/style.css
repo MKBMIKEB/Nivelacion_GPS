@@ -74,7 +74,9 @@ body {
     opacity: 0;
 }
 
-
+.size-default {
+    width: 15rem;
+}
 
 @keyframes bgAnimation {
     0% {

@@ -1,12 +1,64 @@
-// (async () => {
-//     try {
-//         const datos = await fetch('./../json/estaciones.json');
-//         const res = await datos.json();
-//         console.log(res);
-//     } catch (error) {
-//         console.log(error);
-//     }
-// })();
+
+let popup = [
+    {
+      "type": "fields",
+      "fieldInfos": [
+        {
+          "fieldName": "numero_domo_iers",
+          "label": "Número DOMO IERS"
+        },
+        {
+          "fieldName": "identificador",
+          "label": "Identificador"
+        },
+        {
+          "fieldName": "codigo_departamento",
+          "label": "Código departamento"
+        },
+        {
+          "fieldName": "nombre_departamento",
+          "label": "Departamento"
+        },
+        {
+          "fieldName": "codigo_municipio",
+          "label": "Código municipio"
+        },
+        {
+          "fieldName": "codigo_municipio",
+          "label": "Código municipio"
+        },
+        {
+          "fieldName": "nombre_municipio",
+          "label": "Municipio"
+        },
+        {
+          "fieldName": "estado",
+          "label": "Estado"
+        },
+        {
+          "fieldName": "orden_precision",
+          "label": "Orden presicion"
+        },
+        {
+          "fieldName": "fecha_materializacion",
+          "label": "Fecha de materialización"
+        },
+        {
+          "fieldName": "lugar_materializacion",
+          "label": "Lugar de materializacion"
+        },
+        {
+          "fieldName": "agencia_sigla",
+          "label": "Agencia"
+        },
+        {
+          "fieldName": "redes",
+          "label": "Red"
+        }
+      ]
+    }
+  ]
+
 
 
 
@@ -64,42 +116,6 @@ function eliminarEspacios(linea){
     return objeto;
 }
 
-
-function leerArchivoPlano(file){
-
-    let verticesArrayObjetos = [];
-    let reader = new FileReader();
-    reader.onload = (e) => {        
-
-        let vertices = e.target.result.split('\n');
-        
-        //console.log(e.target.result);
-        for(let i=3; i < vertices.length; i++) {
-          if(vertices[i].length > 0){
-            verticesArrayObjetos.push(eliminarEspacios(vertices[i]));    
-          }
-        }       
-        let datosTabla = "";
-        for(let coordenadas of verticesArrayObjetos) {
-          if(coordenadas.tipo != 'CTRL'){                      
-        
-            datosTabla += `
-              <tr>
-                <th scope="row">${coordenadas.nombre}</th>
-                <td>${coordenadas.x}</td>
-                <td>${coordenadas.y}</td>
-                <td>${coordenadas.z}</td>
-              </tr> 
-            `;
-            
-          }
-        }
-        document.getElementById('tablaEntrada').innerHTML = datosTabla;
-    };
-    reader.readAsText(file);
-    
-    return verticesArrayObjetos;
-}
 
 function leerCarpetaLogFiles(file){
 
@@ -202,6 +218,7 @@ const descargarItrf2014 = async (coordenada) => {
   
   let archivoPlano = document.querySelector('#cargarTexto').files[0];   
     
+
 
 
     let reader = new FileReader();
@@ -361,6 +378,7 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
     document.getElementById('texto-archivo').innerText = `${e.target.files[0].name}`;  
   }
 
+  
 
   let archivoPlano = document.querySelector('#cargarTexto').files[0];   
   
@@ -432,15 +450,12 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
     }
 
     
-    console.log('filter', result)
-        
-        
-    
-       
-        
+    console.log('filter', result)   
         
     };
     reader.readAsText(archivoPlano);
+    
+    cargarMapa(-74, 6);
 });
 
 
@@ -551,7 +566,155 @@ document.getElementById("cargarCarpeta").addEventListener("change",function(ev){
 
 
 
+function cargarMapa(longitude, latitude){
+
+  require([
+    "esri/config",
+    "esri/Map",
+    "esri/views/MapView",
+    "esri/widgets/Home",
+    "esri/widgets/ScaleBar",
+    "esri/widgets/LayerList",
+    "esri/widgets/Legend",
+    "esri/widgets/Expand",
+    "esri/widgets/Compass",
+    "esri/geometry/Extent",
+    "esri/layers/MapImageLayer",
+    "esri/layers/VectorTileLayer",
+    "esri/geometry/Point",
+    "esri/Graphic",
+    "esri/layers/GraphicsLayer",
+  ], (
+    esriConfig,
+    Map,
+    MapView,
+    Home,
+    ScaleBar,
+    LayerList,
+    Legend,
+    Expand,
+    Compass,
+    Extent,
+    MapImageLayer,
+    VectorTileLayer,
+    Point,
+    Graphic,
+    GraphicsLayer
+  ) => {
+    esriConfig.apiKey =
+      "AAPK2a2e861a0c794bfdb29a1b4ce47b1583OBbY7CvHSkUPhQ20FG1hZEbAl5GmTTZcs-cyoy2tw5to5j_pJiiTW6J_KRbBx-qS";
+
+    const vtlLayer = new VectorTileLayer({
+      url: "https://tiles.arcgis.com/tiles/RVvWzU3lgJISqdke/arcgis/rest/services/Mapa_base_topografico/VectorTileServer",
+    });
+
+    const layer = new MapImageLayer({
+      url: "https://mapas.igac.gov.co/server/rest/services/centrocontrol/EstacionesGeodesicas/MapServer",
+      sublayers: [
+        {
+          id: 1,
+          visible: true,
+          definitionExpression: "es_pasiva_gnss=1",
+          popupTemplate: {
+            title: "Atributos",
+            outFields: ["*"],
+            content: popup,                
+          },
+        },
+      ]
+    });
+    const map = new Map({
+      layers: [vtlLayer, layer],
+    });
+
+    // GRAFICAR PUNTO EN COORDENADAS CENTER
+    
+    const centerPoint = new Point({
+      longitude: longitude,
+      latitude: latitude
+    });
+
+    const markerSymbol = {
+      type: "simple-marker",
+      color: [226, 119, 40],  // Color naranja
+      outline: {
+        color: [255, 0, 0], // Color blanco
+        width: 1
+      }
+    };
+
+    const pointGraphic = new Graphic({
+      geometry: centerPoint,
+      symbol: markerSymbol
+    });
+
+    const graphicsLayer = new GraphicsLayer();
+    graphicsLayer.add(pointGraphic);
+    map.add(graphicsLayer);
+    // ============================= //
+
+    const view = new MapView({
+      container: "viewDiv",
+      map: map,
+      // center: [-74, 4], // longitude, latitude
+      zoom: 5.4,
+      center: centerPoint,
+    });
+    const homeBtn = new Home({
+      view: view,
+    });
+    const scaleBar = new ScaleBar({
+      view: view,
+      unit: "dual",
+    });
+    const layerList = new LayerList({
+      view: view,
+    });
+    const legend = new Legend({
+      view: view,
+    });
+    const layerListExpand = new Expand({
+      view: view,
+      content: layerList,
+      expanded: false,
+      expandTooltip: "Expand LayerList",
+      mode: "floating",
+    });
+    const legendExpand = new Expand({
+      view: view,
+      content: legend,
+      expandTooltip: "Expand Legend",
+      expanded: false, // ===== VER EXPAND LEGEND  =====//
+      mode: "floating",
+    });
+    const compass = new Compass({
+      view: view,
+      visible: false,
+    });
+    view.ui.add(homeBtn, "top-left");
+    view.ui.add(scaleBar, "bottom-right");
+    view.ui.add(layerListExpand, "top-right");
+    view.ui.add(legendExpand, "bottom-left");
+    view.ui.add(compass, "top-left");
+
+    // load the Compass only when the view is rotated
+    view.watch("rotation", function (rotation) {
+      if (rotation && !compass.visible) {
+        compass.visible = true;
+      }
+    });
+  });
+}
+
+cargarMapa(-74, 4);
 
 
 
+
+
+document.querySelector('#viewDiv').addEventListener('click', function(e){
+  if(e.target.tagName === 'TD' && e.target.parentNode.firstChild.textContent === 'Identificador' ){        
+      console.log(e.target.tagName, e.target.textContent, e.target.parentNode.firstChild)        
+  }
+});
 
