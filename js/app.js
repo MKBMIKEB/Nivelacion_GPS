@@ -117,79 +117,7 @@ function eliminarEspacios(linea){
 }
 
 
-function leerCarpetaLogFiles(file){
 
-  let anosPorHtml = [];
-
-  for(let i of file){
-    let obj = {};
-    if(i.name.indexOf("html") !== -1){
-      
-      obj.name = i.name;
-
-        let reader = new FileReader();
-        reader.onload = (e) => {      
-
-        
-        for(let element of e.target.result.split("</tr>")){
-      
-          
-          if(element.indexOf("Intervalo de observación:") !== -1){            
-            
-            const fecha = element.substring(85, 96);
-            const ano = fecha.substring(6,10);
-            const mes = fecha.substring(3,5);
-            const dia = fecha.substring(0,2);
-      
-
-            
-            var fechaEjemplo = new Date(ano, mes-1, dia);
-            var diaDelAno = calcularDiaDelAno(fechaEjemplo);
-      
-            let anoEpoca = parseInt(ano) + (diaDelAno/365);
-      
-            obj.anoEpoca = anoEpoca;
-      
-            
-            
-            break;
-          }
-
-          if(element.indexOf("Hora Inicio - Hora Fin:") !== -1){            
-            
-            const fecha = element.substring(90, 100);
-            
-            const ano = fecha.substring(6,10);
-            const mes = fecha.substring(3,5);
-            const dia = fecha.substring(0,2);
-            
-            
-
-            
-            var fechaEjemplo = new Date(ano, mes-1, dia);
-            var diaDelAno = calcularDiaDelAno(fechaEjemplo);
-            
-            let anoEpoca = parseInt(ano) + (diaDelAno/365);
-            
-            obj.anoEpoca = anoEpoca;     
-            
-            console.log('anoEpoca', obj.anoEpoca);
-            
-            break;
-          }
-        }        
-
-        anosPorHtml.push(obj);
-        
-    };
-    reader.readAsText(i);
-    
-      
-    }
-  }
-    console.log(anosPorHtml, anosPorHtml.length)
-  return anosPorHtml;
-}
 
 function buscarAnoDeCoordenada(coordenada, logsArray){  
   
@@ -268,29 +196,17 @@ const descargarItrf2014 = async (coordenada) => {
 
 }
 
-function promedioVertices(vertices){
-  let promedio = {x:0, y:0, z:0};
-  let contador = 0;
-  for(let vertice of vertices){
-    if(vertice.tipo != 'CTRL'){
-      promedio.x += parseFloat( vertice.x );
-      promedio.y += parseFloat( vertice.y );
-      promedio.z += parseFloat( vertice.z );
-      contador++;
-    }
-  }
-  promedio.x = promedio.x / contador;
-  promedio.y = promedio.y / contador;
-  promedio.z = promedio.z / contador;
-  console.log(promedio, contador);
-  return promedio;
-}
+
 
 
 
 
 
 document.querySelector('#calcular').addEventListener('click',async function(){
+
+  let arrTexto = JSON.parse( localStorage.getItem('anosPorHtml') ) 
+  let arrCarpeta = JSON.parse( localStorage.getItem('verticesOndula') ) 
+  console.log(arrTexto, arrCarpeta);
   
   let archivoPlano = document.querySelector('#cargarTexto').files[0];   
   
@@ -307,17 +223,9 @@ document.querySelector('#calcular').addEventListener('click',async function(){
          verticesArray.push(eliminarEspacios(vertices[i]));
       }
     }         
-
-        
         
         let datosTabla = "";
-        console.log('vertices a recorrer', verticesArray)
-
-        promedioVertices(verticesArray);
-
-
-
-
+                
 
         for(let coordenadas of verticesArray) {          
           let arr = JSON.parse( localStorage.getItem('anosPorHtml') )    
@@ -330,18 +238,8 @@ document.querySelector('#calcular').addEventListener('click',async function(){
           if(coordenadas.tipo != 'CTRL'){
             
             let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
-            
-            
-            // datosTabla += `
-            //   <tr>
-            //     <th scope="row">${coordenadas.nombre}</th>
-            //     <td>${coordenadaAjustada[0] + (0.00460 * deltaDeTiempo)}</td>
-            //     <td>${coordenadaAjustada[1] + (0.00313 * deltaDeTiempo)}</td>
-            //     <td>${coordenadaAjustada[2] + (0.01348 * deltaDeTiempo)}</td>
-            //     <td>${deltaDeTiempo}</td>
-            //   </tr> 
-            // `;
-            console.log(coordenadas)
+        
+            //console.log(coordenadas)
             datosTabla += `
               <tr>
                 <th scope="row">${coordenadas.nombre}</th>
@@ -350,8 +248,7 @@ document.querySelector('#calcular').addEventListener('click',async function(){
                 <td>${coordenadaAjustada[2] + (0.01290 * deltaDeTiempo)}</td>
                 <td>${deltaDeTiempo}</td>
               </tr> 
-            `;
-            console.log();
+            `;            
           }
         }
         
@@ -379,20 +276,24 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
   }
 
   
+  let arregloVerticesOndulacion = [];
+  localStorage.setItem('verticesOndula', JSON.stringify(arregloVerticesOndulacion));
 
   let archivoPlano = document.querySelector('#cargarTexto').files[0];   
   
   
   let reader = new FileReader();
-  reader.onload = async (e) => {       
+  reader.onload = async (e) => {      
+    
+    
     
     
     let vertices = e.target.result.split('\n');
-    //console.log(e.target.result);
+    
     let verticesArray = [];
-    for(let i=3; i < vertices.length-1; i++) {
+    for(let i=3; i < vertices.length; i++) {
       if(vertices[i].length > 0){
-         verticesArray.push(eliminarEspacios(vertices[i]));
+         verticesArray.push(eliminarEspacios(vertices[i]));         
       }
     }      
     
@@ -407,6 +308,7 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
     } catch (error) {
       console.error(error)
     }
+    
       
     let result = [];
     for(let vertice of verticesArray){
@@ -450,12 +352,75 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
     }
 
     
-    console.log('filter', result)   
+    // ====== BUSCAR Y AGREGAR LA ONDULACIÓN =========
+    let verticeConOndulacion = [];
+    
+ 
+    for(let vertice of result){
+      if(vertice.ondula === undefined){
+        const lat = vertice.lat;
+        const lon = vertice.long;
+
+        try {
+          const resultado = await fetch('./../json/ondulacion.json');
+          const arregloOndula = await resultado.json();
+          for(let i of arregloOndula){
+            if((lat <= (i.lat+0.033) && lat >= (i.lat-0.0033)) && lon <= (i.lon+0.033) && lon >= (i.lon-0.0033)){
+                //console.log(i)
+                verticeConOndulacion.push({
+                  nombre: vertice.nombre, lat: vertice.lat, long: vertice.long, x:vertice.x, y:vertice.y, z:vertice.z,
+                  tipo: vertice.tipo, ondula: i.alt
+                });
+            }                    
+        }
+
+        } catch (error) {
+          console.log('error', error);
+        }
+
+      }else{
+        verticeConOndulacion.push({
+          nombre: vertice.nombre, lat: vertice.lat, long: vertice.long, x:vertice.x, y:vertice.y, z:vertice.z,
+          tipo: vertice.tipo, ondula: vertice.ondula
+        });
+      }
+      
+    }
+
+    // ====== FIN =========
+
+
+    console.log('verticeConOndulacion', verticeConOndulacion);
+
+    //let arre = JSON.parse( localStorage.getItem('verticesOndula'))            
+    //arre.push(obj)
+    localStorage.setItem('verticesOndula', JSON.stringify(verticeConOndulacion));
+
+    // ====== OBTENER EL PROMEDIO DE LOS VERTICES =========
+    let promedio = {latitude:0, longitude:0};
+    let contador = 0;
+    for(let vertice of verticeConOndulacion){
+     
+      if(vertice.tipo != 'CTRL'){
+        promedio.latitude += parseFloat( vertice.lat );
+        promedio.longitude += parseFloat( vertice.long );      
+        contador++;
+      }
+    }
+    promedio.latitude = promedio.latitude / contador;
+    promedio.longitude = promedio.longitude / contador;  
+    
+
+    // ====== FIN =========
+
+    
+
+    cargarMapa(promedio.longitude, promedio.latitude);
+    
         
     };
     reader.readAsText(archivoPlano);
     
-    cargarMapa(-74, 6);
 });
 
 
@@ -485,56 +450,90 @@ document.getElementById("cargarCarpeta").addEventListener("change",function(ev){
         for(let element of e.target.result.split("</tr>")){
       
           
-          if(element.indexOf("Intervalo de observación:") !== -1){            
+          if(element.indexOf("Intervalo de observación:") !== -1){  
+            //console.log("entro: " + element);
             
-            const fecha = element.substring(85, 96);
-            const ano = fecha.substring(6,10);
-            const mes = fecha.substring(3,5);
-            const dia = fecha.substring(0,2);
-      
+            for(let elemento of e.target.result.split("</tr>")){
+              
+              if(elemento.indexOf("Alt Elip.:") !== -1){
+                console.log(elemento.split("</td>")[3].substring(4,14));
+                obj.altelips = elemento.split("</td>")[3].substring(4,13); 
+               }
 
+              if(elemento.indexOf("Intervalo de observación:") !== -1){
+                //console.log("entro: " + elemento);
+                const fecha = elemento.substring(85, 96);
+                const ano = fecha.substring(6,10);
+                const mes = fecha.substring(3,5);
+                const dia = fecha.substring(0,2);
+          
+    
+                
+                var fechaEjemplo = new Date(ano, mes-1, dia);
+                var diaDelAno = calcularDiaDelAno(fechaEjemplo);
+          
+                let anoEpoca = parseInt(ano) + (diaDelAno/365);
+          
+                obj.anoEpoca = anoEpoca;   
+                
+                break;
+               }                
+                
+            }
+
+            let arre = JSON.parse( localStorage.getItem('anosPorHtml') )            
+                arre.push(obj)
+                localStorage.setItem('anosPorHtml', JSON.stringify(arre));
             
-            var fechaEjemplo = new Date(ano, mes-1, dia);
-            var diaDelAno = calcularDiaDelAno(fechaEjemplo);
-      
-            let anoEpoca = parseInt(ano) + (diaDelAno/365);
-      
-            obj.anoEpoca = anoEpoca;
+            break;
+            
+            
+          }
 
+          if(element.indexOf("Hora Inicio - Hora Fin:") !== -1){  
+            
+            for(let elemento of e.target.result.split("</tr>")){
+
+              if(elemento.indexOf("Hora Inicio - Hora Fin:") !== -1){  
+                const fecha = elemento.substring(90, 100);
+            
+                const ano = fecha.substring(6,10);
+                const mes = fecha.substring(3,5);
+                const dia = fecha.substring(0,2);
+                
+                
+
+                
+                var fechaEjemplo = new Date(ano, mes-1, dia);
+                var diaDelAno = calcularDiaDelAno(fechaEjemplo);
+                
+                let anoEpoca = parseInt(ano) + (diaDelAno/365);
+                
+                obj.anoEpoca = anoEpoca;     
+                
+                // console.log('anoEpoca', obj.anoEpoca);
+
+                
+              }
+
+                  //          console.log(element);
+              if(elemento.indexOf("Altura Elip WGS84:") !== -1){ 
+                // console.log(elemento.split("<td>"));
+                obj.altelips = elemento.substring(77, 85);  
+              }
+
+              
+              
+            }
+            
             let arre = JSON.parse( localStorage.getItem('anosPorHtml') )            
             arre.push(obj)
             localStorage.setItem('anosPorHtml', JSON.stringify(arre));
             
-            
             break;
           }
 
-          if(element.indexOf("Hora Inicio - Hora Fin:") !== -1){            
-            
-            const fecha = element.substring(90, 100);
-            
-            const ano = fecha.substring(6,10);
-            const mes = fecha.substring(3,5);
-            const dia = fecha.substring(0,2);
-            
-            
-
-            
-            var fechaEjemplo = new Date(ano, mes-1, dia);
-            var diaDelAno = calcularDiaDelAno(fechaEjemplo);
-            
-            let anoEpoca = parseInt(ano) + (diaDelAno/365);
-            
-            obj.anoEpoca = anoEpoca;     
-            
-            // console.log('anoEpoca', obj.anoEpoca);
-
-            let arre = JSON.parse( localStorage.getItem('anosPorHtml') )            
-            arre.push(obj)
-            localStorage.setItem('anosPorHtml', JSON.stringify(arre));
-            
-            break;
-          }
+          
         }        
 
         anosPorHtml.push(obj);
@@ -609,19 +608,110 @@ function cargarMapa(longitude, latitude){
     });
 
     const layer = new MapImageLayer({
-      url: "https://mapas.igac.gov.co/server/rest/services/centrocontrol/EstacionesGeodesicas/MapServer",
-      sublayers: [
-        {
-          id: 1,
-          visible: true,
-          definitionExpression: "es_pasiva_gnss=1",
-          popupTemplate: {
-            title: "Atributos",
-            outFields: ["*"],
-            content: popup,                
-          },
-        },
-      ]
+      url: "https://mapas.igac.gov.co/server/rest/services/geodesia/redpasiva/MapServer/",
+          sublayers: [
+            {
+              id: 0,
+               visible: true,
+              //  definitionExpression: "es_pasiva_gnss=0",
+               popupTemplate: {
+                   //title: "Atributos",
+                   outFields: ["*"],
+                   content:  [
+                    {
+                      "type": "fields",
+                      "fieldInfos": [
+                        {
+                          "fieldName": "OBJECTID",
+                          "label": "OBJECTID"
+                        },
+                        {
+                          "fieldName": "SHAPE",
+                          "label": "SHAPE"
+                        },    
+                        {
+                          "fieldName": "Nomenc",
+                          "label": "Nomenclatura"
+                        }, 
+                        {
+                          "fieldName": "Lat",
+                          "label": "Latitud"
+                        }, 
+                        {
+                          "fieldName": "Long",
+                          "label": "Longitud"
+                        }, 
+                        {
+                          "fieldName": "AltElips",
+                          "label": "Altura Elipsoidal"
+                        }, 
+                        {
+                          "fieldName": "CoordX",
+                          "label": "Coordenada X"
+                        },    
+                        {
+                          "fieldName": "CoordY",
+                          "label": "Coordenada Y"
+                        },
+                        {
+                          "fieldName": "CoordZ",
+                          "label": "Coordenada Z"
+                        },
+                        {
+                          "fieldName": "VelX",
+                          "label": "Velocidad X"
+                        },
+                        {
+                          "fieldName": "VelY",
+                          "label": "Velocidad Y"
+                        },
+                        {
+                          "fieldName": "VelZ",
+                          "label": "Velocidad Z"
+                        },
+                        {
+                          "fieldName": "Ondula",
+                          "label": "Ondulación"
+                        },
+                        {
+                          "fieldName": "ConcMpio",
+                          "label": "Código Municipio"
+                        },        
+                        {
+                          "fieldName": "NomMpio",
+                          "label": "Nombre Municipio"
+                        },
+                        {
+                          "fieldName": "NomDpto",
+                          "label": "Nombre Departamento"
+                        },
+                        {
+                          "fieldName": "EstPunto",
+                          "label": "Estado Punto"
+                        },
+                        {
+                          "fieldName": "DatITRFRef",
+                          "label": "Datum / ITRF / Epoca Referencia"
+                        },
+                        {
+                          "fieldName": "Obs",
+                          "label": "Observación"
+                        }, 
+                        {
+                          "fieldName": "Tipo_Mat",
+                          "label": "Tipo materialización"
+                        }, 
+                        {
+                          "fieldName": "Fech_Mat",
+                          "label": "Fecha materilización"
+                        }
+                      ]
+                    }
+                  ]               
+                
+              },
+            },
+          ],
     });
     const map = new Map({
       layers: [vtlLayer, layer],
@@ -713,7 +803,7 @@ cargarMapa(-74, 4);
 
 
 document.querySelector('#viewDiv').addEventListener('click', function(e){
-  if(e.target.tagName === 'TD' && e.target.parentNode.firstChild.textContent === 'Identificador' ){        
+  if(e.target.tagName === 'TD' && e.target.parentNode.firstChild.textContent === 'Nomenclatura' ){        
       console.log(e.target.tagName, e.target.textContent, e.target.parentNode.firstChild)        
   }
 });
