@@ -78,6 +78,11 @@ body {
     width: 15rem;
 }
 
+#progress,#progress2 {
+    visibility: hidden;
+}
+
+
 @keyframes bgAnimation {
     0% {
         background-color: #10332c;

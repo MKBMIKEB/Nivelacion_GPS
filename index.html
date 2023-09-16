@@ -46,6 +46,7 @@
         <div class="row">
 
           <div class="col-sm-6">
+
             <div class="contenido-formulario">
               <div class="formulario">
                 <input type="file" id="cargarTexto">
@@ -55,10 +56,16 @@
                 </label>
               </div>
             </div>
+            
+            <div id="progress" class="progress mt-5" style="height: 20px;">
+              <div class="progress-bar" role="progressbar" style="width: 10%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
+
+          </div>
 
 
             <div class="col-sm-6">
+
             <div class="contenido-formulario">
               <div class="formulario">
                 <input type="file" name="files" webkitdirectory directory id="cargarCarpeta" multiple />
@@ -67,7 +74,12 @@
                   <span id="texto-carpeta">Cargar logfiles</span>
                 </label>
             </div>
-            </div>     
+            </div>  
+
+            <div id="progress2" class="progress mt-5" style="height: 20px;">
+              <div  class="progress-bar progress-bar2" role="progressbar" style="width: 10%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            
           </div>     
         </div>
         <hr>

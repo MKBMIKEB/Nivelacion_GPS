@@ -60,7 +60,26 @@ let popup = [
   ]
 
 
+  function cambiosVisualesCarga(e){
+    document.querySelector('#progress').style.visibility = 'visible';
+      setInterval(() => {
+        document.querySelector('.progress-bar').style.width = '100%';
+      }, 2000);
+      setTimeout(() => {
+        document.querySelector('#progress').style.visibility = 'hidden';
+      }, 3000);      
+  }
 
+  function cambiosVisualesCarga2(e){    
+    document.querySelector('#progress2').style.visibility = 'visible';
+      setInterval(() => {
+        document.querySelector('.progress-bar2').style.width = '100%';
+      }, 2000);
+      setTimeout(() => {
+        document.querySelector('#progress2').style.visibility = 'hidden';
+      }, 3000);
+      
+  }
 
 function calcularDiaDelAno(fecha) {
   var inicioAño = new Date(fecha.getFullYear(), 0, 0);  
@@ -202,38 +221,35 @@ const descargarItrf2014 = async (coordenada) => {
 
 
 
-document.querySelector('#calcular').addEventListener('click',async function(){
-
-  let arrTexto = JSON.parse( localStorage.getItem('anosPorHtml') ) 
-  let arrCarpeta = JSON.parse( localStorage.getItem('verticesOndula') ) 
-  console.log(arrTexto, arrCarpeta);
-  
-  let archivoPlano = document.querySelector('#cargarTexto').files[0];   
-  
-  
-  let reader = new FileReader();
-  reader.onload = async (e) => {       
-    
-    
-    let vertices = e.target.result.split('\n');
-    //console.log(e.target.result);
-    let verticesArray = [];
-    for(let i=3; i < vertices.length-1; i++) {
-      if(vertices[i].length > 0){
-         verticesArray.push(eliminarEspacios(vertices[i]));
-      }
-    }         
+document.querySelector('#calcular').addEventListener('click',async function(){   
+            
         
-        let datosTabla = "";
-                
+        let datosTabla = "";               
+        let verticesCompletos = [];
+        
+        let arrTexto = JSON.parse( localStorage.getItem('verticesOndula') ) 
+        let arr = JSON.parse( localStorage.getItem('anosPorHtml') )    
+        console.log(arrTexto, arr);
 
-        for(let coordenadas of verticesArray) {          
-          let arr = JSON.parse( localStorage.getItem('anosPorHtml') )    
+        
+        for(let coordenadas of arrTexto) {          
+          
+          for(let coordenada of arr){
+            //console.log(coordenada.name.split(' - ')[1].split('.')[0])
+            if(coordenadas.nombre === coordenada.name.split(' - ')[1].split('.')[0].trim()){
+              console.log(coordenada.altelips)
+              console.log(coordenadas)
+              verticesCompletos.push(
+                {lat:coordenadas.lat, long:coordenadas.long, nombre:coordenadas.nombre, ondula:coordenadas.ondula,
+                tipo:coordenadas.tipo, x:coordenadas.x, y:coordenadas.y, z:coordenadas.z, altelips: coordenada.altelips}
+                );
+              break;
+            }
+          }
           
           let anoEpocaInicial = buscarAnoDeCoordenada(coordenadas, arr); // ejem: 2023.3424
           
-          let deltaDeTiempo = 2018 - anoEpocaInicial;  // ejem: -5.27
-          
+          let deltaDeTiempo = 2018 - anoEpocaInicial;  // ejem: -5.27          
           
           if(coordenadas.tipo != 'CTRL'){
             
@@ -252,9 +268,9 @@ document.querySelector('#calcular').addEventListener('click',async function(){
           }
         }
         
+        console.log(verticesCompletos);
         document.getElementById('tablaEntrada').innerHTML = datosTabla;
-    };
-    reader.readAsText(archivoPlano);
+    
 });
 
 
@@ -269,10 +285,13 @@ document.querySelector('#descargar').addEventListener('click', function(e) {
 
 
 
-document.querySelector('#cargarTexto').addEventListener('change', (e) => {    
+document.querySelector('#cargarTexto').addEventListener('change', (e) => {      
+
+
   if(e.target.files.length)  {
     document.getElementById('icono-archivo').className = 'bi bi-file-check-fill';
     document.getElementById('texto-archivo').innerText = `${e.target.files[0].name}`;  
+    cambiosVisualesCarga(e);
   }
 
   
@@ -390,16 +409,31 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
     // ====== FIN =========
 
 
-    console.log('verticeConOndulacion', verticeConOndulacion);
+
+    //console.log('verticeConOndulacion', verticeConOndulacion);
+
+    let verticeConOndulacionClean = [];
+    
+    for(let resul of result){
+      for(let vertice of verticeConOndulacion){
+        if(resul.nombre === vertice.nombre){
+          verticeConOndulacionClean.push(vertice);
+          break;
+        }
+      }
+    }
+    console.log(verticeConOndulacionClean)
+    
+
 
     //let arre = JSON.parse( localStorage.getItem('verticesOndula'))            
     //arre.push(obj)
-    localStorage.setItem('verticesOndula', JSON.stringify(verticeConOndulacion));
+    localStorage.setItem('verticesOndula', JSON.stringify(verticeConOndulacionClean));
 
     // ====== OBTENER EL PROMEDIO DE LOS VERTICES =========
     let promedio = {latitude:0, longitude:0};
     let contador = 0;
-    for(let vertice of verticeConOndulacion){
+    for(let vertice of verticeConOndulacionClean){
      
       if(vertice.tipo != 'CTRL'){
         promedio.latitude += parseFloat( vertice.lat );
@@ -416,6 +450,12 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
     
 
     cargarMapa(promedio.longitude, promedio.latitude);
+
+    // document.querySelector('#btnCargarExcel').disabled = false;
+    // console.log('respuesta el servidor');    
+    // document.querySelector('#btnCargarExcel').innerHTML = `Cargar`;
+    
+    
     
         
     };
@@ -429,7 +469,7 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
 
 document.getElementById("cargarCarpeta").addEventListener("change",function(ev){
   
-  
+   
 
   let file = ev.target.files;
   
@@ -550,6 +590,7 @@ document.getElementById("cargarCarpeta").addEventListener("change",function(ev){
   if(ev.target.files.length)  {
     document.getElementById('icono-carpeta').className = 'bi bi-folder-fill';
     document.getElementById('texto-carpeta').innerText = ` Carpeta de LOGFILES cargada.`;
+    cambiosVisualesCarga2(ev);
   }
   // ===================
     
