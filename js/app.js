@@ -1,3 +1,5 @@
+localStorage.setItem('verticesOndula', JSON.stringify([]));
+localStorage.setItem('anosPorHtml', JSON.stringify([]));
 
 let popup = [
     {
@@ -215,13 +217,30 @@ const descargarItrf2014 = async (coordenada) => {
 
 }
 
+const mostrarMensaje = (mensaje, tipo) => {
 
+  toastr.options = {
+    "closeButton":true,
+    "progressBar": true,
+    // "positionClass":"toast-bottom-left"
+  };
 
+  if(tipo === 'success'){
+    toastr.success("Hola, bienvenido al sistema!","Sistema Web");
+  }else if(tipo === 'info'){
+    toastr.clear();
+    toastr.info(mensaje);
+  } 
+  
+}
 
-
-
-
-document.querySelector('#calcular').addEventListener('click',async function(){   
+document.querySelector('#calcular').addEventListener('click',async function(){  
+  
+  
+        if(JSON.parse( localStorage.getItem('verticesOndula') ).length == 0 || JSON.parse( localStorage.getItem('anosPorHtml') ).length == 0){          
+          mostrarMensaje('Debe ingresar el archivo .asc y la carpeta logfiles','info');
+          return
+        }
             
         
         let datosTabla = "";               
