@@ -240,55 +240,89 @@ document.querySelector('#calcular').addEventListener('click',async function(){
         if(JSON.parse( localStorage.getItem('verticesOndula') ).length == 0 || JSON.parse( localStorage.getItem('anosPorHtml') ).length == 0){          
           mostrarMensaje('Debe ingresar el archivo .asc y la carpeta logfiles','info');
           return
-        }
-            
+        }            
         
-        let datosTabla = "";               
+                    
         let verticesCompletos = [];
         
         let arrTexto = JSON.parse( localStorage.getItem('verticesOndula') ) 
         let arr = JSON.parse( localStorage.getItem('anosPorHtml') )    
         console.log(arrTexto, arr);
 
+
+        // ===== OBTENER VELOCIDADES =======
+        let velx= "";
+        let vely="";
+        let velz="";
+        for(let vel of arrTexto){
+          if(vel.velx != undefined){
+            console.log("enroll")
+            velx = parseFloat(vel.velx.replace(",","."));
+            vely = parseFloat(vel.vely.replace(",","."));
+            velz = parseFloat(vel.velz.replace(",","."));
+            break;
+          }
+        }
+        console.log(velx, vely, velz);
+        // ===== FIN =======
+
         
         for(let coordenadas of arrTexto) {          
+          let anoEpocaInicial = buscarAnoDeCoordenada(coordenadas, arr); // ejem: 2023.3424
+            
+          let deltaDeTiempo = 2018 - anoEpocaInicial;  // ejem: -5.27 
           
           for(let coordenada of arr){
             //console.log(coordenada.name.split(' - ')[1].split('.')[0])
             if(coordenadas.nombre === coordenada.name.split(' - ')[1].split('.')[0].trim()){
-              console.log(coordenada.altelips)
-              console.log(coordenadas)
+              // console.log(coordenada.altelips)
+              //console.log(coordenadas)
+              let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
               verticesCompletos.push(
                 {lat:coordenadas.lat, long:coordenadas.long, nombre:coordenadas.nombre, ondula:coordenadas.ondula,
-                tipo:coordenadas.tipo, x:coordenadas.x, y:coordenadas.y, z:coordenadas.z, altelips: coordenada.altelips}
+                tipo:coordenadas.tipo, x:coordenadas.x, y:coordenadas.y, z:coordenadas.z, altelips: coordenada.altelips,
+                xreferencia:coordenadaAjustada[0] + (velx * deltaDeTiempo),
+                yreferencia:coordenadaAjustada[1] + (vely * deltaDeTiempo),
+                zreferencia:coordenadaAjustada[2] + (velz * deltaDeTiempo)}
                 );
               break;
             }
           }
           
-          let anoEpocaInicial = buscarAnoDeCoordenada(coordenadas, arr); // ejem: 2023.3424
-          
-          let deltaDeTiempo = 2018 - anoEpocaInicial;  // ejem: -5.27          
-          
-          if(coordenadas.tipo != 'CTRL'){
-            
-            let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
-        
-            //console.log(coordenadas)
-            datosTabla += `
-              <tr>
-                <th scope="row">${coordenadas.nombre}</th>
-                <td>${coordenadaAjustada[0] + (0.00880 * deltaDeTiempo)}</td>
-                <td>${coordenadaAjustada[1] + (0.00440 * deltaDeTiempo)}</td>
-                <td>${coordenadaAjustada[2] + (0.01290 * deltaDeTiempo)}</td>
-                <td>${deltaDeTiempo}</td>
-              </tr> 
-            `;            
-          }
         }
         
         console.log(verticesCompletos);
-        document.getElementById('tablaEntrada').innerHTML = datosTabla;
+
+        let datosXml = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+                          <Proyecto>
+                            <Nombre>XML</Nombre>
+                            <Calculista>IGAC</Calculista>
+                            <Versión>1.0 BETA</Versión>`
+                          ;
+
+        datosXml += `<Puntos_Calculados>
+                        <Punto Nombre="T-2258">
+                        </Punto>          
+                    </Puntos_Calculados>`;
+
+        datosXml += `</Proyecto>`;
+
+
+        // ======== DESCARGAR XML =========
+        var blob = new Blob([datosXml], {
+          type: 'text/xml'
+        });
+    
+        var link = document.createElement("a");    
+        link.href = window.URL.createObjectURL(blob);        
+        // link.download = archivoPlano.name.replace("20","14");
+        link.download = "xml";
+        document.body.appendChild(link);
+        link.click();
+
+        // ======== FIN =========
+        
+        //document.getElementById('tablaEntrada').innerHTML = datosTabla;
     
 });
 
@@ -395,6 +429,7 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
     
  
     for(let vertice of result){
+      // console.log(vertice)
       if(vertice.ondula === undefined){
         const lat = vertice.lat;
         const lon = vertice.long;
@@ -419,7 +454,7 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
       }else{
         verticeConOndulacion.push({
           nombre: vertice.nombre, lat: vertice.lat, long: vertice.long, x:vertice.x, y:vertice.y, z:vertice.z,
-          tipo: vertice.tipo, ondula: vertice.ondula
+          tipo: vertice.tipo, ondula: vertice.ondula, velx: vertice.velx, vely: vertice.vely, velz: vertice.velz
         });
       }
       
