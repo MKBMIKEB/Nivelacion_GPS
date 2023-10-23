@@ -230,12 +230,21 @@ const mostrarMensaje = (mensaje, tipo) => {
   }else if(tipo === 'info'){
     toastr.clear();
     toastr.info(mensaje);
-  } 
+  }else if(tipo === 'warning'){
+    toastr.clear();
+    toastr.warning(mensaje);
+  }  
   
 }
 
 document.querySelector('#calcular').addEventListener('click',async function(){  
   
+        if(!document.querySelector("#verticeFuente")){
+          mostrarMensaje('Debe elegir un vertice valido primero','info');
+          return
+        }
+        console.log(document.querySelector("#verticeFuente").dataset.altmsnmm )
+        console.log(document.querySelector("#verticeFuente").dataset.ondula )
   
         if(JSON.parse( localStorage.getItem('verticesOndula') ).length == 0 || JSON.parse( localStorage.getItem('anosPorHtml') ).length == 0){          
           mostrarMensaje('Debe ingresar el archivo .asc y la carpeta logfiles','info');
@@ -842,7 +851,7 @@ function cargarMapa(longitude, latitude){
       container: "viewDiv",
       map: map,
       // center: [-74, 4], // longitude, latitude
-      zoom: 5.4,
+      zoom: 8,
       center: centerPoint,
     });
     const homeBtn = new Home({
@@ -897,9 +906,55 @@ cargarMapa(-74, 4);
 
 
 
-document.querySelector('#viewDiv').addEventListener('click', function(e){
+document.querySelector('#viewDiv').addEventListener('click',async function(e){
   if(e.target.tagName === 'TD' && e.target.parentNode.firstChild.textContent === 'Nomenclatura' ){        
-      console.log(e.target.tagName, e.target.textContent, e.target.parentNode.firstChild)        
+      let verticeElegido = {};
+      verticeElegido.nombenclatura = e.target.textContent;
+      verticeElegido.altelips =  e.target.parentNode.parentNode.children[4].children[1].textContent ;      
+      verticeElegido.ondula = parseFloat( e.target.parentNode.parentNode.children[11].children[1].textContent.replace(',','.') );      
+      console.log(verticeElegido)      
+
+      let datosTabla = "";   
+     
+
+      try {
+        const res = await fetch(`https://karratha-tawny-frogmouth-xngk.1.us-1.fl0.io/api/pasiva/ondulacion/${verticeElegido.nombenclatura}`);
+        const datos = await res.json();
+        console.log(datos) 
+        
+        if(!datos.altura_msnmm){
+          document.getElementById('tablaEntrada').innerHTML = "";
+          return mostrarMensaje('El vértice no tiene infromación de altura msnmm','warning');      
+        }
+
+        verticeElegido.altura_msnmm = datos.altura_msnmm;
+        datosTabla = `
+        <tr id= "verticeFuente" 
+          data-nomenclatura="${verticeElegido.nombenclatura}" 
+          data-altelips="${verticeElegido.altelips}"
+          data-ondula="${verticeElegido.ondula}"
+          data-altmsnmm="${verticeElegido.altura_msnmm}"
+        
+        >
+          <th scope="row">${verticeElegido.nombenclatura}</th>
+          <td>${verticeElegido.altelips}</td>
+          <td>${verticeElegido.ondula}</td>
+          <td>${verticeElegido.altura_msnmm}</td>          
+        </tr>
+        `;
+         document.getElementById('tablaEntrada').innerHTML = datosTabla;
+
+        
+      } catch (error) {
+        console.error(error)
+      }
   }
+
+
+
+  
+        
+
+
 });
 
