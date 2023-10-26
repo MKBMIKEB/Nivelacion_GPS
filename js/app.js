@@ -284,15 +284,19 @@ document.querySelector('#calcular').addEventListener('click',async function(){
           for(let coordenada of arr){
             //console.log(coordenada.name.split(' - ')[1].split('.')[0])
             if(coordenadas.nombre === coordenada.name.split(' - ')[1].split('.')[0].trim()){
-              // console.log(coordenada.altelips)
-              //console.log(coordenadas)
+              console.log(coordenada)
+              console.log(coordenadas)
               let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
               verticesCompletos.push(
                 {lat:coordenadas.lat, long:coordenadas.long, nombre:coordenadas.nombre, ondula:coordenadas.ondula,
                 tipo:coordenadas.tipo, x:coordenadas.x, y:coordenadas.y, z:coordenadas.z, altelips: coordenada.altelips,
                 xreferencia:coordenadaAjustada[0] + (velx * deltaDeTiempo),
                 yreferencia:coordenadaAjustada[1] + (vely * deltaDeTiempo),
-                zreferencia:coordenadaAjustada[2] + (velz * deltaDeTiempo)}
+                zreferencia:coordenadaAjustada[2] + (velz * deltaDeTiempo),
+                anoEpoca: coordenada.anoEpoca,
+                velx: coordenadas.velx,
+                vely: coordenadas.vely,
+                velz:coordenadas.velz}
                 );
               break;
             }
@@ -302,6 +306,7 @@ document.querySelector('#calcular').addEventListener('click',async function(){
         
         console.log(verticesCompletos);
 
+        // INICIO XML CABEZERA 
         let datosXml = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
                           <Proyecto>
                             <Nombre>XML</Nombre>
@@ -309,11 +314,73 @@ document.querySelector('#calcular').addEventListener('click',async function(){
                             <Versión>1.0 BETA</Versión>`
                           ;
 
-        datosXml += `<Puntos_Calculados>
-                        <Punto Nombre="T-2258">
-                        </Punto>          
-                    </Puntos_Calculados>`;
+        // CUERPO DEL DOCUMENTO
 
+        for(const vertice of verticesCompletos){
+
+          datosXml += `<Puntos_Calculados>
+                          <Punto Nombre="${vertice.nombre}">
+                          <Tipo_Punto>Recuperado</Tipo_Punto>
+                            <SubTipo_Punto />
+                            <Epoca_Punto>Época 2018</Epoca_Punto>
+                            <Altura_Ortométrica>
+                                <Valor>${vertice.altelips}</Valor>
+                                <Año>2023.0</Año>
+                                <Metodo_Determinación>Geocol</Metodo_Determinación>
+                            </Altura_Ortométrica>
+                            <Ondulación_Geoidal>
+                                <Valor>${vertice.ondula}</Valor>
+                                <Modelo_Geoidal>GEOCOL</Modelo_Geoidal>
+                            </Ondulación_Geoidal>
+                            <Fecha_de_Captura>
+                                <Fecha>02/05/2023</Fecha>
+                                <Hora>00:00:00</Hora>
+                            </Fecha_de_Captura>
+                            <Velocidades>
+                                <Latitud>0.0137</Latitud>
+                                <Longitud>0.00276</Longitud>
+                                <X>${vertice.velx}</X>
+                                <Y>${vertice.vely}</Y>
+                                <Z>${vertice.velz}</Z>
+                            </Velocidades>
+                            <Set_de_Coordenadas>
+                              <Cartesiana3d_referencia>
+                                  <Datum>MAGNA-SIRGAS</Datum>
+                                  <X>${vertice.xreferencia}</X>
+                                  <Y>${vertice.yreferencia}</Y>
+                                  <Z>${vertice.zreferencia}</Z>
+                              </Cartesiana3d_referencia>
+                              <Cartesiana3d_rastreo>
+                                  <Datum>MAGNA-SIRGAS</Datum>
+                                  <X>${vertice.x}</X>
+                                  <Y>${vertice.y}</Y>
+                                  <Z>${vertice.z}</Z>
+                              </Cartesiana3d_rastreo>
+                              <Elipsoidal_rastreo>
+                                  <Datum>MAGNA-SIRGAS</Datum>
+                                  <Latitud>4.151332407273033</Latitud>
+                                  <Longitud>-74.8906323223225</Longitud>
+                                  <Altura_Elipsoidal>339.88394</Altura_Elipsoidal>
+                              </Elipsoidal_rastreo>
+                              <Elipsoidal_referencia>
+                                  <Datum>MAGNA-SIRGAS</Datum>
+                                  <Latitud>4.151331748518632</Latitud>
+                                  <Longitud>-74.89063245517487</Longitud>
+                                  <Altura_Elipsoidal>339.88394</Altura_Elipsoidal>
+                              </Elipsoidal_referencia>
+                              <Gauss_referencia>
+                                  <Datum>MAGNA-SIRGAS</Datum>
+                                  <Norte>950852.4727</Norte>
+                                  <Este>909716.27366</Este>
+                                  <Origen>Central</Origen>
+                              </Gauss_referencia>
+                            </Set_de_Coordenadas>
+                          </Punto>          
+                      </Puntos_Calculados>`;
+
+        }
+        
+        // ETIQUETA DE CIERRE        
         datosXml += `</Proyecto>`;
 
 
@@ -926,6 +993,8 @@ document.querySelector('#viewDiv').addEventListener('click',async function(e){
           document.getElementById('tablaEntrada').innerHTML = "";
           return mostrarMensaje('El vértice no tiene infromación de altura msnmm','warning');      
         }
+
+        mostrarMensaje('El vértice agregado correctamente','info');      
 
         verticeElegido.altura_msnmm = datos.altura_msnmm;
         datosTabla = `
