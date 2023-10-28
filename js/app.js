@@ -243,8 +243,7 @@ document.querySelector('#calcular').addEventListener('click',async function(){
           mostrarMensaje('Debe elegir un vertice valido primero','info');
           return
         }
-        console.log(document.querySelector("#verticeFuente").dataset.altmsnmm )
-        console.log(document.querySelector("#verticeFuente").dataset.ondula )
+    
   
         if(JSON.parse( localStorage.getItem('verticesOndula') ).length == 0 || JSON.parse( localStorage.getItem('anosPorHtml') ).length == 0){          
           mostrarMensaje('Debe ingresar el archivo .asc y la carpeta logfiles','info');
@@ -284,12 +283,12 @@ document.querySelector('#calcular').addEventListener('click',async function(){
           for(let coordenada of arr){
             //console.log(coordenada.name.split(' - ')[1].split('.')[0])
             if(coordenadas.nombre === coordenada.name.split(' - ')[1].split('.')[0].trim()){
-              console.log(coordenada)
-              console.log(coordenadas)
+              // console.log(coordenada)
+              // console.log(coordenadas)
               let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
               verticesCompletos.push(
                 {lat:coordenadas.lat, long:coordenadas.long, nombre:coordenadas.nombre, ondula:coordenadas.ondula,
-                tipo:coordenadas.tipo, x:coordenadas.x, y:coordenadas.y, z:coordenadas.z, altelips: coordenada.altelips,
+                tipo:coordenadas.tipo, x:coordenadas.x, y:coordenadas.y, z:coordenadas.z, altelips: coordenada.altelips.replace(",","."),
                 xreferencia:coordenadaAjustada[0] + (velx * deltaDeTiempo),
                 yreferencia:coordenadaAjustada[1] + (vely * deltaDeTiempo),
                 zreferencia:coordenadaAjustada[2] + (velz * deltaDeTiempo),
@@ -314,9 +313,49 @@ document.querySelector('#calcular').addEventListener('click',async function(){
                             <Versión>1.0 BETA</Versión>`
                           ;
 
+        
+        
+        let baseVertAlt = document.querySelector("#verticeFuente").dataset.altelips;        
+        let baseVertondula = document.querySelector("#verticeFuente").dataset.ondula; 
+        let baseVertAltmsn = document.querySelector("#verticeFuente").dataset.altmsnmm;
+
+        let diferencia = 0;
+        let sumatoria = 0;
+        
+        
+     
+
+        // PROMEDIO DHO
+        for(const vert of verticesCompletos){           
+          
+          const DHI = parseFloat( vert.altelips ) - parseFloat( baseVertAlt );          
+          const DNI = parseFloat( vert.ondula ) - parseFloat( baseVertondula );          
+          const DHG = DHI -DNI;                    
+          const DHO = DHG - 0;                    
+
+          sumatoria +=  DHO          
+        }
+
+        sumatoria = sumatoria / verticesCompletos.length;
+        let corection = (sumatoria - diferencia) / 10;
+
+        
         // CUERPO DEL DOCUMENTO
 
+        // CALCULO ORTOMETRICA
         for(const vertice of verticesCompletos){
+          console.log(vertice.altelips, vertice.ondula, baseVertAlt, baseVertondula, baseVertAltmsn, corection)
+
+          const DHI = parseFloat( vertice.altelips ) - parseFloat( baseVertAlt );
+          const DNI = parseFloat( vertice.ondula ) - parseFloat( baseVertondula );
+          const DHG = DHI -DNI;
+          const HGP = parseFloat( baseVertAltmsn ) + DHG;
+          const DHO = DHG - 0;
+          const DHGC = DHO + parseFloat( corection );
+          const HGPSFINAL = parseFloat( baseVertAltmsn ) + DHGC;
+
+          console.log(HGPSFINAL)
+
 
           datosXml += `<Puntos_Calculados>
                           <Punto Nombre="${vertice.nombre}">
@@ -385,16 +424,16 @@ document.querySelector('#calcular').addEventListener('click',async function(){
 
 
         // ======== DESCARGAR XML =========
-        var blob = new Blob([datosXml], {
-          type: 'text/xml'
-        });
+        // var blob = new Blob([datosXml], {
+        //   type: 'text/xml'
+        // });
     
-        var link = document.createElement("a");    
-        link.href = window.URL.createObjectURL(blob);        
-        // link.download = archivoPlano.name.replace("20","14");
-        link.download = "xml";
-        document.body.appendChild(link);
-        link.click();
+        // var link = document.createElement("a");    
+        // link.href = window.URL.createObjectURL(blob);        
+        // // link.download = archivoPlano.name.replace("20","14");
+        // link.download = "xml";
+        // document.body.appendChild(link);
+        // link.click();
 
         // ======== FIN =========
         
@@ -997,6 +1036,8 @@ document.querySelector('#viewDiv').addEventListener('click',async function(e){
         mostrarMensaje('El vértice agregado correctamente','info');      
 
         verticeElegido.altura_msnmm = datos.altura_msnmm;
+        verticeElegido.altelips = verticeElegido.altelips.replace(/\u200E/g, "");
+
         datosTabla = `
         <tr id= "verticeFuente" 
           data-nomenclatura="${verticeElegido.nombenclatura}" 
