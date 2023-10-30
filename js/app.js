@@ -315,18 +315,54 @@ document.querySelector('#calcular').addEventListener('click',async function(){
 
         
         
+        let baseVertNomen = document.querySelector("#verticeFuente").dataset.nomenclatura;  
         let baseVertAlt = document.querySelector("#verticeFuente").dataset.altelips;        
         let baseVertondula = document.querySelector("#verticeFuente").dataset.ondula; 
         let baseVertAltmsn = document.querySelector("#verticeFuente").dataset.altmsnmm;
 
         let diferencia = 0;
         let sumatoria = 0;
+
+        datosXml += `
+        <Puntos_Base_Nivelación>
+          <Punto Nombre="${baseVertNomen}">
+              <Tipo_Punto>Geodesico</Tipo_Punto>
+              <SubTipo_Punto />
+              <Epoca_Punto />
+              <Altura_Ortométrica>
+                  <Valor>${baseVertAltmsn}</Valor>
+                  <Año>0.0</Año>
+                  <Metodo_Determinación>Geometrica</Metodo_Determinación>
+              </Altura_Ortométrica>
+              <Ondulación_Geoidal>
+                  <Valor>${baseVertondula}</Valor>
+                  <Modelo_Geoidal />
+              </Ondulación_Geoidal>
+              <Velocidades>
+                  <Latitud>0</Latitud>
+                  <Longitud>0</Longitud>
+                  <X>0</X>
+                  <Y>0</Y>
+                  <Z>0</Z>
+              </Velocidades>
+              <Set_de_Coordenadas>
+                  <Ellipsoidal>
+                      <Datum>MAGNA-SIRGAS</Datum>
+                      <Latitud>0.0</Latitud>
+                      <Longitud>0.0</Longitud>
+                      <Altura_Elipsoidal>${baseVertAlt}</Altura_Elipsoidal>
+                  </Ellipsoidal>
+              </Set_de_Coordenadas>
+          </Punto>
+        </Puntos_Base_Nivelación>
+        `;
         
         
      
 
         // PROMEDIO DHO
-        for(const vert of verticesCompletos){           
+        for(const vert of verticesCompletos){       
+                    
           
           const DHI = parseFloat( vert.altelips ) - parseFloat( baseVertAlt );          
           const DNI = parseFloat( vert.ondula ) - parseFloat( baseVertondula );          
@@ -344,6 +380,7 @@ document.querySelector('#calcular').addEventListener('click',async function(){
 
         // CALCULO ORTOMETRICA
         for(const vertice of verticesCompletos){
+          
           console.log(vertice.altelips, vertice.ondula, baseVertAlt, baseVertondula, baseVertAltmsn, corection)
 
           const DHI = parseFloat( vertice.altelips ) - parseFloat( baseVertAlt );
@@ -363,7 +400,7 @@ document.querySelector('#calcular').addEventListener('click',async function(){
                             <SubTipo_Punto />
                             <Epoca_Punto>Época 2018</Epoca_Punto>
                             <Altura_Ortométrica>
-                                <Valor>${vertice.altelips}</Valor>
+                                <Valor>${HGPSFINAL}</Valor>
                                 <Año>2023.0</Año>
                                 <Metodo_Determinación>Geocol</Metodo_Determinación>
                             </Altura_Ortométrica>
@@ -405,7 +442,7 @@ document.querySelector('#calcular').addEventListener('click',async function(){
                                   <Datum>MAGNA-SIRGAS</Datum>
                                   <Latitud>4.151331748518632</Latitud>
                                   <Longitud>-74.89063245517487</Longitud>
-                                  <Altura_Elipsoidal>339.88394</Altura_Elipsoidal>
+                                  <Altura_Elipsoidal>${vertice.altelips}</Altura_Elipsoidal>
                               </Elipsoidal_referencia>
                               <Gauss_referencia>
                                   <Datum>MAGNA-SIRGAS</Datum>
@@ -424,16 +461,16 @@ document.querySelector('#calcular').addEventListener('click',async function(){
 
 
         // ======== DESCARGAR XML =========
-        // var blob = new Blob([datosXml], {
-        //   type: 'text/xml'
-        // });
+        var blob = new Blob([datosXml], {
+          type: 'text/xml'
+        });
     
-        // var link = document.createElement("a");    
-        // link.href = window.URL.createObjectURL(blob);        
-        // // link.download = archivoPlano.name.replace("20","14");
-        // link.download = "xml";
-        // document.body.appendChild(link);
-        // link.click();
+        var link = document.createElement("a");    
+        link.href = window.URL.createObjectURL(blob);        
+        // link.download = archivoPlano.name.replace("20","14");
+        link.download = "xml";
+        document.body.appendChild(link);
+        link.click();
 
         // ======== FIN =========
         
