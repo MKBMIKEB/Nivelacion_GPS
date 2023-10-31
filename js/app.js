@@ -257,6 +257,54 @@ document.querySelector('#calcular').addEventListener('click',async function(){
         let arr = JSON.parse( localStorage.getItem('anosPorHtml') )    
         console.log(arrTexto, arr);
 
+        let datosXml = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+                          <Proyecto>
+                            <Nombre>XML</Nombre>
+                            <Calculista>IGAC</Calculista>
+                            <Versión>1.0 BETA</Versión>`
+                          ;
+
+        // AGREGAR ESTACIONES CORS
+        datosXml += "<Estaciones_Permanentes>";
+
+        for(let ver of arrTexto){
+
+          if(ver.tipo == 'CTRL'){
+            datosXml += `
+          <Punto Nombre="${ver.nombre}">
+                <Tipo_Punto>Estación</Tipo_Punto>
+                <SubTipo_Punto />
+                <Epoca_Punto />
+                <Velocidades>
+                    <Latitud>0</Latitud>
+                    <Longitud>0</Longitud>
+                    <X>0</X>
+                    <Y>0</Y>
+                    <Z>0</Z>
+                </Velocidades>
+                <Set_de_Coordenadas>
+                    <Cartesiana3d_rastreo>
+                        <Datum>MAGNA-SIRGAS</Datum>
+                        <X>${ver.x}</X>
+                        <Y>${ver.y}</Y>
+                        <Z>${ver.z}</Z>
+                    </Cartesiana3d_rastreo>
+                    <Elipsoidal_rastreo>
+                        <Datum>MAGNA-SIRGAS</Datum>
+                        <Latitud>${ver.lat}</Latitud>
+                        <Longitud>${ver.long}</Longitud>
+                        <Ondula>${ver.ondula}</Ondula>
+                    </Elipsoidal_rastreo>
+                </Set_de_Coordenadas>
+            </Punto>
+          `;
+          }
+          
+        }
+
+        datosXml += "</Estaciones_Permanentes>";
+        // ========= FIN ==============
+
 
         // ===== OBTENER VELOCIDADES =======
         let velx= "";
@@ -305,15 +353,7 @@ document.querySelector('#calcular').addEventListener('click',async function(){
         
         console.log(verticesCompletos);
 
-        // INICIO XML CABEZERA 
-        let datosXml = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-                          <Proyecto>
-                            <Nombre>XML</Nombre>
-                            <Calculista>IGAC</Calculista>
-                            <Versión>1.0 BETA</Versión>`
-                          ;
-
-        
+        // INICIO XML CABEZERA       
         
         let baseVertNomen = document.querySelector("#verticeFuente").dataset.nomenclatura;  
         let baseVertAlt = document.querySelector("#verticeFuente").dataset.altelips;        
@@ -323,8 +363,10 @@ document.querySelector('#calcular').addEventListener('click',async function(){
         let diferencia = 0;
         let sumatoria = 0;
 
+        // PUNTO BASE DE NIVELACIÓN
+        datosXml += "<Puntos_Base_Nivelación>";
         datosXml += `
-        <Puntos_Base_Nivelación>
+        
           <Punto Nombre="${baseVertNomen}">
               <Tipo_Punto>Geodesico</Tipo_Punto>
               <SubTipo_Punto />
@@ -354,8 +396,10 @@ document.querySelector('#calcular').addEventListener('click',async function(){
                   </Ellipsoidal>
               </Set_de_Coordenadas>
           </Punto>
-        </Puntos_Base_Nivelación>
+        
         `;
+        datosXml += "</Puntos_Base_Nivelación>";
+        // ====== FIN ============
         
         
      
@@ -377,7 +421,7 @@ document.querySelector('#calcular').addEventListener('click',async function(){
 
         
         // CUERPO DEL DOCUMENTO
-
+        datosXml += "<Puntos_Calculados>";
         // CALCULO ORTOMETRICA
         for(const vertice of verticesCompletos){
           
@@ -394,7 +438,7 @@ document.querySelector('#calcular').addEventListener('click',async function(){
           console.log(HGPSFINAL)
 
 
-          datosXml += `<Puntos_Calculados>
+          datosXml += `
                           <Punto Nombre="${vertice.nombre}">
                           <Tipo_Punto>Recuperado</Tipo_Punto>
                             <SubTipo_Punto />
@@ -452,9 +496,11 @@ document.querySelector('#calcular').addEventListener('click',async function(){
                               </Gauss_referencia>
                             </Set_de_Coordenadas>
                           </Punto>          
-                      </Puntos_Calculados>`;
+                      `;
 
         }
+
+        datosXml += "</Puntos_Calculados>";
         
         // ETIQUETA DE CIERRE        
         datosXml += `</Proyecto>`;
