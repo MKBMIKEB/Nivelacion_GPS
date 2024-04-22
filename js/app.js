@@ -326,7 +326,7 @@ document.querySelector('#calcular').addEventListener('click',async function(){
         for(let coordenadas of arrTexto) {          
           let anoEpocaInicial = buscarAnoDeCoordenada(coordenadas, arr); // ejem: 2023.3424
             
-          let deltaDeTiempo = 2018 - anoEpocaInicial;  // ejem: -5.27 
+          let deltaDeTiempo = 2020 - anoEpocaInicial;  // ejem: -5.27 
           
           for(let coordenada of arr){
             //console.log(coordenada.name.split(' - ')[1].split('.')[0])
@@ -1107,7 +1107,7 @@ document.querySelector('#viewDiv').addEventListener('click',async function(e){
      
 
       try {
-        const res = await fetch(`https://karratha-tawny-frogmouth-xngk.1.us-1.fl0.io/api/pasiva/ondulacion/${verticeElegido.nombenclatura}`);
+        const res = await fetch(`https://redgeodesica-cg.igac.gov.co:8080/api/pasiva/ondulacion/${verticeElegido.nombenclatura}`);
         const datos = await res.json();
         console.log(datos) 
         
