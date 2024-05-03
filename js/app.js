@@ -1,241 +1,7 @@
 localStorage.setItem('verticesOndula', JSON.stringify([]));
 localStorage.setItem('anosPorHtml', JSON.stringify([]));
 
-let popup = [
-    {
-      "type": "fields",
-      "fieldInfos": [
-        {
-          "fieldName": "numero_domo_iers",
-          "label": "Número DOMO IERS"
-        },
-        {
-          "fieldName": "identificador",
-          "label": "Identificador"
-        },
-        {
-          "fieldName": "codigo_departamento",
-          "label": "Código departamento"
-        },
-        {
-          "fieldName": "nombre_departamento",
-          "label": "Departamento"
-        },
-        {
-          "fieldName": "codigo_municipio",
-          "label": "Código municipio"
-        },
-        {
-          "fieldName": "codigo_municipio",
-          "label": "Código municipio"
-        },
-        {
-          "fieldName": "nombre_municipio",
-          "label": "Municipio"
-        },
-        {
-          "fieldName": "estado",
-          "label": "Estado"
-        },
-        {
-          "fieldName": "orden_precision",
-          "label": "Orden presicion"
-        },
-        {
-          "fieldName": "fecha_materializacion",
-          "label": "Fecha de materialización"
-        },
-        {
-          "fieldName": "lugar_materializacion",
-          "label": "Lugar de materializacion"
-        },
-        {
-          "fieldName": "agencia_sigla",
-          "label": "Agencia"
-        },
-        {
-          "fieldName": "redes",
-          "label": "Red"
-        }
-      ]
-    }
-  ]
 
-
-  function cambiosVisualesCarga(e){
-    document.querySelector('#progress').style.visibility = 'visible';
-      setInterval(() => {
-        document.querySelector('.progress-bar').style.width = '100%';
-      }, 2000);
-      setTimeout(() => {
-        document.querySelector('#progress').style.visibility = 'hidden';
-      }, 3000);      
-  }
-
-  function cambiosVisualesCarga2(e){    
-    document.querySelector('#progress2').style.visibility = 'visible';
-      setInterval(() => {
-        document.querySelector('.progress-bar2').style.width = '100%';
-      }, 2000);
-      setTimeout(() => {
-        document.querySelector('#progress2').style.visibility = 'hidden';
-      }, 3000);
-      
-  }
-
-function calcularDiaDelAno(fecha) {
-  var inicioAño = new Date(fecha.getFullYear(), 0, 0);  
-  var tiempoTranscurrido = fecha - inicioAño;  
-  
-  var milisegundosEnUnDía = 24 * 60 * 60 * 1000;
-
-  var diaDelAño = Math.floor(tiempoTranscurrido / milisegundosEnUnDía);
-  return diaDelAño;
-}
-
-function convertirCoordenadasITRF2020aITRF2014(x, y, z) { 
-    
-  let xITRF2014 = parseFloat(x) * 0.00000000042
-  let yITRF2014 = parseFloat(y) * 0.00000000042
-  let zITRF2014 = parseFloat(z) * 0.00000000042
-
-  xITRF2014 = xITRF2014 + 0.0014 + parseFloat(x)
-  yITRF2014 = yITRF2014 + 0.0014 + parseFloat(y)
-  zITRF2014 = zITRF2014 - 0.0024 + parseFloat(z)
-  
-  return [xITRF2014, yITRF2014, zITRF2014];
-}
-
-
-function eliminarEspacios(linea){
-    let arreglo = [];
-    let palabra = "";
-    let estado = true;
-    for(let letra of linea){
-        if(letra == ' '){
-            if(estado){
-                arreglo.push(palabra);
-                palabra = '';
-            }
-            estado = false;
-        }else{
-            palabra += letra;
-            estado = true;            
-        }
-    }
-
-
-    let objeto = {
-        nombre:arreglo[0].substring(2, arreglo[0].length),
-        x:arreglo[1],
-        y:arreglo[2],
-        z:arreglo[3],
-        tipo:arreglo[4]
-    }
-
-
-    return objeto;
-}
-
-
-
-
-function buscarAnoDeCoordenada(coordenada, logsArray){  
-  
-  for(let i=0; i<logsArray.length; i++){            
-    if(logsArray[i].name.indexOf(coordenada.nombre) !== -1){                  
-        return logsArray[i].anoEpoca;      
-    }
-  }
-
-}
-
-
-function espacioEstasdar(cadena){
-  console.log(cadena.length);
-  for(let i=cadena.length; i<6; i++) {
-    cadena += ' ';
-  }
-  return cadena;
-}
-
-
-// ======== DESCARGAR ITRF 2014 =================
-// ==============================================
-
-const descargarItrf2014 = async (coordenada) => {        
-  
-  let archivoPlano = document.querySelector('#cargarTexto').files[0];   
-    
-
-
-
-    let reader = new FileReader();
-    reader.onload = (e) => {        
-
-        let vertices = e.target.result.split('\n');
-        
-        let verticesArray = [];
-        for(let i=3; i < vertices.length; i++) {
-          
-          if(vertices[i].length > 0){
-            verticesArray.push(eliminarEspacios(vertices[i]));
-          }
-        }      
-        
-        let datosTabla = `${vertices[0]}\n${vertices[1]}\n${vertices[2]}\n`;
-        
-        for(let coordenadas of verticesArray) {
-          console.log(coordenadas);
-          if(coordenadas.tipo != 'CTRL'){
-            let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);                         
-            
-            datosTabla += `@#${coordenadas.nombre} \t ${coordenadaAjustada[0].toFixed(5)} \t ${coordenadaAjustada[1].toFixed(5)} \t ${coordenadaAjustada[2].toFixed(5)} \t ${coordenadas.tipo} \n`;
-            
-          }else {            
-            let nombreAjustado = espacioEstasdar(coordenadas.nombre);
-            datosTabla += `@#${nombreAjustado} \t  ${coordenadas.x} \t  ${coordenadas.y} \t  ${coordenadas.z} \t ${coordenadas.tipo} \n`;
-          }
-        }
-        console.log( datosTabla );
-
-        var blob = new Blob([datosTabla], {
-          type: 'text/txt'
-        });
-    
-        var link = document.createElement("a");    
-        link.href = window.URL.createObjectURL(blob);        
-        link.download = archivoPlano.name.replace("20","14");
-        document.body.appendChild(link);
-        link.click();
-    };
-    reader.readAsText(archivoPlano);
-
-    
-  
-
-
-}
-
-const mostrarMensaje = (mensaje, tipo) => {
-
-  toastr.options = {
-    "closeButton":true,
-    "progressBar": true,
-    // "positionClass":"toast-bottom-left"
-  };
-
-  if(tipo === 'success'){
-    toastr.success("Hola, bienvenido al sistema!","Sistema Web");
-  }else if(tipo === 'info'){
-    toastr.clear();
-    toastr.info(mensaje);
-  }else if(tipo === 'warning'){
-    toastr.clear();
-    toastr.warning(mensaje);
-  }  
-  
-}
 
 document.querySelector('#calcular').addEventListener('click',async function(){  
   
@@ -534,8 +300,10 @@ document.querySelector('#descargar').addEventListener('click', function(e) {
 
 
 
-
-
+/**
+ * Carga el archivo de texto, lee las coordenadas y las almacena localmente.
+ * @param {file} e - Texto plano con coordenadas. 
+ */
 document.querySelector('#cargarTexto').addEventListener('change', (e) => {      
 
 
@@ -552,20 +320,36 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
   let archivoPlano = document.querySelector('#cargarTexto').files[0];   
   
   
+  
   let reader = new FileReader();
   reader.onload = async (e) => {      
     
+    console.log(e.target.result[0])
     
     
-    
-    let vertices = e.target.result.split('\n');
+    // valido si el primer caracter es @ o no, para saber
+    // que version de archivo es y que función aplicarle
     
     let verticesArray = [];
-    for(let i=3; i < vertices.length; i++) {
-      if(vertices[i].length > 0){
-         verticesArray.push(eliminarEspacios(vertices[i]));         
-      }
-    }      
+    let vertices = e.target.result.split('\n');      
+      
+
+    if(e.target.result[0] === '@'){
+
+      for(let i=3; i < vertices.length; i++) {
+        if(vertices[i].length > 0){
+           verticesArray.push(eliminarEspacios(vertices[i]));         
+        }
+      }      
+    }else {
+      for(let i=1; i < vertices.length; i++) {
+        if(vertices[i].length > 0){
+           verticesArray.push(eliminarEspacios2(vertices[i]));         
+        }
+      }      
+    }
+
+    
     
     
     // espacio para traer velocidades
@@ -858,238 +642,7 @@ document.getElementById("cargarCarpeta").addEventListener("change",function(ev){
 
 
 
-function cargarMapa(longitude, latitude){
 
-  require([
-    "esri/config",
-    "esri/Map",
-    "esri/views/MapView",
-    "esri/widgets/Home",
-    "esri/widgets/ScaleBar",
-    "esri/widgets/LayerList",
-    "esri/widgets/Legend",
-    "esri/widgets/Expand",
-    "esri/widgets/Compass",
-    "esri/geometry/Extent",
-    "esri/layers/MapImageLayer",
-    "esri/layers/VectorTileLayer",
-    "esri/geometry/Point",
-    "esri/Graphic",
-    "esri/layers/GraphicsLayer",
-  ], (
-    esriConfig,
-    Map,
-    MapView,
-    Home,
-    ScaleBar,
-    LayerList,
-    Legend,
-    Expand,
-    Compass,
-    Extent,
-    MapImageLayer,
-    VectorTileLayer,
-    Point,
-    Graphic,
-    GraphicsLayer
-  ) => {
-    esriConfig.apiKey =
-      "AAPK2a2e861a0c794bfdb29a1b4ce47b1583OBbY7CvHSkUPhQ20FG1hZEbAl5GmTTZcs-cyoy2tw5to5j_pJiiTW6J_KRbBx-qS";
-
-    const vtlLayer = new VectorTileLayer({
-      url: "https://tiles.arcgis.com/tiles/RVvWzU3lgJISqdke/arcgis/rest/services/Mapa_base_topografico/VectorTileServer",
-    });
-
-    const layer = new MapImageLayer({
-      url: "https://mapas.igac.gov.co/server/rest/services/geodesia/redpasiva/MapServer/",
-          sublayers: [
-            {
-              id: 0,
-               visible: true,
-              //  definitionExpression: "es_pasiva_gnss=0",
-               popupTemplate: {
-                   //title: "Atributos",
-                   outFields: ["*"],
-                   content:  [
-                    {
-                      "type": "fields",
-                      "fieldInfos": [
-                        {
-                          "fieldName": "OBJECTID",
-                          "label": "OBJECTID"
-                        },
-                        {
-                          "fieldName": "SHAPE",
-                          "label": "SHAPE"
-                        },    
-                        {
-                          "fieldName": "Nomenc",
-                          "label": "Nomenclatura"
-                        }, 
-                        {
-                          "fieldName": "Lat",
-                          "label": "Latitud"
-                        }, 
-                        {
-                          "fieldName": "Long",
-                          "label": "Longitud"
-                        }, 
-                        {
-                          "fieldName": "AltElips",
-                          "label": "Altura Elipsoidal"
-                        }, 
-                        {
-                          "fieldName": "CoordX",
-                          "label": "Coordenada X"
-                        },    
-                        {
-                          "fieldName": "CoordY",
-                          "label": "Coordenada Y"
-                        },
-                        {
-                          "fieldName": "CoordZ",
-                          "label": "Coordenada Z"
-                        },
-                        {
-                          "fieldName": "VelX",
-                          "label": "Velocidad X"
-                        },
-                        {
-                          "fieldName": "VelY",
-                          "label": "Velocidad Y"
-                        },
-                        {
-                          "fieldName": "VelZ",
-                          "label": "Velocidad Z"
-                        },
-                        {
-                          "fieldName": "Ondula",
-                          "label": "Ondulación"
-                        },
-                        {
-                          "fieldName": "ConcMpio",
-                          "label": "Código Municipio"
-                        },        
-                        {
-                          "fieldName": "NomMpio",
-                          "label": "Nombre Municipio"
-                        },
-                        {
-                          "fieldName": "NomDpto",
-                          "label": "Nombre Departamento"
-                        },
-                        {
-                          "fieldName": "EstPunto",
-                          "label": "Estado Punto"
-                        },
-                        {
-                          "fieldName": "DatITRFRef",
-                          "label": "Datum / ITRF / Epoca Referencia"
-                        },
-                        {
-                          "fieldName": "Obs",
-                          "label": "Observación"
-                        }, 
-                        {
-                          "fieldName": "Tipo_Mat",
-                          "label": "Tipo materialización"
-                        }, 
-                        {
-                          "fieldName": "Fech_Mat",
-                          "label": "Fecha materilización"
-                        }
-                      ]
-                    }
-                  ]               
-                
-              },
-            },
-          ],
-    });
-    const map = new Map({
-      layers: [vtlLayer, layer],
-    });
-
-    // GRAFICAR PUNTO EN COORDENADAS CENTER
-    
-    const centerPoint = new Point({
-      longitude: longitude,
-      latitude: latitude
-    });
-
-    const markerSymbol = {
-      type: "simple-marker",
-      color: [226, 119, 40],  // Color naranja
-      outline: {
-        color: [255, 0, 0], // Color blanco
-        width: 1
-      }
-    };
-
-    const pointGraphic = new Graphic({
-      geometry: centerPoint,
-      symbol: markerSymbol
-    });
-
-    const graphicsLayer = new GraphicsLayer();
-    graphicsLayer.add(pointGraphic);
-    map.add(graphicsLayer);
-    // ============================= //
-
-    const view = new MapView({
-      container: "viewDiv",
-      map: map,
-      // center: [-74, 4], // longitude, latitude
-      zoom: 8,
-      center: centerPoint,
-    });
-    const homeBtn = new Home({
-      view: view,
-    });
-    const scaleBar = new ScaleBar({
-      view: view,
-      unit: "dual",
-    });
-    const layerList = new LayerList({
-      view: view,
-    });
-    const legend = new Legend({
-      view: view,
-    });
-    const layerListExpand = new Expand({
-      view: view,
-      content: layerList,
-      expanded: false,
-      expandTooltip: "Expand LayerList",
-      mode: "floating",
-    });
-    const legendExpand = new Expand({
-      view: view,
-      content: legend,
-      expandTooltip: "Expand Legend",
-      expanded: false, // ===== VER EXPAND LEGEND  =====//
-      mode: "floating",
-    });
-    const compass = new Compass({
-      view: view,
-      visible: false,
-    });
-    view.ui.add(homeBtn, "top-left");
-    view.ui.add(scaleBar, "bottom-right");
-    view.ui.add(layerListExpand, "top-right");
-    view.ui.add(legendExpand, "bottom-left");
-    view.ui.add(compass, "top-left");
-
-    // load the Compass only when the view is rotated
-    view.watch("rotation", function (rotation) {
-      if (rotation && !compass.visible) {
-        compass.visible = true;
-      }
-    });
-  });
-}
-
-cargarMapa(-74, 4);
 
 
 
@@ -1097,9 +650,10 @@ cargarMapa(-74, 4);
 
 document.querySelector('#viewDiv').addEventListener('click',async function(e){
   if(e.target.tagName === 'TD' && e.target.parentNode.firstChild.textContent === 'Nomenclatura' ){        
+    // console.log(e.target.parentNode.parentNode.children[4].children[1].textContent);
       let verticeElegido = {};
       verticeElegido.nombenclatura = e.target.textContent;
-      verticeElegido.altelips =  e.target.parentNode.parentNode.children[4].children[1].textContent ;      
+      verticeElegido.altelips =  e.target.parentNode.parentNode.children[4].children[1].textContent;      
       verticeElegido.ondula = parseFloat( e.target.parentNode.parentNode.children[11].children[1].textContent.replace(',','.') );      
       console.log(verticeElegido)      
 
@@ -1140,6 +694,7 @@ document.querySelector('#viewDiv').addEventListener('click',async function(e){
         
       } catch (error) {
         console.error(error)
+        mostrarMensaje('Error de red, el servidor no responde','warning');      
       }
   }
 
