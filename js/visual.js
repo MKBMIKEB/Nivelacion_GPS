@@ -61,11 +61,12 @@
         "AAPK2a2e861a0c794bfdb29a1b4ce47b1583OBbY7CvHSkUPhQ20FG1hZEbAl5GmTTZcs-cyoy2tw5to5j_pJiiTW6J_KRbBx-qS";
   
       const vtlLayer = new VectorTileLayer({
-        url: "https://tiles.arcgis.com/tiles/RVvWzU3lgJISqdke/arcgis/rest/services/Mapa_base_topografico/VectorTileServer",
+         url: "https://tiles.arcgis.com/tiles/RVvWzU3lgJISqdke/arcgis/rest/services/Mapa_base_topografico/VectorTileServer",        
       });
   
       const layer = new MapImageLayer({
-        url: "https://mapas.igac.gov.co/server/rest/services/geodesia/redpasiva/MapServer/",
+        // url: "https://mapas.igac.gov.co/server/rest/services/geodesia/redpasiva/MapServer/",
+        url: "https://mapas.igac.gov.co/server/rest/services/geodesia/redcontrolverticaldeprecision/MapServer/",
             sublayers: [
               {
                 id: 0,
@@ -79,92 +80,69 @@
                         "type": "fields",
                         "fieldInfos": [
                           {
-                            "fieldName": "OBJECTID",
-                            "label": "OBJECTID"
+                            "fieldName": "FID",
+                            "label": "FID"
                           },
                           {
-                            "fieldName": "SHAPE",
-                            "label": "SHAPE"
-                          },    
-                          {
-                            "fieldName": "Nomenc",
+                            "fieldName": "Nomenclatu",
                             "label": "Nomenclatura"
-                          }, 
+                          },       
                           {
-                            "fieldName": "Lat",
+                            "fieldName": "Latitud",
                             "label": "Latitud"
-                          }, 
+                          },     
                           {
-                            "fieldName": "Long",
+                            "fieldName": "Longitud",
                             "label": "Longitud"
-                          }, 
-                          {
-                            "fieldName": "AltElips",
-                            "label": "Altura Elipsoidal"
-                          }, 
-                          {
-                            "fieldName": "CoordX",
-                            "label": "Coordenada X"
-                          },    
-                          {
-                            "fieldName": "CoordY",
-                            "label": "Coordenada Y"
                           },
                           {
-                            "fieldName": "CoordZ",
-                            "label": "Coordenada Z"
+                            "fieldName": "Altura_m_s",
+                            "label": "Altura"
                           },
                           {
-                            "fieldName": "VelX",
-                            "label": "Velocidad X"
+                            "fieldName": "Línea_Niv",
+                            "label": "Línea nivelada"
                           },
                           {
-                            "fieldName": "VelY",
-                            "label": "Velocidad Y"
+                            "fieldName": "Bloque_Aju",
+                            "label": "Bloque ajustado"
                           },
                           {
-                            "fieldName": "VelZ",
-                            "label": "Velocidad Z"
+                            "fieldName": "Año_Calcu",
+                            "label": "Año calculo"
                           },
                           {
-                            "fieldName": "Ondula",
-                            "label": "Ondulación"
+                            "fieldName": "Alt_Elipso",
+                            "label": "Altura elipsoidal"
                           },
                           {
-                            "fieldName": "ConcMpio",
-                            "label": "Código Municipio"
-                          },        
-                          {
-                            "fieldName": "NomMpio",
-                            "label": "Nombre Municipio"
+                            "fieldName": "Tipo_Coord",
+                            "label": "Tipo coordenada"
                           },
                           {
-                            "fieldName": "NomDpto",
-                            "label": "Nombre Departamento"
+                            "fieldName": "Estado_Vé",
+                            "label": "Estado vértice"
                           },
                           {
-                            "fieldName": "EstPunto",
-                            "label": "Estado Punto"
+                            "fieldName": "Código_De",
+                            "label": "Código departamento"
                           },
                           {
-                            "fieldName": "DatITRFRef",
-                            "label": "Datum / ITRF / Epoca Referencia"
+                            "fieldName": "Nombre_Dep",
+                            "label": "Nombre departamento"
                           },
                           {
-                            "fieldName": "Obs",
-                            "label": "Observación"
-                          }, 
+                            "fieldName": "Concatenad",
+                            "label": "Código municipio"
+                          },
                           {
-                            "fieldName": "Tipo_Mat",
-                            "label": "Tipo materialización"
-                          }, 
-                          {
-                            "fieldName": "Fech_Mat",
-                            "label": "Fecha materilización"
-                          }
+                            "fieldName": "Nombre_Mun",
+                            "label": "Nombre municipio"
+                          },
+                        
                         ]
                       }
-                    ]               
+                    ],               
                   
                 },
               },

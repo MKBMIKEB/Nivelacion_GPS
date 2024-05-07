@@ -306,6 +306,15 @@ document.querySelector('#descargar').addEventListener('click', function(e) {
  */
 document.querySelector('#cargarTexto').addEventListener('change', (e) => {      
 
+  // deshabiliar botton elegir vertice
+  document.querySelector('#elegir-verticel').disabled = true;
+  document.querySelector('#elegir-verticel').innerHTML = `
+  <div class="spinner-border" role="status">
+  <span class="visually-hidden">Loading...</span>
+  </div>
+  `;
+
+  
 
   if(e.target.files.length)  {
     document.getElementById('icono-archivo').className = 'bi bi-file-check-fill';
@@ -459,7 +468,12 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
       }
     }
     console.log(verticeConOndulacionClean)
-    
+
+    // habilitar el boton 
+    document.querySelector('#elegir-verticel').disabled = false;
+    document.querySelector('#elegir-verticel').innerHTML = `
+      Elegir Vertice   <i class="bi bi-globe-americas"></i> 
+    `;
 
 
     //let arre = JSON.parse( localStorage.getItem('verticesOndula'))            
