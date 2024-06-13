@@ -60,7 +60,7 @@ function cambiosToggleHabilitar(estado) {
 }
 
 
-function paneos(vertice, verticePunto) {
+function tabular(vertice, verticePunto) {
   console.log(verticePunto)
   let texto = `
         <tr>

@@ -228,7 +228,7 @@ document.querySelector('#calculos').innerHTML += texto;
 
     console.log(vertice)   
 
-    paneos({ DHI, DNI, DHG, HGP, DHO, DHGC, HGPSFINAL }, vertice)
+    tabular({ DHI, DNI, DHG, HGP, DHO, DHGC, HGPSFINAL }, vertice)
 
 
     datosXml += `
@@ -518,14 +518,15 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
     for (let vertice of verticeConOndulacionClean) {
 
       if (vertice.tipo != 'CTRL') {
-        promedio.latitude += parseFloat(vertice.lat);
-        promedio.longitude += parseFloat(vertice.long);
+        promedio.latitude += parseFloat(vertice.lat.replace(',','.'));
+        promedio.longitude += parseFloat(vertice.long.replace(',','.'));
         contador++;
       }
     }
     promedio.latitude = promedio.latitude / contador;
     promedio.longitude = promedio.longitude / contador;
 
+    console.log(promedio)
 
     // ====== FIN =========
 
