@@ -518,8 +518,9 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
     for (let vertice of verticeConOndulacionClean) {
 
       if (vertice.tipo != 'CTRL') {
-        promedio.latitude += parseFloat(vertice.lat.replace(',','.'));
-        promedio.longitude += parseFloat(vertice.long.replace(',','.'));
+        console.log(typeof vertice.lat)
+        promedio.latitude += typeof vertice.lat === "number" ? vertice.lat : parseFloat(vertice.lat.replace(',','.'));
+        promedio.longitude += typeof vertice.long === "number" ? vertice.long : parseFloat(vertice.long.replace(',','.'));
         contador++;
       }
     }

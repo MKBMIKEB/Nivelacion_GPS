@@ -105,27 +105,24 @@ function eliminarEspacios2(linea) {
 
 function eliminarEspacios3(linea) {
 
-
   let arreglo = linea.split('\t');   
-
+  
   let tipo = '';
-  if(arreglo[1] === 'Control'){
+  if(arreglo[4].split('\r')[0] === 'Control'){
     tipo = 'CTRL';
   }
-  if(arreglo[1] === 'Averaged'){
+  if(arreglo[4].split('\r')[0] === 'Averaged'){
     tipo = 'MEAN';
   }
   
     let objeto = {
     nombre: arreglo[0],
-    x: arreglo[2],
-    y: arreglo[3],
-    z: arreglo[4].split('\r')[0],
+    x: arreglo[1],
+    y: arreglo[2],
+    z: arreglo[3],
     tipo: tipo
-
   }  
-
-
+  
   return objeto;
 }
 
