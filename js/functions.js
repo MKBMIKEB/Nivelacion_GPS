@@ -103,6 +103,34 @@ function eliminarEspacios2(linea) {
   return objeto;
 }
 
+function eliminarEspacios3(linea) {
+
+
+  let arreglo = linea.split('\t');   
+
+  let tipo = '';
+  if(arreglo[1] === 'Control'){
+    tipo = 'CTRL';
+  }
+  if(arreglo[1] === 'Averaged'){
+    tipo = 'MEAN';
+  }
+  
+    let objeto = {
+    nombre: arreglo[0],
+    x: arreglo[2],
+    y: arreglo[3],
+    z: arreglo[4].split('\r')[0],
+    tipo: tipo
+
+  }  
+
+
+  return objeto;
+}
+
+
+
 
 // Función para convertir coordenadas de grados, minutos, segundos a grados decimales
 function dmsToDd(degrees, minutes, seconds, direction) {

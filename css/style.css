@@ -82,6 +82,10 @@ body {
     visibility: hidden;
 }
 
+.table-paneo {
+    font-size: 15px;
+}
+
 
 @keyframes bgAnimation {
     0% {
