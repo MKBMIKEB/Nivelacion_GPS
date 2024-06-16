@@ -61,7 +61,7 @@ function cambiosToggleHabilitar(estado) {
 
 
 function tabular(vertice, verticePunto) {
-  console.log(verticePunto)
+  
   let texto = `
         <tr>
           <th scope="row">${verticePunto.nombre}</th>

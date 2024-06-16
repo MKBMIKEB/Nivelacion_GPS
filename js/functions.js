@@ -41,7 +41,7 @@ function eliminarEspacios(linea) {
     }
   }
 
-  // console.log(arreglo)
+  
 
   let objeto = {
     nombre: arreglo[0].substring(2, arreglo[0].length),
@@ -158,7 +158,7 @@ function buscarAnoDeCoordenada(coordenada, logsArray) {
 }
 
 function espacioEstasdar(cadena) {
-  console.log(cadena.length);
+  
   for (let i = cadena.length; i < 6; i++) {
     cadena += ' ';
   }
@@ -191,7 +191,7 @@ const descargarItrf2014 = async (coordenada) => {
     let datosTabla = `${vertices[0]}\n${vertices[1]}\n${vertices[2]}\n`;
 
     for (let coordenadas of verticesArray) {
-      console.log(coordenadas);
+      
       if (coordenadas.tipo != 'CTRL') {
         let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
 
@@ -202,7 +202,7 @@ const descargarItrf2014 = async (coordenada) => {
         datosTabla += `@#${nombreAjustado} \t  ${coordenadas.x} \t  ${coordenadas.y} \t  ${coordenadas.z} \t ${coordenadas.tipo} \n`;
       }
     }
-    console.log(datosTabla);
+    
 
     var blob = new Blob([datosTabla], {
       type: 'text/txt'

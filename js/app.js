@@ -20,8 +20,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   let verticesCompletos = [];
 
   let arrTexto = JSON.parse(localStorage.getItem('verticesOndula'))
-  let arr = JSON.parse(localStorage.getItem('anosPorHtml'))
-  console.log(arrTexto, arr);
+  let arr = JSON.parse(localStorage.getItem('anosPorHtml'))  
 
   let datosXml = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
                           <Proyecto>
@@ -33,8 +32,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   // AGREGAR ESTACIONES CORS
   datosXml += "<Estaciones_Permanentes>";
 
-  for (let ver of arrTexto) {
-    console.log(ver);
+  for (let ver of arrTexto) {    
 
     if (ver.tipo == 'CTRL') {
       datosXml += `
@@ -78,15 +76,13 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   let vely = "";
   let velz = "";
   for (let vel of arrTexto) {
-    if (vel.velx != undefined) {
-      console.log("enroll")
+    if (vel.velx != undefined) {      
       velx = parseFloat(vel.velx.replace(",", "."));
       vely = parseFloat(vel.vely.replace(",", "."));
       velz = parseFloat(vel.velz.replace(",", "."));
       break;
     }
-  }
-  console.log(velx, vely, velz);
+  }  
   // ===== FIN =======
 
 
@@ -119,8 +115,6 @@ document.querySelector('#calcular').addEventListener('click', async function () 
 
   }
 
-  console.log(verticesCompletos);
-
   // INICIO XML CABEZERA       
 
   let baseVertNomen = document.querySelector("#verticeFuente").dataset.nomenclatura;
@@ -128,8 +122,8 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   let baseVertondula = document.querySelector("#verticeFuente").dataset.ondula;
   let baseVertAltmsn = document.querySelector("#verticeFuente").dataset.altmsnmm;
 
-  let diferencia = 0;
-  let sumatoria = 0;
+  
+  
 
   // PUNTO BASE DE NIVELACIÓN
   datosXml += "<Puntos_Base_Nivelación>";
@@ -170,8 +164,9 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   // ====== FIN ============
 
 
-
-
+  let sumatoria = 0;
+  let DHG_ANTERIOR_prime = 0;
+  verticesCompletos.push({nombre: baseVertNomen, altelips: baseVertAlt, ondula:baseVertondula})
   // PROMEDIO DHO
   for (const vert of verticesCompletos) {
 
@@ -179,15 +174,20 @@ document.querySelector('#calcular').addEventListener('click', async function () 
     const DHI = parseFloat(vert.altelips) - parseFloat(baseVertAlt);
     const DNI = parseFloat(vert.ondula) - parseFloat(baseVertondula);
     const DHG = DHI - DNI;
-    const DHO = DHG - 0;
+    const DHO = DHG - DHG_ANTERIOR_prime;
 
+    DHG_ANTERIOR_prime = DHG;
     sumatoria += DHO
   }
 
-  sumatoria = sumatoria / verticesCompletos.length;
-  let corection = (sumatoria - diferencia) / 10;
+  let diferencia = baseVertAltmsn - baseVertAltmsn;
+  console.log("sumatoria", sumatoria)
+  
+  let correccion = (diferencia - sumatoria) / (verticesCompletos.length);
+  console.log("correcion", correccion)
 
-  // Inicializar tabla paneos
+
+  // Inicializar tabla resultados
   let texto = `
   <tr>
     <th scope="row">${baseVertNomen}</th>
@@ -210,23 +210,28 @@ document.querySelector('#calculos').innerHTML += texto;
   datosXml += "<Puntos_Calculados>";
 
 
+  console.log(verticesCompletos);
+  
+  let DHG_ANTERIOR = 0;
+  let HGPSFINAL_ANTERIOR = baseVertAltmsn;
 
   // CALCULO ORTOMETRICA
   for (const vertice of verticesCompletos) {
 
-
-
-    console.log(vertice.altelips, vertice.ondula, baseVertAlt, baseVertondula, baseVertAltmsn, corection)
+    // console.log(vertice.altelips, vertice.ondula, baseVertAlt, baseVertondula, baseVertAltmsn, correccion)
 
     const DHI = parseFloat(vertice.altelips) - parseFloat(baseVertAlt);
     const DNI = parseFloat(vertice.ondula) - parseFloat(baseVertondula);
     const DHG = DHI - DNI;
     const HGP = parseFloat(baseVertAltmsn) + DHG;
-    const DHO = DHG - 0;
-    const DHGC = DHO + parseFloat(corection);
-    const HGPSFINAL = parseFloat(baseVertAltmsn) + DHGC;
+    const DHO = DHG - parseFloat(DHG_ANTERIOR)
+    const DHGC = DHO + parseFloat(correccion);    
+    const HGPSFINAL = parseFloat(HGPSFINAL_ANTERIOR) + DHGC;
 
-    console.log(vertice)   
+    DHG_ANTERIOR = DHG;
+    HGPSFINAL_ANTERIOR = HGPSFINAL;
+
+    // console.log(DHI, DNI, DHG, HGP, DHO, DHGC, HGPSFINAL)   
 
     tabular({ DHI, DNI, DHG, HGP, DHO, DHGC, HGPSFINAL }, vertice)
 
@@ -290,8 +295,10 @@ document.querySelector('#calculos').innerHTML += texto;
                             </Set_de_Coordenadas>
                           </Punto>          
                       `;
-
   }
+
+  
+
 
   datosXml += "</Puntos_Calculados>";
 
@@ -383,7 +390,7 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
 
       } else {
         // CAR.txt
-        console.log("este es CAR")
+        
         for (let i = 1; i < vertices.length; i++) {
           if (vertices[i].length > 0) {
             verticesArray.push(eliminarEspacios3(vertices[i]));
@@ -403,7 +410,7 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
     try {
       const res = await fetch('./../json/Red pasiva GNSS.json');
       arregloRedPasiva = await res.json();
-      //console.log(arregloRedPasiva)
+      
     } catch (error) {
       console.error(error)
     }
@@ -418,7 +425,7 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
           velx: res.VelX, vely: res.VelY, velz: res.VelZ, altelips: res.AltElips, ondula: res.Ondula,
           lat: res.Lat, long: res.Long
         });
-        //console.log(res)
+        
       } else {
 
         // ====== CONVERTIR CORDENADAS GEOCENTRICAS A LAT Y LONG =========
@@ -456,7 +463,7 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
 
 
     for (let vertice of result) {
-      // console.log(vertice)
+      
       if (vertice.ondula === undefined) {
         const lat = vertice.lat;
         const lon = vertice.long;
@@ -466,7 +473,7 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
           const arregloOndula = await resultado.json();
           for (let i of arregloOndula) {
             if ((lat <= (i.lat + 0.033) && lat >= (i.lat - 0.0033)) && lon <= (i.lon + 0.033) && lon >= (i.lon - 0.0033)) {
-              //console.log(i)
+              
               verticeConOndulacion.push({
                 nombre: vertice.nombre, lat: vertice.lat, long: vertice.long, x: vertice.x, y: vertice.y, z: vertice.z,
                 tipo: vertice.tipo, ondula: i.alt
@@ -489,10 +496,6 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
 
     // ====== FIN =========
 
-
-
-    //console.log('verticeConOndulacion', verticeConOndulacion);
-
     let verticeConOndulacionClean = [];
 
     for (let resul of result) {
@@ -503,7 +506,7 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
         }
       }
     }
-    console.log(verticeConOndulacionClean)
+    
 
 
     // habilitar botones
@@ -518,7 +521,7 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
     for (let vertice of verticeConOndulacionClean) {
 
       if (vertice.tipo != 'CTRL') {
-        console.log(typeof vertice.lat)
+        
         promedio.latitude += typeof vertice.lat === "number" ? vertice.lat : parseFloat(vertice.lat.replace(',','.'));
         promedio.longitude += typeof vertice.long === "number" ? vertice.long : parseFloat(vertice.long.replace(',','.'));
         contador++;
@@ -527,7 +530,7 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
     promedio.latitude = promedio.latitude / contador;
     promedio.longitude = promedio.longitude / contador;
 
-    console.log(promedio)
+    
 
     // ====== FIN =========
 
@@ -569,17 +572,16 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
 
 
           if (element.indexOf("Intervalo de observación:") !== -1) {
-            //console.log("entro: " + element);
+            
 
             for (let elemento of e.target.result.split("</tr>")) {
 
-              if (elemento.indexOf("Alt Elip.:") !== -1) {
-                console.log(elemento.split("</td>")[3].substring(4, 14));
+              if (elemento.indexOf("Alt Elip.:") !== -1) {            
                 obj.altelips = elemento.split("</td>")[3].substring(4, 13);
               }
 
               if (elemento.indexOf("Intervalo de observación:") !== -1) {
-                //console.log("entro: " + elemento);
+                
                 const fecha = elemento.substring(85, 96);
                 const ano = fecha.substring(6, 10);
                 const mes = fecha.substring(3, 5);
@@ -629,14 +631,10 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
 
                 obj.anoEpoca = anoEpoca;
 
-                // console.log('anoEpoca', obj.anoEpoca);
-
-
               }
 
-              //          console.log(element);
-              if (elemento.indexOf("Altura Elip WGS84:") !== -1) {
-                // console.log(elemento.split("<td>"));
+              
+              if (elemento.indexOf("Altura Elip WGS84:") !== -1) {                
                 obj.altelips = elemento.substring(77, 85);
               }
 
@@ -658,9 +656,6 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
 
       };
       reader.readAsText(i);
-      // console.log(anosPorHtml, anosPorHtml.length)
-
-
     }
   }
 
@@ -692,20 +687,17 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
 
 document.querySelector('#viewDiv').addEventListener('click', async function (e) {
   if (e.target.tagName === 'TD' && e.target.parentNode.firstChild.textContent === 'Nomenclatura') {
-    // console.log(e.target.parentNode.parentNode.children[4].children[1].textContent);
+    
     let verticeElegido = {};
     verticeElegido.nombenclatura = e.target.textContent;
     // verticeElegido.altelips = e.target.parentNode.parentNode.children[4].children[1].textContent;
-    // verticeElegido.ondula = parseFloat(e.target.parentNode.parentNode.children[11].children[1].textContent.replace(',', '.'));
-    // console.log(verticeElegido)
+    // verticeElegido.ondula = parseFloat(e.target.parentNode.parentNode.children[11].children[1].textContent.replace(',', '.'));  
 
     let datosTabla = "";
 
-
     try {
       const res = await fetch(`https://redgeodesica-cg.igac.gov.co:8080/api/pasiva/ondulacion/${verticeElegido.nombenclatura}`);
-      const datos = await res.json();
-      console.log(datos)
+      const datos = await res.json();      
 
       if (!datos.ondula) {
         document.getElementById('tablaEntrada').innerHTML = "";
