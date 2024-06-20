@@ -41,7 +41,7 @@ function eliminarEspacios(linea) {
     }
   }
 
-  
+
 
   let objeto = {
     nombre: arreglo[0].substring(2, arreglo[0].length),
@@ -60,13 +60,13 @@ function eliminarEspacios2(linea) {
   let p = linea.split();
   let o = p[0].split(' ');
   let arreglo3 = [];
-  
+
 
 
   for (let i of o) {
     arreglo3 = arreglo3.concat(i.split('\t'));
   }
-  
+
 
   let latDd = dmsToDd(arreglo3[2], arreglo3[3], arreglo3[4], arreglo3[5]);
   let lonDd = dmsToDd(arreglo3[6], arreglo3[7], arreglo3[8], arreglo3[9]);
@@ -75,54 +75,54 @@ function eliminarEspacios2(linea) {
   let R = 6371000;
 
   let altWithComa = arreglo3[10].split('\r')[0]
-  let alt = parseFloat( altWithComa.replace(',','.') );  // Altura en metros
-  
+  let alt = parseFloat(altWithComa.replace(',', '.'));  // Altura en metros
+
 
   // Convertir coordenadas geodésicas a cartesianas
   let x = (R + alt) * Math.cos(degreesToRadians(latDd)) * Math.cos(degreesToRadians(lonDd));
   let y = (R + alt) * Math.cos(degreesToRadians(latDd)) * Math.sin(degreesToRadians(lonDd));
   let z = (R + alt) * Math.sin(degreesToRadians(latDd));
-  
+
 
   let tipo = '';
-  if(arreglo3[1] === 'Control'){
+  if (arreglo3[1] === 'Control') {
     tipo = 'CTRL';
   }
-  if(arreglo3[1] === 'Averaged'){
+  if (arreglo3[1] === 'Averaged') {
     tipo = 'MEAN';
   }
 
   let objeto = {
-      nombre:arreglo3[0],
-      x:x,
-      y:y,
-      z:z,
-      tipo:tipo
-  }  
-  
+    nombre: arreglo3[0],
+    x: x,
+    y: y,
+    z: z,
+    tipo: tipo
+  }
+
   return objeto;
 }
 
 function eliminarEspacios3(linea) {
 
-  let arreglo = linea.split('\t');   
-  
+  let arreglo = linea.split('\t');
+
   let tipo = '';
-  if(arreglo[4].split('\r')[0] === 'Control'){
+  if (arreglo[4].split('\r')[0] === 'Control') {
     tipo = 'CTRL';
   }
-  if(arreglo[4].split('\r')[0] === 'Averaged'){
+  if (arreglo[4].split('\r')[0] === 'Averaged') {
     tipo = 'MEAN';
   }
-  
-    let objeto = {
+
+  let objeto = {
     nombre: arreglo[0],
     x: arreglo[1],
     y: arreglo[2],
     z: arreglo[3],
     tipo: tipo
-  }  
-  
+  }
+
   return objeto;
 }
 
@@ -158,7 +158,7 @@ function buscarAnoDeCoordenada(coordenada, logsArray) {
 }
 
 function espacioEstasdar(cadena) {
-  
+
   for (let i = cadena.length; i < 6; i++) {
     cadena += ' ';
   }
@@ -191,7 +191,7 @@ const descargarItrf2014 = async (coordenada) => {
     let datosTabla = `${vertices[0]}\n${vertices[1]}\n${vertices[2]}\n`;
 
     for (let coordenadas of verticesArray) {
-      
+
       if (coordenadas.tipo != 'CTRL') {
         let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
 
@@ -202,7 +202,7 @@ const descargarItrf2014 = async (coordenada) => {
         datosTabla += `@#${nombreAjustado} \t  ${coordenadas.x} \t  ${coordenadas.y} \t  ${coordenadas.z} \t ${coordenadas.tipo} \n`;
       }
     }
-    
+
 
     var blob = new Blob([datosTabla], {
       type: 'text/txt'
@@ -239,6 +239,147 @@ const mostrarMensaje = (mensaje, tipo) => {
     toastr.clear();
     toastr.warning(mensaje);
   }
+
+}
+
+
+
+function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVertondula, baseVertAltmsn, baseVertAltmsn2, tabla) {
+  console.log(verticesCompletos, tabla)
+
+  let sumatoria = 0;
+  let DHG_ANTERIOR_prime = 0;
+
+  // PROMEDIO DHO
+  for (const vert of verticesCompletos) {
+
+
+    const DHI = parseFloat(vert.altelips) - parseFloat(baseVertAlt);
+    const DNI = parseFloat(vert.ondula) - parseFloat(baseVertondula);
+    const DHG = DHI - DNI;
+    const DHO = DHG - DHG_ANTERIOR_prime;
+
+    DHG_ANTERIOR_prime = DHG;
+    sumatoria += DHO
+  }
+
+  let diferencia = baseVertAltmsn - baseVertAltmsn2;
+  console.log("sumatoria", sumatoria)
+  console.log("diferencia", diferencia)
+
+  let correccion = (diferencia - sumatoria) / (verticesCompletos.length);
+  console.log("correcion", correccion)
+
+
+  // Inicializar tabla resultados
+  let texto = `
+   <tr>
+     <th scope="row">${baseVertNomen}</th>
+     <td>${baseVertAlt}</td>
+     <td>${baseVertondula}</td>
+     <td>${baseVertAltmsn}</td>
+     <td></td>
+     <td></td>
+     <td></td>
+     <td></td>
+     <td></td>
+     <td></td>
+     <td>${baseVertAltmsn}</td>         
+   </tr>
+   `;
+  document.querySelector(`#${tabla}`).innerHTML += texto;
+
+  let DHG_ANTERIOR = 0;
+  let HGPSFINAL_ANTERIOR = baseVertAltmsn;
+
+  // CALCULO ORTOMETRICA
+  for (const vertice of verticesCompletos) {
+
+    // console.log(vertice.altelips, vertice.ondula, baseVertAlt, baseVertondula, baseVertAltmsn, correccion)
+
+    const DHI = parseFloat(vertice.altelips) - parseFloat(baseVertAlt);
+    const DNI = parseFloat(vertice.ondula) - parseFloat(baseVertondula);
+    const DHG = DHI - DNI;
+    const HGP = parseFloat(baseVertAltmsn) + DHG;
+    const DHO = DHG - parseFloat(DHG_ANTERIOR)
+    const DHGC = DHO + parseFloat(correccion);
+    const HGPSFINAL = parseFloat(HGPSFINAL_ANTERIOR) + DHGC;
+
+    DHG_ANTERIOR = DHG;
+    HGPSFINAL_ANTERIOR = HGPSFINAL;
+
+    // console.log(DHI, DNI, DHG, HGP, DHO, DHGC, HGPSFINAL)   
+
+    tabular({ DHI, DNI, DHG, HGP, DHO, DHGC, HGPSFINAL }, vertice, tabla)
+  }
+  // ============ Fin calculos par tabular3 =========
+}
+
+
+
+function tabularDiferencias() {
+  // Obtén la tabla
+  const table1 = document.querySelector('#calculos');
+  const table2 = document.querySelector('#calculos2');
+  const table3 = document.querySelector('#calculos3');
+
+
+  const rows1 = table1.querySelectorAll('tr');
+  const rows2 = table2.querySelectorAll('tr');
+  const rows3 = table3.querySelectorAll('tr');
+
+  let listaVertices = [];
+
+  for (let i = 0; i < rows1.length; i++) {
+
+    const vertice = rows1[i].querySelector('th').textContent;
+    const listaTdUno = rows1[i].querySelectorAll('td');
+    const niveladaUno = listaTdUno[listaTdUno.length - 1].textContent;
+
+    const listaTdDos = rows2[i].querySelectorAll('td');
+    const niveladaDos = listaTdDos[listaTdDos.length - 1].textContent;
+
+    const listaTdTres = rows3[i].querySelectorAll('td');
+    const niveladaTres = listaTdTres[listaTdTres.length - 1].textContent;
+
+    const diferenciaUno = parseFloat(niveladaUno) - parseFloat(niveladaDos)
+    const diferenciaDos = parseFloat(niveladaDos) - parseFloat(niveladaTres)
+    const diferenciaTres = parseFloat(niveladaUno) - parseFloat(niveladaTres)
+
+    listaVertices.push({
+      vertice,
+      niveladaUno,
+      niveladaDos,
+      niveladaTres,
+      diferenciaUno,
+      diferenciaDos,
+      diferenciaTres
+    });
+
+
+
+
+  }
+  listaVertices = listaVertices.slice(1, listaVertices.length - 1);
+  console.log(listaVertices)
+
+  let texto = '';
+  for (let ver of listaVertices) {
+    texto += `
+    <tr>
+      <th scope="row">${ver.vertice}</th>      
+      <td>${ver.niveladaUno}</td>
+      <td>${ver.niveladaDos}</td>
+      <td>${ver.niveladaTres}</td>      
+      <td>${ver.diferenciaUno}</td>
+      <td>${ver.diferenciaDos}</td>
+      <td>${ver.diferenciaTres}</td>
+    </tr>
+    `;
+  }
+
+  document.querySelector('#bodyResultados').innerHTML = texto;
+
 
 }
 

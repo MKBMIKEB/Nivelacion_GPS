@@ -60,7 +60,7 @@ function cambiosToggleHabilitar(estado) {
 }
 
 
-function tabular(vertice, verticePunto) {
+function tabular(vertice, verticePunto, tabla) {
   
   let texto = `
         <tr>
@@ -77,8 +77,13 @@ function tabular(vertice, verticePunto) {
           <td>${vertice.HGPSFINAL.toFixed(5)}</td>         
         </tr>
         `;
-  document.querySelector('#calculos').innerHTML += texto;
+  document.querySelector(`#${tabla}`).innerHTML += texto;
 }
+
+function recargar(){
+  location.reload();
+}
+
 
 function cargarMapa(longitude, latitude) {
 

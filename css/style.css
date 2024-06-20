@@ -82,9 +82,45 @@ body {
     visibility: hidden;
 }
 
-.table-paneo {
+.table-resultados {
     font-size: 15px;
 }
+
+.arcoiris {
+    border-image: linear-gradient(to right, rgb(125, 125, 206) 20%, rgb(166, 221, 166) 20%, rgb(156, 197, 156) 40%, rgb(226, 187, 226) 40%, rgb(183, 114, 183) 60%, rgb(215, 190, 142) 60%, rgb(199, 172, 121) 80%, rgb(215, 109, 109) 80%) 1;           
+}
+
+.titulo {    
+    color: rgb(167, 192, 218);
+    margin-top: 10vh;
+}
+
+.table-resultados th {
+    color: #89decd !important;    
+}
+
+.bi-file-earmark-plus {
+    margin-right: 1vw;
+}
+
+
+
+#recargar {
+    position: fixed;
+    bottom: 20px; 
+    right: 20px;  
+    padding: 10px 20px;
+    background-color: #20947b;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#recargar:hover {
+    background-color: #0056b3;
+}
+
 
 
 @keyframes bgAnimation {
