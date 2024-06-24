@@ -121,6 +121,10 @@ body {
     background-color: #0056b3;
 }
 
+.agregar {
+    font-size: large;
+    color: rgb(13, 147, 66);
+}
 
 
 @keyframes bgAnimation {

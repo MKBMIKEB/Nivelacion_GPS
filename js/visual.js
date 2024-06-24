@@ -103,6 +103,7 @@ function cargarMapa(longitude, latitude) {
     "esri/geometry/Point",
     "esri/Graphic",
     "esri/layers/GraphicsLayer",
+    "esri/layers/GeoJSONLayer" 
   ], (
     esriConfig,
     Map,
@@ -118,7 +119,8 @@ function cargarMapa(longitude, latitude) {
     VectorTileLayer,
     Point,
     Graphic,
-    GraphicsLayer
+    GraphicsLayer,
+    GeoJSONLayer
   ) => {
     esriConfig.apiKey =
       "AAPK2a2e861a0c794bfdb29a1b4ce47b1583OBbY7CvHSkUPhQ20FG1hZEbAl5GmTTZcs-cyoy2tw5to5j_pJiiTW6J_KRbBx-qS";
@@ -127,92 +129,46 @@ function cargarMapa(longitude, latitude) {
       url: "https://tiles.arcgis.com/tiles/RVvWzU3lgJISqdke/arcgis/rest/services/Mapa_base_topografico/VectorTileServer",
     });
 
-    const layer = new MapImageLayer({
-      // url: "https://mapas.igac.gov.co/server/rest/services/geodesia/redpasiva/MapServer/",
-      url: "https://mapas.igac.gov.co/server/rest/services/geodesia/redcontrolverticaldeprecision/MapServer/",
-      sublayers: [
-        {
-          id: 0,
-          visible: true,
-          //  definitionExpression: "es_pasiva_gnss=0",
-          popupTemplate: {
-            //title: "Atributos",
-            outFields: ["*"],
-            content: [
-              {
-                "type": "fields",
-                "fieldInfos": [
-                  {
-                    "fieldName": "FID",
-                    "label": "FID"
-                  },
-                  {
-                    "fieldName": "Nomenclatu",
-                    "label": "Nomenclatura"
-                  },
-                  {
-                    "fieldName": "Latitud",
-                    "label": "Latitud"
-                  },
-                  {
-                    "fieldName": "Longitud",
-                    "label": "Longitud"
-                  },
-                  {
-                    "fieldName": "Altura_m_s",
-                    "label": "Altura"
-                  },
-                  {
-                    "fieldName": "Línea_Niv",
-                    "label": "Línea nivelada"
-                  },
-                  {
-                    "fieldName": "Bloque_Aju",
-                    "label": "Bloque ajustado"
-                  },
-                  {
-                    "fieldName": "Año_Calcu",
-                    "label": "Año calculo"
-                  },
-                  {
-                    "fieldName": "Alt_Elipso",
-                    "label": "Altura elipsoidal"
-                  },
-                  {
-                    "fieldName": "Tipo_Coord",
-                    "label": "Tipo coordenada"
-                  },
-                  {
-                    "fieldName": "Estado_Vé",
-                    "label": "Estado vértice"
-                  },
-                  {
-                    "fieldName": "Código_De",
-                    "label": "Código departamento"
-                  },
-                  {
-                    "fieldName": "Nombre_Dep",
-                    "label": "Nombre departamento"
-                  },
-                  {
-                    "fieldName": "Concatenad",
-                    "label": "Código municipio"
-                  },
-                  {
-                    "fieldName": "Nombre_Mun",
-                    "label": "Nombre municipio"
-                  },
-
-                ]
-              }
-            ],
-
-          },
-        },
-      ],
-    });
+  
+    const geojsonLayer = new GeoJSONLayer({
+      url: "./../../json/nivelados.json",
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-marker",
+          color: "orange",
+          outline: {
+            color: "white",
+            width: 1
+          }
+        }
+      },          
+      popupTemplate: {
+        title: "{Nomenclatu}",
+        content: [
+          {
+            type: "fields",
+            fieldInfos: [
+              { fieldName: "OBJECTID", label: "ID" },
+              { fieldName: "Nomenclatu", label: "Nomenclatura" },
+              { fieldName: "Alt_Elipso", label: "Altura elipsoidal" },
+              { fieldName: "Ondulacion", label: "ondulacion" },
+              { fieldName: "Altura_m_s", label: "Altura" },
+              { fieldName: "Latitud", label: "Latitud" },
+              { fieldName: "Longitud", label: "Longitud" },
+              { fieldName: "Línea_Niv", label: "Línea nivelada" },
+              { fieldName: "Bloque_Aju", label: "Bloque ajustado" },
+              { fieldName: "Año_Calcu", label: "Año calculo" },
+              { fieldName: "Tipo_Coord", label: "Tipo coordenada" },
+              { fieldName: "Estado_Vé", label: "Estado vértice" },                   
+            ]
+          }
+        ]
+      }
+      
+  });
     const map = new Map({
-      layers: [vtlLayer, layer],
+      layers: [vtlLayer, geojsonLayer],
     });
 
     // GRAFICAR PUNTO EN COORDENADAS CENTER

@@ -713,34 +713,24 @@ document.querySelector('#viewDiv').addEventListener('click', async function (e) 
 
     let verticeElegido = {};
     verticeElegido.nombenclatura = e.target.textContent;
-    // verticeElegido.altelips = e.target.parentNode.parentNode.children[4].children[1].textContent;
-    // verticeElegido.ondula = parseFloat(e.target.parentNode.parentNode.children[11].children[1].textContent.replace(',', '.'));  
+    verticeElegido.altura_msnmm = parseFloat( e.target.parentNode.parentNode.children[4].children[1].textContent.replace(/[^\d.-]/g, '') );
+    verticeElegido.ondula = parseFloat( e.target.parentNode.parentNode.children[3].children[1].textContent.replace(/[^\d.-]/g, '') );  
+    verticeElegido.altelips = parseFloat( e.target.parentNode.parentNode.children[2].children[1].textContent.replace(/[^\d.-]/g, '') );  
+    
+    // console.log("vertice elegido",verticeElegido);    
 
     let datosTabla = "";
 
-    try {
-      const res = await fetch(`https://redgeodesica-cg.igac.gov.co:8080/api/pasiva/ondulacion/${verticeElegido.nombenclatura}`);
-      const datos = await res.json();
-
-      if (!datos.ondula) {
-        document.getElementById('tablaEntrada').innerHTML = "";
-        return mostrarMensaje('El vértice no tiene infromación de Ondulación', 'warning');
-      }
-
-      mostrarMensaje('El vértice agregado correctamente', 'info');
-
-      verticeElegido.altura_msnmm = datos.altura_msnmm;
-      verticeElegido.altelips = datos.altura_elipsoidal;
-      verticeElegido.ondula = datos.ondula;
-
-
+    try {        
+      
       const tablaVertices = document.getElementById('tablaEntrada');
-
-      console.log(tablaVertices?.childNodes.length);
+      
+      // console.log(tablaVertices?.childNodes.length);
       if (tablaVertices?.childNodes.length > 3) {
         return mostrarMensaje('Ya se eligieron los vertices', 'warning');
       }
-
+      
+      mostrarMensaje('El vértice agregado correctamente', 'info');
 
       const primerVertice = document.getElementById('verticeFuente');
 
