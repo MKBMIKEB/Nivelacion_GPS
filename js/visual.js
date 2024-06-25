@@ -61,7 +61,7 @@ function cambiosToggleHabilitar(estado) {
 
 
 function tabular(vertice, verticePunto, tabla) {
-  
+
   let texto = `
         <tr>
           <th scope="row">${verticePunto.nombre}</th>
@@ -80,7 +80,7 @@ function tabular(vertice, verticePunto, tabla) {
   document.querySelector(`#${tabla}`).innerHTML += texto;
 }
 
-function recargar(){
+function recargar() {
   location.reload();
 }
 
@@ -103,7 +103,7 @@ function cargarMapa(longitude, latitude) {
     "esri/geometry/Point",
     "esri/Graphic",
     "esri/layers/GraphicsLayer",
-    "esri/layers/GeoJSONLayer" 
+    "esri/layers/GeoJSONLayer"
   ], (
     esriConfig,
     Map,
@@ -122,14 +122,14 @@ function cargarMapa(longitude, latitude) {
     GraphicsLayer,
     GeoJSONLayer
   ) => {
-    esriConfig.apiKey =
-      "AAPK2a2e861a0c794bfdb29a1b4ce47b1583OBbY7CvHSkUPhQ20FG1hZEbAl5GmTTZcs-cyoy2tw5to5j_pJiiTW6J_KRbBx-qS";
+    // esriConfig.apiKey =
+    //   "AAPK2a2e861a0c794bfdb29a1b4ce47b1583OBbY7CvHSkUPhQ20FG1hZEbAl5GmTTZcs-cyoy2tw5to5j_pJiiTW6J_KRbBx-qS";
 
-    const vtlLayer = new VectorTileLayer({
-      url: "https://tiles.arcgis.com/tiles/RVvWzU3lgJISqdke/arcgis/rest/services/Mapa_base_topografico/VectorTileServer",
-    });
+    // const vtlLayer = new VectorTileLayer({
+    //   url: "https://tiles.arcgis.com/tiles/RVvWzU3lgJISqdke/arcgis/rest/services/Mapa_base_topografico/VectorTileServer",
+    // });
 
-  
+
     const geojsonLayer = new GeoJSONLayer({
       url: "./../../json/nivelados.json",
       renderer: {
@@ -142,7 +142,7 @@ function cargarMapa(longitude, latitude) {
             width: 1
           }
         }
-      },          
+      },
       popupTemplate: {
         title: "{Nomenclatu}",
         content: [
@@ -160,15 +160,21 @@ function cargarMapa(longitude, latitude) {
               { fieldName: "Bloque_Aju", label: "Bloque ajustado" },
               { fieldName: "Año_Calcu", label: "Año calculo" },
               { fieldName: "Tipo_Coord", label: "Tipo coordenada" },
-              { fieldName: "Estado_Vé", label: "Estado vértice" },                   
+              { fieldName: "Estado_Vé", label: "Estado vértice" },
             ]
           }
         ]
       }
-      
-  });
+
+    });
+
+    // const map = new Map({
+    //   layers: [vtlLayer, geojsonLayer],
+    // });
+
     const map = new Map({
-      layers: [vtlLayer, geojsonLayer],
+      basemap: "topo-vector",
+      layers: [geojsonLayer],
     });
 
     // GRAFICAR PUNTO EN COORDENADAS CENTER

@@ -37,16 +37,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
     if (ver.tipo == 'CTRL') {
       datosXml += `
           <Punto Nombre="${ver.nombre}">
-                <Tipo_Punto>Estación</Tipo_Punto>
-                <SubTipo_Punto />
-                <Epoca_Punto />
-                <Velocidades>
-                    <Latitud>0</Latitud>
-                    <Longitud>0</Longitud>
-                    <X>0</X>
-                    <Y>0</Y>
-                    <Z>0</Z>
-                </Velocidades>
+                <Tipo_Punto>Estación</Tipo_Punto>                                                
                 <Set_de_Coordenadas>
                     <Cartesiana3d_rastreo>
                         <Datum>MAGNA-SIRGAS</Datum>
@@ -96,17 +87,39 @@ document.querySelector('#calcular').addEventListener('click', async function () 
       if (coordenadas.nombre === coordenada.name.split(' - ')[1].split('.')[0].trim()) {
 
         let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
+
+        let xreferencia = coordenadaAjustada[0] + (velx * deltaDeTiempo);
+        let yreferencia = coordenadaAjustada[1] + (vely * deltaDeTiempo);
+        let zreferencia = coordenadaAjustada[2] + (velz * deltaDeTiempo);
+
+        let latlonreferencia = geocentricas_elipsoidales(xreferencia, yreferencia, zreferencia);
+        let origenNac = transformarAOrigenNac(latlonreferencia.latDec, latlonreferencia.lonDec);
+        let gauss = gaussKrugger(latlonreferencia.latDec, latlonreferencia.lonDec);
+
         verticesCompletos.push(
           {
             lat: coordenadas.lat, long: coordenadas.long, nombre: coordenadas.nombre, ondula: coordenadas.ondula,
             tipo: coordenadas.tipo, x: coordenadas.x, y: coordenadas.y, z: coordenadas.z, altelips: coordenada.altelips.replace(",", "."),
-            xreferencia: coordenadaAjustada[0] + (velx * deltaDeTiempo),
-            yreferencia: coordenadaAjustada[1] + (vely * deltaDeTiempo),
-            zreferencia: coordenadaAjustada[2] + (velz * deltaDeTiempo),
+            xreferencia: xreferencia,
+            yreferencia: yreferencia,
+            zreferencia: zreferencia,
+            latReferencia: latlonreferencia.latDec,
+            lonReferencia: latlonreferencia.lonDec,
             anoEpoca: coordenada.anoEpoca,
             velx: coordenadas.velx,
             vely: coordenadas.vely,
-            velz: coordenadas.velz
+            velz: coordenadas.velz,
+            fecha: coordenada.fecha,
+            este: origenNac.x,
+            norte: origenNac.y,
+            esteKrugger: gauss.x,
+            norteKrugger: gauss.y,
+            originName: gauss.originName,
+            mascara: coordenada.mascara,
+            satelites: coordenada.satelites,
+            lecturaAltura: coordenada.lecturaAltura,
+            alturaAntena: coordenada.alturaAntena,
+            tipoSolucion: coordenada.tipoSolucion
           }
         );
         break;
@@ -146,14 +159,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
               <Ondulación_Geoidal>
                   <Valor>${baseVertondula}</Valor>
                   <Modelo_Geoidal />
-              </Ondulación_Geoidal>
-              <Velocidades>
-                  <Latitud>0</Latitud>
-                  <Longitud>0</Longitud>
-                  <X>0</X>
-                  <Y>0</Y>
-                  <Z>0</Z>
-              </Velocidades>
+              </Ondulación_Geoidal>              
               <Set_de_Coordenadas>
                   <Ellipsoidal>
                       <Datum>MAGNA-SIRGAS</Datum>
@@ -244,10 +250,10 @@ document.querySelector('#calcular').addEventListener('click', async function () 
 
     tabular({ DHI, DNI, DHG, HGP, DHO, DHGC, HGPSFINAL }, vertice, 'calculos')
 
+    console.log(vertice)
     datosXml += `
     <Punto Nombre="${vertice.nombre}">
-    <Tipo_Punto>Recuperado</Tipo_Punto>
-      <SubTipo_Punto />
+    <Tipo_Punto>Recuperado</Tipo_Punto>      
       <Epoca_Punto>Época 2018</Epoca_Punto>
       <Altura_Ortométrica>
           <Valor>${HGPSFINAL}</Valor>
@@ -259,7 +265,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
           <Modelo_Geoidal>GEOCOL</Modelo_Geoidal>
       </Ondulación_Geoidal>
       <Fecha_de_Captura>
-          <Fecha>02/05/2023</Fecha>
+          <Fecha>${vertice.fecha}</Fecha>
           <Hora>00:00:00</Hora>
       </Fecha_de_Captura>
       <Velocidades>
@@ -284,22 +290,34 @@ document.querySelector('#calcular').addEventListener('click', async function () 
         </Cartesiana3d_rastreo>
         <Elipsoidal_rastreo>
             <Datum>MAGNA-SIRGAS</Datum>
-            <Latitud>4.151332407273033</Latitud>
-            <Longitud>-74.8906323223225</Longitud>
-            <Altura_Elipsoidal>339.88394</Altura_Elipsoidal>
+            <Latitud>${vertice.lat}</Latitud>
+            <Longitud>${vertice.long}</Longitud>
+            <Altura_Elipsoidal>${vertice.altelips}</Altura_Elipsoidal>
         </Elipsoidal_rastreo>
         <Elipsoidal_referencia>
             <Datum>MAGNA-SIRGAS</Datum>
-            <Latitud>4.151331748518632</Latitud>
-            <Longitud>-74.89063245517487</Longitud>
-            <Altura_Elipsoidal>${vertice.altelips}</Altura_Elipsoidal>
+            <Latitud>${vertice.latReferencia}</Latitud>
+            <Longitud>${vertice.lonReferencia}</Longitud>            
         </Elipsoidal_referencia>
         <Gauss_referencia>
             <Datum>MAGNA-SIRGAS</Datum>
-            <Norte>950852.4727</Norte>
-            <Este>909716.27366</Este>
-            <Origen>Central</Origen>
+            <Norte>${vertice.norteKrugger}</Norte>
+            <Este>${vertice.esteKrugger}</Este>
+            <Origen>${vertice.originName}</Origen>
         </Gauss_referencia>
+        <Origen>
+            <Datum>MAGNA-SIRGAS</Datum>
+            <Norte>${vertice.norte}</Norte>
+            <Este>${vertice.este}</Este>            
+        </Origen>
+        <Otros>
+          <Mascara>${vertice?.mascara}</Mascara>
+          <Satelites>${vertice?.satelites}</Satelites>
+          <LecturaAltura>${vertice?.lecturaAltura}</LecturaAltura>
+          <LecturaAntena>${vertice?.alturaAntena}</LecturaAntena>
+          <TipoSolucion>${vertice?.tipoSolucion}</TipoSolucion>
+
+        </Otros>
       </Set_de_Coordenadas>
     </Punto>          
 `;
@@ -601,6 +619,15 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
 
               if (elemento.indexOf("Alt Elip.:") !== -1) {
                 obj.altelips = elemento.split("</td>")[3].substring(4, 13);
+              }             
+              
+
+              if (elemento.indexOf("Altura de antena:") !== -1) {
+                obj.alturaAntena = elemento.split('<td>')[2].split('</td>')[0];                
+              }
+
+              if (elemento.indexOf("Tipo de solución:") !== -1) {
+                console.log(elemento.split("</td>"));               
               }
 
               if (elemento.indexOf("Intervalo de observación:") !== -1) {
@@ -618,9 +645,12 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
                 let anoEpoca = parseInt(ano) + (diaDelAno / 365);
 
                 obj.anoEpoca = anoEpoca;
+                obj.fecha = `${ano}/${mes}/${dia}`;
 
                 break;
               }
+
+            
 
             }
 
@@ -653,12 +683,32 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
                 let anoEpoca = parseInt(ano) + (diaDelAno / 365);
 
                 obj.anoEpoca = anoEpoca;
+                obj.fecha = `${ano}/${mes}/${dia}`;
 
               }
 
 
               if (elemento.indexOf("Altura Elip WGS84:") !== -1) {
-                obj.altelips = elemento.substring(77, 85);
+                obj.altelips = elemento.substring(77, 85).replace('.', '');
+              }
+
+              if (elemento.indexOf("M&#225;scara de Elevaci&#243;n:") !== -1) {
+                obj.mascara = elemento.substring(98, 106).split('&#176;')[0] + '°';
+              }
+
+              if (elemento.indexOf("Sistema de Sat&#233;lites:") !== -1) {
+                obj.satelites = elemento.split('<td>')[2].split('</td>')[0];
+              }
+
+              if (elemento.indexOf("Lectura de Altura:") !== -1) {
+                obj.lecturaAltura = elemento.split('<td>')[2].split('</td>')[0];
+              }
+
+              if (elemento.indexOf("Altura de Antena:") !== -1) {
+                obj.alturaAntena = elemento.split('<td>')[2].split('</td>')[0];
+              }
+              if (elemento.indexOf("Tipo de Soluci&#243;n:") !== -1) {
+                obj.tipoSolucion = elemento.split('<td>')[2].split('</td>')[0];
               }
 
 
@@ -713,23 +763,23 @@ document.querySelector('#viewDiv').addEventListener('click', async function (e) 
 
     let verticeElegido = {};
     verticeElegido.nombenclatura = e.target.textContent;
-    verticeElegido.altura_msnmm = parseFloat( e.target.parentNode.parentNode.children[4].children[1].textContent.replace(/[^\d.-]/g, '') );
-    verticeElegido.ondula = parseFloat( e.target.parentNode.parentNode.children[3].children[1].textContent.replace(/[^\d.-]/g, '') );  
-    verticeElegido.altelips = parseFloat( e.target.parentNode.parentNode.children[2].children[1].textContent.replace(/[^\d.-]/g, '') );  
-    
+    verticeElegido.altura_msnmm = parseFloat(e.target.parentNode.parentNode.children[4].children[1].textContent.replace(/[^\d.-]/g, ''));
+    verticeElegido.ondula = parseFloat(e.target.parentNode.parentNode.children[3].children[1].textContent.replace(/[^\d.-]/g, ''));
+    verticeElegido.altelips = parseFloat(e.target.parentNode.parentNode.children[2].children[1].textContent.replace(/[^\d.-]/g, ''));
+
     // console.log("vertice elegido",verticeElegido);    
 
     let datosTabla = "";
 
-    try {        
-      
+    try {
+
       const tablaVertices = document.getElementById('tablaEntrada');
-      
+
       // console.log(tablaVertices?.childNodes.length);
       if (tablaVertices?.childNodes.length > 3) {
         return mostrarMensaje('Ya se eligieron los vertices', 'warning');
       }
-      
+
       mostrarMensaje('El vértice agregado correctamente', 'info');
 
       const primerVertice = document.getElementById('verticeFuente');

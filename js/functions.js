@@ -245,7 +245,7 @@ const mostrarMensaje = (mensaje, tipo) => {
 
 
 function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVertondula, baseVertAltmsn, baseVertAltmsn2, tabla) {
-  console.log(verticesCompletos, tabla)
+  // console.log(verticesCompletos, tabla)
 
   let sumatoria = 0;
   let DHG_ANTERIOR_prime = 0;
@@ -264,11 +264,11 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
   }
 
   let diferencia = baseVertAltmsn - baseVertAltmsn2;
-  console.log("sumatoria", sumatoria)
-  console.log("diferencia", diferencia)
+  // console.log("sumatoria", sumatoria)
+  // console.log("diferencia", diferencia)
 
   let correccion = (diferencia - sumatoria) / (verticesCompletos.length);
-  console.log("correcion", correccion)
+  // console.log("correcion", correccion)
 
 
   // Inicializar tabla resultados
@@ -361,7 +361,7 @@ function tabularDiferencias() {
 
   }
   listaVertices = listaVertices.slice(1, listaVertices.length - 1);
-  console.log(listaVertices)
+  // console.log(listaVertices)
 
   let texto = '';
   for (let ver of listaVertices) {
@@ -384,8 +384,171 @@ function tabularDiferencias() {
 }
 
 
+// ====== CONVERTIR CORDENADAS GEOCENTRICAS A LAT Y LONG =========
+function geocentricas_elipsoidales(xreferencia, yreferencia, zreferencia) {
+  // console.log(xreferencia, yreferencia, zreferencia);
+  let x = parseFloat(xreferencia);
+  let y = parseFloat(yreferencia);
+  let z = parseFloat(zreferencia);
+
+  var a = 6378137.0; // Semieje mayor de la Tierra en metros
+  var f = 1.0 / 298.257223563; // Factor de achatamiento
+  var e2 = 2 * f - f * f; // Excentricidad al cuadrado
+
+  var lon = Math.atan2(y, x);
+  var p = Math.sqrt(x * x + y * y);
+  var lat = Math.atan2(z, p * (1 - e2));
+  var v = a / Math.sqrt(1 - e2 * Math.sin(lat) * Math.sin(lat));
+
+  var latDec = lat * 180 / Math.PI;
+  var lonDec = lon * 180 / Math.PI;
+
+  // console.log(latDec, lonDec);
+  return { latDec, lonDec };
+
+}
+// ====== FIN =========
 
 
+// Función para calcular la distancia meridiana
+function meridianDistance(lat) {
+
+  // Constantes WGS84
+  const a = 6378137.0;  // Radio ecuatorial
+  const f = 1 / 298.257223563;  // Aplanamiento
+  const e2 = 2 * f - f * f;  // Excentricidad al cuadrado
+
+
+  const e4 = e2 * e2;
+  const e6 = e4 * e2;
+  return a * (
+    (1 - e2 / 4 - 3 * e4 / 64 - 5 * e6 / 256) * lat
+    - (3 * e2 / 8 + 3 * e4 / 32 + 45 * e6 / 1024) * Math.sin(2 * lat)
+    + (15 * e4 / 256 + 45 * e6 / 1024) * Math.sin(4 * lat)
+    - (35 * e6 / 3072) * Math.sin(6 * lat)
+  );
+}
+
+
+// Función para transformar coordenadas
+function transformarAOrigenNac(lat, lon) {
+
+  // Definir constantes de la proyección
+  const lat_0 = 4.0 * (Math.PI / 180);  // Convertir grados a radianes
+  const lon_0 = -73.0 * (Math.PI / 180); // Convertir grados a radianes
+  const false_northing = 2000000;
+  const false_easting = 5000000;
+  const k0 = 0.9992;
+  // Constantes WGS84
+  const a = 6378137.0;  // Radio ecuatorial
+  const f = 1 / 298.257223563;  // Aplanamiento
+  const e2 = 2 * f - f * f;  // Excentricidad al cuadrado
+
+
+  // Convertir latitud y longitud a radianes
+  lat = lat * (Math.PI / 180);
+  lon = lon * (Math.PI / 180);
+  // Cálculo de coordenadas en la proyección Transverse Mercator
+  const N = a / Math.sqrt(1 - e2 * Math.sin(lat) * Math.sin(lat));
+  const T = Math.tan(lat) * Math.tan(lat);
+  const C = e2 * Math.cos(lat) * Math.cos(lat) / (1 - e2);
+  const A = (lon - lon_0) * Math.cos(lat);
+  const M = meridianDistance(lat);
+  const M0 = meridianDistance(lat_0);  // Distancia meridiana del origen
+  const x = false_easting + k0 * N * (A + (1 - T + C) * Math.pow(A, 3) / 6 + (5 - 18 * T + T * T + 72 * C - 58 * e2) * Math.pow(A, 5) / 120);
+  const y = false_northing + k0 * (M - M0 + N * Math.tan(lat) * (A * A / 2 + (5 - T + 9 * C + 4 * C * C) * Math.pow(A, 4) / 24 + (61 - 58 * T + T * T + 600 * C - 330 * e2) * Math.pow(A, 6) / 720));
+  return { x, y };
+}
+
+
+
+// Función para transformar coordenadas
+function gaussKrugger(lat, lon) {
+
+    // Constantes WGS84
+    const a = 6378137.0;  // Radio ecuatorial
+    const f = 1 / 298.257223563;  // Aplanamiento
+    const e2 = 2 * f - f * f;  // Excentricidad al cuadrado
+ 
+  // Convertir latitud y longitud a radianes
+  lat = lat * (Math.PI / 180);
+  lon = lon * (Math.PI / 180);
+  // Identificar el origen adecuado
+  const origin = identifyOrigin(lon * (180 / Math.PI));
+  // Cálculo de coordenadas en la proyección Transverse Mercator
+  const N = a / Math.sqrt(1 - e2 * Math.sin(lat) * Math.sin(lat));
+  const T = Math.tan(lat) * Math.tan(lat);
+  const C = e2 * Math.cos(lat) * Math.cos(lat) / (1 - e2);
+  const A = (lon - origin.lon_0) * Math.cos(lat);
+  const M = meridianDistance(lat);
+  const M0 = meridianDistance(origin.lat_0);  // Distancia meridiana del origen
+  const x = origin.false_easting + origin.k0 * N * (A + (1 - T + C) * Math.pow(A, 3) / 6 + (5 - 18 * T + T * T + 72 * C - 58 * e2) * Math.pow(A, 5) / 120);
+  const y = origin.false_northing + origin.k0 * (M - M0 + N * Math.tan(lat) * (A * A / 2 + (5 - T + 9 * C + 4 * C * C) * Math.pow(A, 4) / 24 + (61 - 58 * T + T * T + 600 * C - 330 * e2) * Math.pow(A, 6) / 720));
+  // console.log('Origen identificado: ' + origin.name);
+  const originName = origin.name;
+  return {x, y, originName};
+}
+
+// Definir los parámetros de los orígenes de Gauss-Krüger en Colombia
+const origins = [
+  {
+      name: "Central-MAGNA",
+      lat_0: 4.59620041667 * (Math.PI / 180), // Convertir grados a radianes
+      lon_0: -74.07750791667 * (Math.PI / 180), // Convertir grados a radianes
+      false_northing: 1000000,
+      false_easting: 1000000,
+      k0: 1.0
+  },
+  {
+      name: "Este-MAGNA",
+      lat_0: 4.59620041667 * (Math.PI / 180), // Convertir grados a radianes
+      lon_0: -71.07750791667 * (Math.PI / 180), // Convertir grados a radianes
+      false_northing: 1000000,
+      false_easting: 1000000,
+      k0: 1.0
+  },
+  {
+      name: "Este Este - MAGNA",
+      lat_0: 4.596200417 * (Math.PI / 180), // Convertir grados a radianes
+      lon_0: -68.07750791667 * (Math.PI / 180), // Convertir grados a radianes
+      false_northing: 1000000,
+      false_easting: 1000000,
+      k0: 1.0
+  },
+  {
+      name: "Oeste - MAGNA",
+      lat_0: 4.59620041667 * (Math.PI / 180), // Convertir grados a radianes
+      lon_0: -77.07750791667 * (Math.PI / 180), // Convertir grados a radianes
+      false_northing: 1000000,
+      false_easting: 1000000,
+      k0: 1.0
+  },
+  {
+      name: "Oeste Oeste - MAGNA",
+      lat_0: 4.59620041667 * (Math.PI / 180), // Convertir grados a radianes
+      lon_0: -80.07750791667 * (Math.PI / 180), // Convertir grados a radianes
+      false_northing: 1000000,
+      false_easting: 1000000,
+      k0: 1.0
+  }
+];
+
+// Función para identificar el origen adecuado basado en la longitud
+function identifyOrigin(lon) {
+  if (lon >= -75 && lon < -71) {
+      return origins[0]; // Bogotá-MAGNA
+  } else if (lon >= -71 && lon < -68) {
+      return origins[1]; // Este Central - MAGNA
+  } else if (lon >= -68 && lon < -65) {
+      return origins[2]; // Este Este - MAGNA
+  } else if (lon >= -77 && lon < -75) {
+      return origins[3]; // Oeste - MAGNA
+  } else if (lon >= -80 && lon < -77) {
+      return origins[4]; // Oeste Oeste - MAGNA
+  } else {
+      throw new Error("Longitud fuera del rango de los orígenes definidos.");
+  }
+}
 
 
 
