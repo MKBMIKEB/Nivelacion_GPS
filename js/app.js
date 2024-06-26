@@ -67,10 +67,11 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   let vely = "";
   let velz = "";
   for (let vel of arrTexto) {
+
     if (vel.velx != undefined) {
-      velx = parseFloat(vel.velx.replace(",", "."));
-      vely = parseFloat(vel.vely.replace(",", "."));
-      velz = parseFloat(vel.velz.replace(",", "."));
+      velx = parseFloat(typeof vel.velx == 'string' ? vel.velx.replace(",", ".") : vel.velx);
+      vely = parseFloat(typeof vel.vely == 'string' ? vel.vely.replace(",", ".") : vel.vely);
+      velz = parseFloat(typeof vel.velz == 'string' ? vel.velz.replace(",", ".") : vel.velz);
       break;
     }
   }
@@ -119,7 +120,10 @@ document.querySelector('#calcular').addEventListener('click', async function () 
             satelites: coordenada.satelites,
             lecturaAltura: coordenada.lecturaAltura,
             alturaAntena: coordenada.alturaAntena,
-            tipoSolucion: coordenada.tipoSolucion
+            tipoSolucion: coordenada.tipoSolucion,
+            m0: coordenada.m0,
+            gdop: coordenada.gdop,
+            duracion: coordenada.duracion
           }
         );
         break;
@@ -249,11 +253,10 @@ document.querySelector('#calcular').addEventListener('click', async function () 
     // console.log(DHI, DNI, DHG, HGP, DHO, DHGC, HGPSFINAL)   
 
     tabular({ DHI, DNI, DHG, HGP, DHO, DHGC, HGPSFINAL }, vertice, 'calculos')
-
-    console.log(vertice)
+    // console.log(vertice)
     datosXml += `
     <Punto Nombre="${vertice.nombre}">
-    <Tipo_Punto>Recuperado</Tipo_Punto>      
+    <Tipo_Punto>${tipoPunto(vertice.duracion)}</Tipo_Punto>      
       <Epoca_Punto>Época 2018</Epoca_Punto>
       <Altura_Ortométrica>
           <Valor>${HGPSFINAL}</Valor>
@@ -316,7 +319,8 @@ document.querySelector('#calcular').addEventListener('click', async function () 
           <LecturaAltura>${vertice?.lecturaAltura}</LecturaAltura>
           <LecturaAntena>${vertice?.alturaAntena}</LecturaAntena>
           <TipoSolucion>${vertice?.tipoSolucion}</TipoSolucion>
-
+          <M0>${vertice?.m0}</M0>
+          <Gdop>${vertice?.gdop}</Gdop>
         </Otros>
       </Set_de_Coordenadas>
     </Punto>          
@@ -469,8 +473,7 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
 
       } else {
 
-        // ====== CONVERTIR CORDENADAS GEOCENTRICAS A LAT Y LONG =========
-
+        // ====== CONVERTIR CORDENADAS GEOCENTRICAS A LAT Y LONG =========        
         let x = parseFloat(vertice.x);
         let y = parseFloat(vertice.y);
         let z = parseFloat(vertice.z);
@@ -587,8 +590,6 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
 
 
 
-
-
 document.getElementById("cargarCarpeta").addEventListener("change", function (ev) {
 
 
@@ -600,7 +601,9 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
   localStorage.setItem('anosPorHtml', JSON.stringify(anosPorHtml));
 
   for (let i of file) {
+
     let obj = {};
+
     if (i.name.indexOf("html") !== -1) {
 
       obj.name = i.name;
@@ -619,15 +622,15 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
 
               if (elemento.indexOf("Alt Elip.:") !== -1) {
                 obj.altelips = elemento.split("</td>")[3].substring(4, 13);
-              }             
-              
+              }
+
 
               if (elemento.indexOf("Altura de antena:") !== -1) {
-                obj.alturaAntena = elemento.split('<td>')[2].split('</td>')[0];                
+                obj.alturaAntena = elemento.split('<td>')[2].split('</td>')[0];
               }
 
               if (elemento.indexOf("Tipo de solución:") !== -1) {
-                console.log(elemento.split("</td>"));               
+                console.log(elemento.split("</td>"));
               }
 
               if (elemento.indexOf("Intervalo de observación:") !== -1) {
@@ -650,7 +653,7 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
                 break;
               }
 
-            
+
 
             }
 
@@ -689,7 +692,8 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
 
 
               if (elemento.indexOf("Altura Elip WGS84:") !== -1) {
-                obj.altelips = elemento.substring(77, 85).replace('.', '');
+                // obj.altelips = elemento.substring(77, 85).replace('.', '');
+                obj.altelips = elemento.split('<td>')[2].split('</td>')[0].split(' ')[0].replace('.', '');
               }
 
               if (elemento.indexOf("M&#225;scara de Elevaci&#243;n:") !== -1) {
@@ -710,6 +714,82 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
               if (elemento.indexOf("Tipo de Soluci&#243;n:") !== -1) {
                 obj.tipoSolucion = elemento.split('<td>')[2].split('</td>')[0];
               }
+              if (elemento.indexOf("M0:") !== -1) {
+                obj.m0 = elemento.split('<td>')[2].split('</td>')[0];
+              }
+              if (elemento.indexOf("GDOP:") !== -1) {
+                obj.gdop = elemento.split('<td>')[4].split('</td>')[0];
+              }
+              if (elemento.indexOf("Duraci&#243;n:") !== -1) {                
+                obj.duracion = elemento.split('<td>')[2].split('</td>')[0];
+              }
+
+            }
+
+            let arre = JSON.parse(localStorage.getItem('anosPorHtml'))
+            arre.push(obj)
+            localStorage.setItem('anosPorHtml', JSON.stringify(arre));
+
+            break;
+          }
+
+
+          if (element.indexOf("Start Time - End Time:") !== -1) {
+            for (let elemento of e.target.result.split("</tr>")) {
+
+              if (elemento.indexOf("Start Time - End Time:") !== -1) {
+                // console.log(elemento.substring(89, 100))
+                const fecha = elemento.substring(89, 100);
+
+                const ano = fecha.substring(6, 10);
+                const mes = fecha.substring(3, 5);
+                const dia = fecha.substring(0, 2);
+
+
+
+
+                var fechaEjemplo = new Date(ano, mes - 1, dia);
+                var diaDelAno = calcularDiaDelAno(fechaEjemplo);
+
+                let anoEpoca = parseInt(ano) + (diaDelAno / 365);
+
+                obj.anoEpoca = anoEpoca;
+                obj.fecha = `${ano}/${mes}/${dia}`;
+
+              }
+
+
+              if (elemento.indexOf("WGS84 Ellip. Height:") !== -1) {
+                obj.altelips = elemento.split('<td>')[2].split('</td>')[0].split(' ')[0].replace('.', '');
+              }
+
+              if (elemento.indexOf("Cut-Off Angle:") !== -1) {
+                obj.mascara = elemento.split('<td>')[2].split('&#176;')[0] + '°';
+              }
+
+              if (elemento.indexOf("Satellite System:") !== -1) {
+                obj.satelites = elemento.split('<td>')[2].split('</td>')[0];
+              }
+
+              if (elemento.indexOf("Height Reading:") !== -1) {
+                obj.lecturaAltura = elemento.split('<td>')[2].split('</td>')[0];
+              }
+
+              if (elemento.indexOf("Antenna Height:") !== -1) {
+                obj.alturaAntena = elemento.split('<td>')[2].split('</td>')[0];
+              }
+              if (elemento.indexOf("Solution Type:") !== -1) {
+                obj.tipoSolucion = elemento.split('<td>')[2].split('</td>')[0];
+              }
+              if (elemento.indexOf("M0:") !== -1) {
+                obj.m0 = elemento.split('<td>')[2].split('</td>')[0];
+              }
+              if (elemento.indexOf("GDOP:") !== -1) {
+                obj.gdop = elemento.split('<td>')[4].split('</td>')[0];
+              }
+              if (elemento.indexOf("Duration:") !== -1) {                
+                obj.duracion = elemento.split('<td>')[2].split('</td>')[0];
+              }
 
 
 
@@ -721,6 +801,7 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
 
             break;
           }
+
 
 
         }

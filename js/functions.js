@@ -550,5 +550,25 @@ function identifyOrigin(lon) {
   }
 }
 
+function tipoPunto(duracion){
+  
+  if(duracion !== undefined){
+
+    let tiempo = duracion.substring(0, 2);
+    tiempo = parseInt(tiempo);
+
+    if(tiempo < 5){
+      return "Fotocontrol";
+    }else if(tiempo >= 5 && tiempo <= 6){
+      return "Auxiliar";
+    }else {
+      return "Geodésico";
+    }    
+
+  }else {
+    return "";
+  }
+}
+
 
 
