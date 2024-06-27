@@ -465,11 +465,11 @@ function transformarAOrigenNac(lat, lon) {
 // Función para transformar coordenadas
 function gaussKrugger(lat, lon) {
 
-    // Constantes WGS84
-    const a = 6378137.0;  // Radio ecuatorial
-    const f = 1 / 298.257223563;  // Aplanamiento
-    const e2 = 2 * f - f * f;  // Excentricidad al cuadrado
- 
+  // Constantes WGS84
+  const a = 6378137.0;  // Radio ecuatorial
+  const f = 1 / 298.257223563;  // Aplanamiento
+  const e2 = 2 * f - f * f;  // Excentricidad al cuadrado
+
   // Convertir latitud y longitud a radianes
   lat = lat * (Math.PI / 180);
   lon = lon * (Math.PI / 180);
@@ -486,89 +486,211 @@ function gaussKrugger(lat, lon) {
   const y = origin.false_northing + origin.k0 * (M - M0 + N * Math.tan(lat) * (A * A / 2 + (5 - T + 9 * C + 4 * C * C) * Math.pow(A, 4) / 24 + (61 - 58 * T + T * T + 600 * C - 330 * e2) * Math.pow(A, 6) / 720));
   // console.log('Origen identificado: ' + origin.name);
   const originName = origin.name;
-  return {x, y, originName};
+  return { x, y, originName };
 }
 
 // Definir los parámetros de los orígenes de Gauss-Krüger en Colombia
 const origins = [
   {
-      name: "Central-MAGNA",
-      lat_0: 4.59620041667 * (Math.PI / 180), // Convertir grados a radianes
-      lon_0: -74.07750791667 * (Math.PI / 180), // Convertir grados a radianes
-      false_northing: 1000000,
-      false_easting: 1000000,
-      k0: 1.0
+    name: "Central-MAGNA",
+    lat_0: 4.59620041667 * (Math.PI / 180), // Convertir grados a radianes
+    lon_0: -74.07750791667 * (Math.PI / 180), // Convertir grados a radianes
+    false_northing: 1000000,
+    false_easting: 1000000,
+    k0: 1.0
   },
   {
-      name: "Este-MAGNA",
-      lat_0: 4.59620041667 * (Math.PI / 180), // Convertir grados a radianes
-      lon_0: -71.07750791667 * (Math.PI / 180), // Convertir grados a radianes
-      false_northing: 1000000,
-      false_easting: 1000000,
-      k0: 1.0
+    name: "Este-MAGNA",
+    lat_0: 4.59620041667 * (Math.PI / 180), // Convertir grados a radianes
+    lon_0: -71.07750791667 * (Math.PI / 180), // Convertir grados a radianes
+    false_northing: 1000000,
+    false_easting: 1000000,
+    k0: 1.0
   },
   {
-      name: "Este Este - MAGNA",
-      lat_0: 4.596200417 * (Math.PI / 180), // Convertir grados a radianes
-      lon_0: -68.07750791667 * (Math.PI / 180), // Convertir grados a radianes
-      false_northing: 1000000,
-      false_easting: 1000000,
-      k0: 1.0
+    name: "Este Este - MAGNA",
+    lat_0: 4.596200417 * (Math.PI / 180), // Convertir grados a radianes
+    lon_0: -68.07750791667 * (Math.PI / 180), // Convertir grados a radianes
+    false_northing: 1000000,
+    false_easting: 1000000,
+    k0: 1.0
   },
   {
-      name: "Oeste - MAGNA",
-      lat_0: 4.59620041667 * (Math.PI / 180), // Convertir grados a radianes
-      lon_0: -77.07750791667 * (Math.PI / 180), // Convertir grados a radianes
-      false_northing: 1000000,
-      false_easting: 1000000,
-      k0: 1.0
+    name: "Oeste - MAGNA",
+    lat_0: 4.59620041667 * (Math.PI / 180), // Convertir grados a radianes
+    lon_0: -77.07750791667 * (Math.PI / 180), // Convertir grados a radianes
+    false_northing: 1000000,
+    false_easting: 1000000,
+    k0: 1.0
   },
   {
-      name: "Oeste Oeste - MAGNA",
-      lat_0: 4.59620041667 * (Math.PI / 180), // Convertir grados a radianes
-      lon_0: -80.07750791667 * (Math.PI / 180), // Convertir grados a radianes
-      false_northing: 1000000,
-      false_easting: 1000000,
-      k0: 1.0
+    name: "Oeste Oeste - MAGNA",
+    lat_0: 4.59620041667 * (Math.PI / 180), // Convertir grados a radianes
+    lon_0: -80.07750791667 * (Math.PI / 180), // Convertir grados a radianes
+    false_northing: 1000000,
+    false_easting: 1000000,
+    k0: 1.0
   }
 ];
 
 // Función para identificar el origen adecuado basado en la longitud
 function identifyOrigin(lon) {
   if (lon >= -75 && lon < -71) {
-      return origins[0]; // Bogotá-MAGNA
+    return origins[0]; // Bogotá-MAGNA
   } else if (lon >= -71 && lon < -68) {
-      return origins[1]; // Este Central - MAGNA
+    return origins[1]; // Este Central - MAGNA
   } else if (lon >= -68 && lon < -65) {
-      return origins[2]; // Este Este - MAGNA
+    return origins[2]; // Este Este - MAGNA
   } else if (lon >= -77 && lon < -75) {
-      return origins[3]; // Oeste - MAGNA
+    return origins[3]; // Oeste - MAGNA
   } else if (lon >= -80 && lon < -77) {
-      return origins[4]; // Oeste Oeste - MAGNA
+    return origins[4]; // Oeste Oeste - MAGNA
   } else {
-      throw new Error("Longitud fuera del rango de los orígenes definidos.");
+    throw new Error("Longitud fuera del rango de los orígenes definidos.");
   }
 }
 
-function tipoPunto(duracion){
-  
-  if(duracion !== undefined){
+function tipoPunto(duracion) {
+
+  if (duracion !== undefined) {
 
     let tiempo = duracion.substring(0, 2);
     tiempo = parseInt(tiempo);
 
-    if(tiempo < 5){
+    if (tiempo < 5) {
       return "Fotocontrol";
-    }else if(tiempo >= 5 && tiempo <= 6){
+    } else if (tiempo >= 5 && tiempo <= 6) {
       return "Auxiliar";
-    }else {
+    } else {
       return "Geodésico";
-    }    
+    }
 
-  }else {
+  } else {
     return "";
   }
 }
 
+
+
+
+
+// ======== funciones para la velocidad ====================
+
+// Function to find the exact match for velocity
+function findExactMatchVelocity(velocityData, lat, lon) {
+  for (let point of velocityData) {
+    if (point.Latitude !== undefined && point.Longitude !== undefined) {
+      if (Math.abs(point.Latitude - lat) < 1e-6 && Math.abs(point.Longitude - lon) < 1e-6) {
+        return {
+          vx: point.Vx,
+          vy: point.Vy,
+          vz: point.Vz
+        };
+      }
+    }
+  }
+  return null;
+}
+
+// Function to find the nearest velocity point with detailed debugging
+function findNearestVelocity(velocityData, lat, lon) {
+  let nearestPoint = null;
+  let minDistance = Infinity;
+
+  for (let point of velocityData) {
+    if (point.Latitude !== undefined && point.Longitude !== undefined) {
+      let distance = Math.sqrt(Math.pow(lat - point.Latitude, 2) + Math.pow(lon - point.Longitude, 2));
+      if (distance < minDistance) {
+        minDistance = distance;
+        nearestPoint = point;
+      }
+    }
+  }
+
+  if (minDistance <= 1.0) {
+    return {
+      vx: nearestPoint.Vx,
+      vy: nearestPoint.Vy,
+      vz: nearestPoint.Vz
+    };
+  }
+  return null;
+}
+
+// Function para calcular velocidades
+async function calcularVelocidades(lat, lon) {
+  
+  if (isNaN(lat) || isNaN(lon)) {    
+    return;
+  }
+
+  try {
+    const response = await fetch('json/velocidades4.json');
+    const text = await response.text();
+    let cleanText = text.replace(/\\"/g, '"').replace(/"\[/g, '[').replace(/\]"/g, ']').replace(/"\{/g, '{').replace(/\}"/g, '}');
+
+    try {
+      let data = JSON.parse(cleanText);
+
+      let velocity = findExactMatchVelocity(data, lat, lon);
+      
+      if (velocity !== null) {
+        console.log('entro', velocity);
+        const velx = velocity.vx.toFixed(3);
+        const vely = velocity.vy.toFixed(3);
+        const velz = velocity.vz.toFixed(3);
+        return {
+          velx,
+          vely,
+          velz
+        }
+      } else {
+        velocity = findNearestVelocity(data, lat, lon);
+      
+        if (velocity !== null) {
+      
+          const velx = velocity.vx.toFixed(3);
+          const vely = velocity.vy.toFixed(3);
+          const velz = velocity.vz.toFixed(3);
+          return {
+            velx,
+            vely,
+            velz
+          }
+        } else {
+          return {
+            velx: 0.0,
+            vely: 0.0,
+            velz: 0.0
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error al parsear el JSON:', error);        
+    }
+  } catch (error) {
+    console.error('Error:', error);      
+  }
+}
+
+
+
+async function guardarVelocidades(){
+  let arrTexto = JSON.parse(localStorage.getItem('verticesOndula'))
+  let arrTexto2 = []
+  console.log(arrTexto)
+  for(let vertice of arrTexto){
+    if(vertice.velx){
+          arrTexto2.push(vertice)
+    }else{
+      let velocidades = await calcularVelocidades(vertice.lat, vertice.long);   
+      vertice.velx = velocidades.velx;
+      vertice.vely = velocidades.vely;      
+      vertice.velz = velocidades.velz;
+      arrTexto2.push(vertice)
+    }
+  }  
+  localStorage.setItem('verticesOndula', JSON.stringify(arrTexto2));  
+}
 
 

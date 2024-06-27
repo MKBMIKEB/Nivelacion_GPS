@@ -253,7 +253,10 @@ document.querySelector('#calcular').addEventListener('click', async function () 
     // console.log(DHI, DNI, DHG, HGP, DHO, DHGC, HGPSFINAL)   
 
     tabular({ DHI, DNI, DHG, HGP, DHO, DHGC, HGPSFINAL }, vertice, 'calculos')
-    // console.log(vertice)
+      // console.log(vertice)
+   
+
+    
     datosXml += `
     <Punto Nombre="${vertice.nombre}">
     <Tipo_Punto>${tipoPunto(vertice.duracion)}</Tipo_Punto>      
@@ -398,6 +401,9 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
 
   let arregloVerticesOndulacion = [];
   localStorage.setItem('verticesOndula', JSON.stringify(arregloVerticesOndulacion));
+
+
+  
 
   let archivoPlano = document.querySelector('#cargarTexto').files[0];
 
@@ -556,8 +562,10 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
     // habilitar botones
     cambiosToggleHabilitar(false);
 
-
+    
     localStorage.setItem('verticesOndula', JSON.stringify(verticeConOndulacionClean));
+    
+    guardarVelocidades();
 
     // ====== OBTENER EL PROMEDIO DE LOS VERTICES =========
     let promedio = { latitude: 0, longitude: 0 };
@@ -720,7 +728,7 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
               if (elemento.indexOf("GDOP:") !== -1) {
                 obj.gdop = elemento.split('<td>')[4].split('</td>')[0];
               }
-              if (elemento.indexOf("Duraci&#243;n:") !== -1) {                
+              if (elemento.indexOf("Duraci&#243;n:") !== -1) {
                 obj.duracion = elemento.split('<td>')[2].split('</td>')[0];
               }
 
@@ -787,7 +795,7 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
               if (elemento.indexOf("GDOP:") !== -1) {
                 obj.gdop = elemento.split('<td>')[4].split('</td>')[0];
               }
-              if (elemento.indexOf("Duration:") !== -1) {                
+              if (elemento.indexOf("Duration:") !== -1) {
                 obj.duracion = elemento.split('<td>')[2].split('</td>')[0];
               }
 
