@@ -139,10 +139,19 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   let baseVertondula = document.querySelector("#verticeFuente").dataset.ondula;
   let baseVertAltmsn = document.querySelector("#verticeFuente").dataset.altmsnmm;
 
+  let baseLatitud = document.querySelector("#verticeFuente").dataset.latitud;
+  let baseLongitud = document.querySelector("#verticeFuente").dataset.longitud;
+  let baseAno = document.querySelector("#verticeFuente").dataset.ano;
+
   let baseVertNomen2 = document.querySelector("#verticeFuente2").dataset.nomenclatura2;
   let baseVertAlt2 = document.querySelector("#verticeFuente2").dataset.altelips2;
   let baseVertondula2 = document.querySelector("#verticeFuente2").dataset.ondula2;
   let baseVertAltmsn2 = document.querySelector("#verticeFuente2").dataset.altmsnmm2;
+
+  
+  let baseLatitud2 = document.querySelector("#verticeFuente").dataset.latitud2;
+  let baseLongitud2 = document.querySelector("#verticeFuente").dataset.longitud2;
+  let baseAno2 = document.querySelector("#verticeFuente").dataset.ano2;
 
 
 
@@ -152,12 +161,10 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   datosXml += `
         
           <Punto Nombre="${baseVertNomen}">
-              <Tipo_Punto>Geodesico</Tipo_Punto>
-              <SubTipo_Punto />
-              <Epoca_Punto />
+              <Tipo_Punto>Geodesico</Tipo_Punto>              
               <Altura_Ortométrica>
                   <Valor>${baseVertAltmsn}</Valor>
-                  <Año>0.0</Año>
+                  <Año>${baseAno}</Año>
                   <Metodo_Determinación>Geometrica</Metodo_Determinación>
               </Altura_Ortométrica>
               <Ondulación_Geoidal>
@@ -167,8 +174,8 @@ document.querySelector('#calcular').addEventListener('click', async function () 
               <Set_de_Coordenadas>
                   <Ellipsoidal>
                       <Datum>MAGNA-SIRGAS</Datum>
-                      <Latitud>0.0</Latitud>
-                      <Longitud>0.0</Longitud>
+                      <Latitud>${baseLatitud}</Latitud>
+                      <Longitud>${baseLongitud}</Longitud>
                       <Altura_Elipsoidal>${baseVertAlt}</Altura_Elipsoidal>
                   </Ellipsoidal>
               </Set_de_Coordenadas>
@@ -253,10 +260,10 @@ document.querySelector('#calcular').addEventListener('click', async function () 
     // console.log(DHI, DNI, DHG, HGP, DHO, DHGC, HGPSFINAL)   
 
     tabular({ DHI, DNI, DHG, HGP, DHO, DHGC, HGPSFINAL }, vertice, 'calculos')
-      // console.log(vertice)
-   
+    // console.log(vertice)
 
-    
+
+
     datosXml += `
     <Punto Nombre="${vertice.nombre}">
     <Tipo_Punto>${tipoPunto(vertice.duracion)}</Tipo_Punto>      
@@ -403,7 +410,7 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
   localStorage.setItem('verticesOndula', JSON.stringify(arregloVerticesOndulacion));
 
 
-  
+
 
   let archivoPlano = document.querySelector('#cargarTexto').files[0];
 
@@ -442,20 +449,20 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
         }
 
       } else {
-        if(vertices[0].split('\t')[1] === "Clase de Punto"){
+        if (vertices[0].split('\t')[1] === "Clase de Punto") {
           // CAR.txt
           console.log("CAR.txt 2")
-          for (let i = 1; i < vertices.length; i++) {             
+          for (let i = 1; i < vertices.length; i++) {
             if (vertices[i].length > 0) {
               verticesArray.push(eliminarEspacios4(vertices[i]));
             }
           }
 
-          
+
 
         } else {
           console.log("CAR.txt 1")
-          for (let i = 1; i < vertices.length; i++) {          
+          for (let i = 1; i < vertices.length; i++) {
             if (vertices[i].length > 0) {
               verticesArray.push(eliminarEspacios3(vertices[i]));
             }
@@ -463,7 +470,7 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
 
         }
 
-       
+
 
       }
 
@@ -579,9 +586,9 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
     // habilitar botones
     cambiosToggleHabilitar(false);
 
-    
+
     localStorage.setItem('verticesOndula', JSON.stringify(verticeConOndulacionClean));
-    
+
     guardarVelocidades();
 
     // ====== OBTENER EL PROMEDIO DE LOS VERTICES =========
@@ -873,7 +880,10 @@ document.querySelector('#viewDiv').addEventListener('click', async function (e) 
     verticeElegido.ondula = parseFloat(e.target.parentNode.parentNode.children[3].children[1].textContent.replace(/[^\d.-]/g, ''));
     verticeElegido.altelips = parseFloat(e.target.parentNode.parentNode.children[2].children[1].textContent.replace(/[^\d.-]/g, ''));
 
-    // console.log("vertice elegido",verticeElegido);    
+    verticeElegido.latitud = e.target.parentNode.parentNode.children[5].children[1].innerText.replace(/[^\d.-]/g, '');
+    verticeElegido.longitud = e.target.parentNode.parentNode.children[6].children[1].innerText.replace(/[^\d.-]/g, '');
+    verticeElegido.ano = e.target.parentNode.parentNode.children[9].children[1].innerText.replace(/[^\d.-]/g, '').substring(0, 4);
+    console.log("vertice elegido", verticeElegido);
 
     let datosTabla = "";
 
@@ -898,11 +908,17 @@ document.querySelector('#viewDiv').addEventListener('click', async function (e) 
           data-altelips2="${verticeElegido.altelips}"
           data-ondula2="${verticeElegido.ondula}"
           data-altmsnmm2="${verticeElegido.altura_msnmm}"        
+          data-latitud2="${verticeElegido.latitud}"
+          data-longitud2="${verticeElegido.longitud}"
+          data-ano2="${verticeElegido.ano}"
         >
           <th scope="row">${verticeElegido.nombenclatura}</th>
           <td>${verticeElegido.altelips}</td>
           <td>${verticeElegido.ondula}</td>
           <td>${verticeElegido.altura_msnmm}</td>          
+          <td>${verticeElegido.latitud}</td>      
+          <td>${verticeElegido.longitud}</td>      
+          <td>${verticeElegido.ano}</td>      
         </tr>
         `;
         document.getElementById('tablaEntrada').innerHTML += datosTabla2;
@@ -915,12 +931,17 @@ document.querySelector('#viewDiv').addEventListener('click', async function (e) 
           data-altelips="${verticeElegido.altelips}"
           data-ondula="${verticeElegido.ondula}"
           data-altmsnmm="${verticeElegido.altura_msnmm}"
-        
+          data-latitud="${verticeElegido.latitud}"
+          data-longitud="${verticeElegido.longitud}"
+          data-ano="${verticeElegido.ano}"        
         >
           <th scope="row">${verticeElegido.nombenclatura}</th>
           <td>${verticeElegido.altelips}</td>
           <td>${verticeElegido.ondula}</td>
-          <td>${verticeElegido.altura_msnmm}</td>          
+          <td>${verticeElegido.altura_msnmm}</td>      
+           <td>${verticeElegido.latitud}</td>      
+          <td>${verticeElegido.longitud}</td>      
+          <td>${verticeElegido.ano}</td>        
         </tr>
         `;
         document.getElementById('tablaEntrada').innerHTML = datosTabla;
