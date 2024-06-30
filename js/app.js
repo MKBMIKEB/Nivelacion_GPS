@@ -269,8 +269,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
     <Tipo_Punto>${tipoPunto(vertice.duracion)}</Tipo_Punto>      
       <Epoca_Punto>Época 2018</Epoca_Punto>
       <Altura_Ortométrica>
-          <Valor>${HGPSFINAL}</Valor>
-          <Año>2023.0</Año>
+          <Valor>${HGPSFINAL}</Valor>          
           <Metodo_Determinación>Geocol</Metodo_Determinación>
       </Altura_Ortométrica>
       <Ondulación_Geoidal>
@@ -278,12 +277,9 @@ document.querySelector('#calcular').addEventListener('click', async function () 
           <Modelo_Geoidal>GEOCOL</Modelo_Geoidal>
       </Ondulación_Geoidal>
       <Fecha_de_Captura>
-          <Fecha>${vertice.fecha}</Fecha>
-          <Hora>00:00:00</Hora>
+          <Fecha>${vertice.fecha}</Fecha>          
       </Fecha_de_Captura>
-      <Velocidades>
-          <Latitud>0.0137</Latitud>
-          <Longitud>0.00276</Longitud>
+      <Velocidades>          
           <X>${vertice.velx}</X>
           <Y>${vertice.vely}</Y>
           <Z>${vertice.velz}</Z>

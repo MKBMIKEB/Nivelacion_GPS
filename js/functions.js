@@ -516,61 +516,61 @@ function gaussKrugger(lat, lon) {
 // Definir los parámetros de los orígenes de Gauss-Krüger en Colombia
 const origins = [
   {
-    name: "Central-MAGNA",
-    lat_0: 4.59620041667 * (Math.PI / 180), // Convertir grados a radianes
-    lon_0: -74.07750791667 * (Math.PI / 180), // Convertir grados a radianes
-    false_northing: 1000000,
-    false_easting: 1000000,
-    k0: 1.0
+      name: "Bogotá-MAGNA",
+      lat_0: 4.5962004167 * (Math.PI / 180), // Convertir grados a radianes
+      lon_0: -74.0775079167 * (Math.PI / 180), // Convertir grados a radianes
+      false_northing: 1000000,
+      false_easting: 1000000,
+      k0: 1.0
   },
   {
-    name: "Este-MAGNA",
-    lat_0: 4.59620041667 * (Math.PI / 180), // Convertir grados a radianes
-    lon_0: -71.07750791667 * (Math.PI / 180), // Convertir grados a radianes
-    false_northing: 1000000,
-    false_easting: 1000000,
-    k0: 1.0
+      name: "Este - MAGNA",
+      lat_0:  4.5962004167 * (Math.PI / 180), // Convertir grados a radianes
+      lon_0: -71.0775079167 * (Math.PI / 180), // Convertir grados a radianes
+      false_northing: 1000000,
+      false_easting: 1000000,
+      k0: 1.0
   },
   {
-    name: "Este Este - MAGNA",
-    lat_0: 4.596200417 * (Math.PI / 180), // Convertir grados a radianes
-    lon_0: -68.07750791667 * (Math.PI / 180), // Convertir grados a radianes
-    false_northing: 1000000,
-    false_easting: 1000000,
-    k0: 1.0
+      name: "Este - MAGNA",
+      lat_0: 4.5962004167 * (Math.PI / 180), // Convertir grados a radianes
+      lon_0: -68.0775079167 * (Math.PI / 180), // Convertir grados a radianes
+      false_northing: 1000000,
+      false_easting: 1000000,
+      k0: 1.0
   },
   {
-    name: "Oeste - MAGNA",
-    lat_0: 4.59620041667 * (Math.PI / 180), // Convertir grados a radianes
-    lon_0: -77.07750791667 * (Math.PI / 180), // Convertir grados a radianes
-    false_northing: 1000000,
-    false_easting: 1000000,
-    k0: 1.0
+      name: "Oeste - MAGNA",
+      lat_0: 4.5962004167 * (Math.PI / 180), // Convertir grados a radianes
+      lon_0: -77.0775079167 * (Math.PI / 180), // Convertir grados a radianes
+      false_northing: 1000000,
+      false_easting: 1000000,
+      k0: 1.0
   },
   {
-    name: "Oeste Oeste - MAGNA",
-    lat_0: 4.59620041667 * (Math.PI / 180), // Convertir grados a radianes
-    lon_0: -80.07750791667 * (Math.PI / 180), // Convertir grados a radianes
-    false_northing: 1000000,
-    false_easting: 1000000,
-    k0: 1.0
+      name: "Oeste Oeste - MAGNA",
+      lat_0: 4.5962004167 * (Math.PI / 180), // Convertir grados a radianes
+      lon_0: -80.0775079167 * (Math.PI / 180), // Convertir grados a radianes
+      false_northing: 1000000,
+      false_easting: 1000000,
+      k0: 1.0
   }
 ];
 
 // Función para identificar el origen adecuado basado en la longitud
 function identifyOrigin(lon) {
-  if (lon >= -75 && lon < -71) {
-    return origins[0]; // Bogotá-MAGNA
-  } else if (lon >= -71 && lon < -68) {
-    return origins[1]; // Este Central - MAGNA
-  } else if (lon >= -68 && lon < -65) {
-    return origins[2]; // Este Este - MAGNA
-  } else if (lon >= -77 && lon < -75) {
-    return origins[3]; // Oeste - MAGNA
-  } else if (lon >= -80 && lon < -77) {
-    return origins[4]; // Oeste Oeste - MAGNA
+  if (lon >= -76 && lon < -74) {
+      return origins[0]; // Bogotá-MAGNA
+  } else if (lon >= -74 && lon < -70) {
+      return origins[1]; // Este Central - MAGNA
+  } else if (lon >= -70 && lon < -67) {
+      return origins[2]; // Este Este - MAGNA
+  } else if (lon >= -78 && lon < -76) {
+      return origins[3]; // Oeste - MAGNA
+  } else if (lon >= -81 && lon < -78) {
+      return origins[4]; // Oeste Oeste - MAGNA
   } else {
-    throw new Error("Longitud fuera del rango de los orígenes definidos.");
+      throw new Error("Longitud fuera del rango de los orígenes definidos.");
   }
 }
 
