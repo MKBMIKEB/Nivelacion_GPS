@@ -423,6 +423,7 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
 
     if (e.target.result[0] === '@') {
       // ITRF.asc
+      console.log("ITRF.asc")
       for (let i = 3; i < vertices.length; i++) {
         if (vertices[i].length > 0) {
           verticesArray.push(eliminarEspacios(vertices[i]));
@@ -433,6 +434,7 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
 
       if (vertices[0].includes("Latitud")) {
         // GEO.txt
+        console.log("GEO.txt")
         for (let i = 1; i < vertices.length; i++) {
           if (vertices[i].length > 0) {
             verticesArray.push(eliminarEspacios2(vertices[i]));
@@ -440,13 +442,28 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
         }
 
       } else {
-        // CAR.txt
-
-        for (let i = 1; i < vertices.length; i++) {
-          if (vertices[i].length > 0) {
-            verticesArray.push(eliminarEspacios3(vertices[i]));
+        if(vertices[0].split('\t')[1] === "Clase de Punto"){
+          // CAR.txt
+          console.log("CAR.txt 2")
+          for (let i = 1; i < vertices.length; i++) {             
+            if (vertices[i].length > 0) {
+              verticesArray.push(eliminarEspacios4(vertices[i]));
+            }
           }
+
+          
+
+        } else {
+          console.log("CAR.txt 1")
+          for (let i = 1; i < vertices.length; i++) {          
+            if (vertices[i].length > 0) {
+              verticesArray.push(eliminarEspacios3(vertices[i]));
+            }
+          }
+
         }
+
+       
 
       }
 

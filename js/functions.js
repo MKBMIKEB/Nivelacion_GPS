@@ -126,6 +126,30 @@ function eliminarEspacios3(linea) {
   return objeto;
 }
 
+function eliminarEspacios4(linea) {
+  
+  let arreglo = linea.split('\t');
+  // console.log(arreglo);
+
+  let tipo = '';
+  if (arreglo[1] === 'Control') {
+    tipo = 'CTRL';
+  }
+  if (arreglo[1] === 'Averaged') {
+    tipo = 'MEAN';
+  }
+
+  let objeto = {
+    nombre: arreglo[0],
+    x: arreglo[2],
+    y: arreglo[3],
+    z: arreglo[4].split('\r')[0],
+    tipo: tipo
+  }
+
+  return objeto;
+}
+
 
 
 
