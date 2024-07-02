@@ -127,7 +127,7 @@ function eliminarEspacios3(linea) {
 }
 
 function eliminarEspacios4(linea) {
-  
+
   let arreglo = linea.split('\t');
   // console.log(arreglo);
 
@@ -192,40 +192,116 @@ function espacioEstasdar(cadena) {
 // ======== DESCARGAR ITRF 2014 =================
 // ==============================================
 
-const descargarItrf2014 = async (coordenada) => {
+const descargarItrf2014 = async () => {
 
   let archivoPlano = document.querySelector('#cargarTexto').files[0];
 
 
+  if (!archivoPlano) {
+    return mostrarMensaje('Cargue archivo de texto', 'warning');
+  }
+  
 
 
   let reader = new FileReader();
   reader.onload = (e) => {
 
-    let vertices = e.target.result.split('\n');
 
     let verticesArray = [];
-    for (let i = 3; i < vertices.length; i++) {
+    let vertices = e.target.result.split('\n');
+    let tipo = "";
 
-      if (vertices[i].length > 0) {
-        verticesArray.push(eliminarEspacios(vertices[i]));
+    if (e.target.result[0] === '@') {
+      // ITRF.asc
+      console.log("ITRF.asc")
+      tipo = 'asc';
+      for (let i = 3; i < vertices.length; i++) {
+        if (vertices[i].length > 0) {
+          verticesArray.push(eliminarEspacios(vertices[i]));
+        }
       }
+
+    } else {
+
+      if (vertices[0].includes("Latitud")) {
+        // GEO.txt
+        tipo = 'geo';
+        console.log("GEO.txt")
+        for (let i = 1; i < vertices.length; i++) {
+          if (vertices[i].length > 0) {
+            verticesArray.push(eliminarEspacios2(vertices[i]));
+          }
+        }
+
+      } else {
+        if (vertices[0].split('\t')[1] === "Clase de Punto") {
+          // CAR2.txt
+          console.log("CAR.txt 2")
+          tipo = "car2";
+          for (let i = 1; i < vertices.length; i++) {
+            if (vertices[i].length > 0) {
+              verticesArray.push(eliminarEspacios4(vertices[i]));
+            }
+          }
+
+
+
+        } else {
+          // CAR.txt
+          console.log("CAR.txt 1")
+          tipo = "car";
+          for (let i = 1; i < vertices.length; i++) {
+            if (vertices[i].length > 0) {
+              verticesArray.push(eliminarEspacios3(vertices[i]));
+            }
+          }
+
+        }
+
+      }
+
     }
 
-    let datosTabla = `${vertices[0]}\n${vertices[1]}\n${vertices[2]}\n`;
+    //========== Orginizar txt según tipo ===========
+    let datosTabla = "";
+    if (tipo === 'car2') {
+      const titulos = vertices[0].split('\t');
+      datosTabla += `${titulos[0]}\t${titulos[2]}\t${titulos[3]}\t${titulos[4].split('\r')[0]}\t${titulos[1]}\n`;
+    }
+    if (tipo === 'car') {
+      datosTabla += `${vertices[0]}\n`;
+    }
+    if (tipo === 'asc') {
+      datosTabla += `${vertices[0]}\n${vertices[1]}\n${vertices[2]}\n`;
+    }
+    if (tipo === 'geo') {
+      const titulos = vertices[0].split('\t');
+      datosTabla += `${titulos[0]} \t WGS84 X \t WGS84 Y \t WGS84 Z \t ${titulos[1]}\n`;
+
+    }
+
+
+
+    //========== Fin Orginizar txt según tipo ===========
+
+
+
+    //========== Escribir archivo ===========
 
     for (let coordenadas of verticesArray) {
 
       if (coordenadas.tipo != 'CTRL') {
         let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
 
-        datosTabla += `@#${coordenadas.nombre} \t ${coordenadaAjustada[0].toFixed(5)} \t ${coordenadaAjustada[1].toFixed(5)} \t ${coordenadaAjustada[2].toFixed(5)} \t ${coordenadas.tipo} \n`;
+        datosTabla += `@#${coordenadas.nombre} \t ${coordenadaAjustada[0].toFixed(5)} \t ${coordenadaAjustada[1].toFixed(5)}   ${coordenadaAjustada[2].toFixed(5)} \t ${coordenadas.tipo} \n`;
 
       } else {
         let nombreAjustado = espacioEstasdar(coordenadas.nombre);
-        datosTabla += `@#${nombreAjustado} \t  ${coordenadas.x} \t  ${coordenadas.y} \t  ${coordenadas.z} \t ${coordenadas.tipo} \n`;
+        datosTabla += `@#${nombreAjustado} \t  ${parseFloat( coordenadas.x ).toFixed(5)} ${parseFloat( coordenadas.y).toFixed(5)} \t  ${parseFloat( coordenadas.z ).toFixed(5)} \t ${coordenadas.tipo} \n`;
       }
     }
+
+    //========== Fin Escribir archivo ===========
 
 
     var blob = new Blob([datosTabla], {
@@ -516,61 +592,61 @@ function gaussKrugger(lat, lon) {
 // Definir los parámetros de los orígenes de Gauss-Krüger en Colombia
 const origins = [
   {
-      name: "Bogotá-MAGNA",
-      lat_0: 4.5962004167 * (Math.PI / 180), // Convertir grados a radianes
-      lon_0: -74.0775079167 * (Math.PI / 180), // Convertir grados a radianes
-      false_northing: 1000000,
-      false_easting: 1000000,
-      k0: 1.0
+    name: "Bogotá-MAGNA",
+    lat_0: 4.5962004167 * (Math.PI / 180), // Convertir grados a radianes
+    lon_0: -74.0775079167 * (Math.PI / 180), // Convertir grados a radianes
+    false_northing: 1000000,
+    false_easting: 1000000,
+    k0: 1.0
   },
   {
-      name: "Este - MAGNA",
-      lat_0:  4.5962004167 * (Math.PI / 180), // Convertir grados a radianes
-      lon_0: -71.0775079167 * (Math.PI / 180), // Convertir grados a radianes
-      false_northing: 1000000,
-      false_easting: 1000000,
-      k0: 1.0
+    name: "Este - MAGNA",
+    lat_0: 4.5962004167 * (Math.PI / 180), // Convertir grados a radianes
+    lon_0: -71.0775079167 * (Math.PI / 180), // Convertir grados a radianes
+    false_northing: 1000000,
+    false_easting: 1000000,
+    k0: 1.0
   },
   {
-      name: "Este - MAGNA",
-      lat_0: 4.5962004167 * (Math.PI / 180), // Convertir grados a radianes
-      lon_0: -68.0775079167 * (Math.PI / 180), // Convertir grados a radianes
-      false_northing: 1000000,
-      false_easting: 1000000,
-      k0: 1.0
+    name: "Este - MAGNA",
+    lat_0: 4.5962004167 * (Math.PI / 180), // Convertir grados a radianes
+    lon_0: -68.0775079167 * (Math.PI / 180), // Convertir grados a radianes
+    false_northing: 1000000,
+    false_easting: 1000000,
+    k0: 1.0
   },
   {
-      name: "Oeste - MAGNA",
-      lat_0: 4.5962004167 * (Math.PI / 180), // Convertir grados a radianes
-      lon_0: -77.0775079167 * (Math.PI / 180), // Convertir grados a radianes
-      false_northing: 1000000,
-      false_easting: 1000000,
-      k0: 1.0
+    name: "Oeste - MAGNA",
+    lat_0: 4.5962004167 * (Math.PI / 180), // Convertir grados a radianes
+    lon_0: -77.0775079167 * (Math.PI / 180), // Convertir grados a radianes
+    false_northing: 1000000,
+    false_easting: 1000000,
+    k0: 1.0
   },
   {
-      name: "Oeste Oeste - MAGNA",
-      lat_0: 4.5962004167 * (Math.PI / 180), // Convertir grados a radianes
-      lon_0: -80.0775079167 * (Math.PI / 180), // Convertir grados a radianes
-      false_northing: 1000000,
-      false_easting: 1000000,
-      k0: 1.0
+    name: "Oeste Oeste - MAGNA",
+    lat_0: 4.5962004167 * (Math.PI / 180), // Convertir grados a radianes
+    lon_0: -80.0775079167 * (Math.PI / 180), // Convertir grados a radianes
+    false_northing: 1000000,
+    false_easting: 1000000,
+    k0: 1.0
   }
 ];
 
 // Función para identificar el origen adecuado basado en la longitud
 function identifyOrigin(lon) {
   if (lon >= -76 && lon < -74) {
-      return origins[0]; // Bogotá-MAGNA
+    return origins[0]; // Bogotá-MAGNA
   } else if (lon >= -74 && lon < -70) {
-      return origins[1]; // Este Central - MAGNA
+    return origins[1]; // Este Central - MAGNA
   } else if (lon >= -70 && lon < -67) {
-      return origins[2]; // Este Este - MAGNA
+    return origins[2]; // Este Este - MAGNA
   } else if (lon >= -78 && lon < -76) {
-      return origins[3]; // Oeste - MAGNA
+    return origins[3]; // Oeste - MAGNA
   } else if (lon >= -81 && lon < -78) {
-      return origins[4]; // Oeste Oeste - MAGNA
+    return origins[4]; // Oeste Oeste - MAGNA
   } else {
-      throw new Error("Longitud fuera del rango de los orígenes definidos.");
+    throw new Error("Longitud fuera del rango de los orígenes definidos.");
   }
 }
 
@@ -643,8 +719,8 @@ function findNearestVelocity(velocityData, lat, lon) {
 
 // Function para calcular velocidades
 async function calcularVelocidades(lat, lon) {
-  
-  if (isNaN(lat) || isNaN(lon)) {    
+
+  if (isNaN(lat) || isNaN(lon)) {
     return;
   }
 
@@ -657,7 +733,7 @@ async function calcularVelocidades(lat, lon) {
       let data = JSON.parse(cleanText);
 
       let velocity = findExactMatchVelocity(data, lat, lon);
-      
+
       if (velocity !== null) {
         console.log('entro', velocity);
         const velx = velocity.vx.toFixed(3);
@@ -670,9 +746,9 @@ async function calcularVelocidades(lat, lon) {
         }
       } else {
         velocity = findNearestVelocity(data, lat, lon);
-      
+
         if (velocity !== null) {
-      
+
           const velx = velocity.vx.toFixed(3);
           const vely = velocity.vy.toFixed(3);
           const velz = velocity.vz.toFixed(3);
@@ -690,31 +766,31 @@ async function calcularVelocidades(lat, lon) {
         }
       }
     } catch (error) {
-      console.error('Error al parsear el JSON:', error);        
+      console.error('Error al parsear el JSON:', error);
     }
   } catch (error) {
-    console.error('Error:', error);      
+    console.error('Error:', error);
   }
 }
 
 
 
-async function guardarVelocidades(){
+async function guardarVelocidades() {
   let arrTexto = JSON.parse(localStorage.getItem('verticesOndula'))
   let arrTexto2 = []
   console.log(arrTexto)
-  for(let vertice of arrTexto){
-    if(vertice.velx){
-          arrTexto2.push(vertice)
-    }else{
-      let velocidades = await calcularVelocidades(vertice.lat, vertice.long);   
+  for (let vertice of arrTexto) {
+    if (vertice.velx) {
+      arrTexto2.push(vertice)
+    } else {
+      let velocidades = await calcularVelocidades(vertice.lat, vertice.long);
       vertice.velx = velocidades.velx;
-      vertice.vely = velocidades.vely;      
+      vertice.vely = velocidades.vely;
       vertice.velz = velocidades.velz;
       arrTexto2.push(vertice)
     }
-  }  
-  localStorage.setItem('verticesOndula', JSON.stringify(arrTexto2));  
+  }
+  localStorage.setItem('verticesOndula', JSON.stringify(arrTexto2));
 }
 
 

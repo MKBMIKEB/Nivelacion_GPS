@@ -379,7 +379,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
 
 
 document.querySelector('#descargar').addEventListener('click', function (e) {
-  descargarItrf2014('hollaaaa');
+  descargarItrf2014();
 });
 
 
