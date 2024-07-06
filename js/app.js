@@ -627,6 +627,7 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
             for (let elemento of e.target.result.split("</tr>")) {
 
               if (elemento.indexOf("Alt Elip.:") !== -1) {
+                console.log(elemento.split("</td>")[3].substring(4, 13))
                 obj.altelips = elemento.split("</td>")[3].substring(4, 13);
               }
 
@@ -699,7 +700,8 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
 
               if (elemento.indexOf("Altura Elip WGS84:") !== -1) {
                 // obj.altelips = elemento.substring(77, 85).replace('.', '');
-                obj.altelips = elemento.split('<td>')[2].split('</td>')[0].split(' ')[0].replace('.', '');
+                // console.log(elemento.split('<td>')[3].split('</td>')[0].split(' ')[0].replace('.', ''))
+                obj.altelips = elemento.split('<td>')[3].split('</td>')[0].split(' ')[0].replace('.', '');
               }
 
               if (elemento.indexOf("M&#225;scara de Elevaci&#243;n:") !== -1) {
@@ -765,8 +767,8 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
               }
 
 
-              if (elemento.indexOf("WGS84 Ellip. Height:") !== -1) {
-                obj.altelips = elemento.split('<td>')[2].split('</td>')[0].split(' ')[0].replace('.', '');
+              if (elemento.indexOf("WGS84 Ellip. Height:") !== -1) {                
+                obj.altelips = elemento.split('<td>')[3].split('</td>')[0].split(' ')[0].replace('.', '');
               }
 
               if (elemento.indexOf("Cut-Off Angle:") !== -1) {
