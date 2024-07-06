@@ -392,6 +392,7 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
   let DHG_ANTERIOR = 0;
   let HGPSFINAL_ANTERIOR = baseVertAltmsn;
 
+  const HGPSFINALArray = [];
   // CALCULO ORTOMETRICA
   for (const vertice of verticesCompletos) {
 
@@ -405,6 +406,8 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
     const DHGC = DHO + parseFloat(correccion);
     const HGPSFINAL = parseFloat(HGPSFINAL_ANTERIOR) + DHGC;
 
+    HGPSFINALArray.push(HGPSFINAL);
+
     DHG_ANTERIOR = DHG;
     HGPSFINAL_ANTERIOR = HGPSFINAL;
 
@@ -413,6 +416,7 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
     tabular({ DHI, DNI, DHG, HGP, DHO, DHGC, HGPSFINAL }, vertice, tabla)
   }
   // ============ Fin calculos par tabular3 =========
+  return HGPSFINALArray;
 }
 
 

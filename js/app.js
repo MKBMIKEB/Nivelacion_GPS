@@ -22,10 +22,14 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   let arrTexto = JSON.parse(localStorage.getItem('verticesOndula'))
   let arr = JSON.parse(localStorage.getItem('anosPorHtml'))
 
+  const nombreCalculista = document.querySelector('#nombreCalculista').value;
+  const nombreProyecto = document.querySelector('#nombreProyecto').value;
+  console.log(nombreCalculista === '', nombreProyecto);
+
   let datosXml = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
                           <Proyecto>
-                            <Nombre>XML</Nombre>
-                            <Calculista>IGAC</Calculista>
+                            <Nombre>${nombreProyecto === ''?'XML':nombreProyecto}</Nombre>
+                            <Calculista>${nombreCalculista === ''?'IGAC':nombreCalculista}</Calculista>
                             <Versión>1.0 BETA</Versión>`
     ;
 
@@ -149,9 +153,9 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   let baseVertAltmsn2 = document.querySelector("#verticeFuente2").dataset.altmsnmm2;
 
   
-  let baseLatitud2 = document.querySelector("#verticeFuente").dataset.latitud2;
-  let baseLongitud2 = document.querySelector("#verticeFuente").dataset.longitud2;
-  let baseAno2 = document.querySelector("#verticeFuente").dataset.ano2;
+  let baseLatitud2 = document.querySelector("#verticeFuente2").dataset.latitud2;
+  let baseLongitud2 = document.querySelector("#verticeFuente2").dataset.longitud2;
+  let baseAno2 = document.querySelector("#verticeFuente2").dataset.ano2;
 
 
 
@@ -180,6 +184,27 @@ document.querySelector('#calcular').addEventListener('click', async function () 
                   </Ellipsoidal>
               </Set_de_Coordenadas>
           </Punto>
+
+           <Punto Nombre="${baseVertNomen2}">
+              <Tipo_Punto>Geodesico</Tipo_Punto>              
+              <Altura_Ortométrica>
+                  <Valor>${baseVertAltmsn2}</Valor>
+                  <Año>${baseAno2}</Año>
+                  <Metodo_Determinación>Geometrica</Metodo_Determinación>
+              </Altura_Ortométrica>
+              <Ondulación_Geoidal>
+                  <Valor>${baseVertondula2}</Valor>
+                  <Modelo_Geoidal />
+              </Ondulación_Geoidal>              
+              <Set_de_Coordenadas>
+                  <Ellipsoidal>
+                      <Datum>MAGNA-SIRGAS</Datum>
+                      <Latitud>${baseLatitud2}</Latitud>
+                      <Longitud>${baseLongitud2}</Longitud>
+                      <Altura_Elipsoidal>${baseVertAlt2}</Altura_Elipsoidal>
+                  </Ellipsoidal>
+              </Set_de_Coordenadas>
+          </Punto>
         
         `;
   datosXml += "</Puntos_Base_Nivelación>";
@@ -187,170 +212,107 @@ document.querySelector('#calcular').addEventListener('click', async function () 
 
 
   // ============ calculos par tabular =========
-  let sumatoria = 0;
-  let DHG_ANTERIOR_prime = 0;
+
   let verticesCompletos2 = [...verticesCompletos];
   let verticesCompletos3 = [...verticesCompletos];
-  verticesCompletos.push({ nombre: baseVertNomen, altelips: baseVertAlt, ondula: baseVertondula })
-
-  // PROMEDIO DHO
-  for (const vert of verticesCompletos) {
-
-
-    const DHI = parseFloat(vert.altelips) - parseFloat(baseVertAlt);
-    const DNI = parseFloat(vert.ondula) - parseFloat(baseVertondula);
-    const DHG = DHI - DNI;
-    const DHO = DHG - DHG_ANTERIOR_prime;
-
-    DHG_ANTERIOR_prime = DHG;
-    sumatoria += DHO
-  }
-
-  let diferencia = baseVertAltmsn - baseVertAltmsn;
-  console.log("sumatoria", sumatoria)
-
-  let correccion = (diferencia - sumatoria) / (verticesCompletos.length);
-  console.log("correcion", correccion)
-
-
-  // Inicializar resultados
-  let texto = `
-  <tr>
-    <th scope="row">${baseVertNomen}</th>
-    <td>${baseVertAlt}</td>
-    <td>${baseVertondula}</td>
-    <td>${baseVertAltmsn}</td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td>${baseVertAltmsn}</td>         
-  </tr>
-  `;
-  document.querySelector('#calculos').innerHTML += texto;
-
-
-  // CUERPO DEL DOCUMENTO
-  datosXml += "<Puntos_Calculados>";
-
-
+  
   console.log(verticesCompletos);
-
-  let DHG_ANTERIOR = 0;
-  let HGPSFINAL_ANTERIOR = baseVertAltmsn;
-
-  // CALCULO ORTOMETRICA
-  for (const vertice of verticesCompletos) {
-
-    // console.log(vertice.altelips, vertice.ondula, baseVertAlt, baseVertondula, baseVertAltmsn, correccion)
-
-    const DHI = parseFloat(vertice.altelips) - parseFloat(baseVertAlt);
-    const DNI = parseFloat(vertice.ondula) - parseFloat(baseVertondula);
-    const DHG = DHI - DNI;
-    const HGP = parseFloat(baseVertAltmsn) + DHG;
-    const DHO = DHG - parseFloat(DHG_ANTERIOR)
-    const DHGC = DHO + parseFloat(correccion);
-    const HGPSFINAL = parseFloat(HGPSFINAL_ANTERIOR) + DHGC;
-
-    DHG_ANTERIOR = DHG;
-    HGPSFINAL_ANTERIOR = HGPSFINAL;
-
-    // console.log(DHI, DNI, DHG, HGP, DHO, DHGC, HGPSFINAL)   
-
-    tabular({ DHI, DNI, DHG, HGP, DHO, DHGC, HGPSFINAL }, vertice, 'calculos')
-    // console.log(vertice)
-
-
-
-    datosXml += `
-    <Punto Nombre="${vertice.nombre}">
-    <Tipo_Punto>${tipoPunto(vertice.duracion)}</Tipo_Punto>      
-      <Epoca_Punto>Época 2018</Epoca_Punto>
-      <Altura_Ortométrica>
-          <Valor>${HGPSFINAL}</Valor>          
-          <Metodo_Determinación>Geocol</Metodo_Determinación>
-      </Altura_Ortométrica>
-      <Ondulación_Geoidal>
-          <Valor>${vertice.ondula}</Valor>
-          <Modelo_Geoidal>GEOCOL</Modelo_Geoidal>
-      </Ondulación_Geoidal>
-      <Fecha_de_Captura>
-          <Fecha>${vertice.fecha}</Fecha>          
-      </Fecha_de_Captura>
-      <Velocidades>          
-          <X>${vertice.velx}</X>
-          <Y>${vertice.vely}</Y>
-          <Z>${vertice.velz}</Z>
-      </Velocidades>
-      <Set_de_Coordenadas>
-        <Cartesiana3d_referencia>
-            <Datum>MAGNA-SIRGAS</Datum>
-            <X>${vertice.xreferencia}</X>
-            <Y>${vertice.yreferencia}</Y>
-            <Z>${vertice.zreferencia}</Z>
-        </Cartesiana3d_referencia>
-        <Cartesiana3d_rastreo>
-            <Datum>MAGNA-SIRGAS</Datum>
-            <X>${vertice.x}</X>
-            <Y>${vertice.y}</Y>
-            <Z>${vertice.z}</Z>
-        </Cartesiana3d_rastreo>
-        <Elipsoidal_rastreo>
-            <Datum>MAGNA-SIRGAS</Datum>
-            <Latitud>${vertice.lat}</Latitud>
-            <Longitud>${vertice.long}</Longitud>
-            <Altura_Elipsoidal>${vertice.altelips}</Altura_Elipsoidal>
-        </Elipsoidal_rastreo>
-        <Elipsoidal_referencia>
-            <Datum>MAGNA-SIRGAS</Datum>
-            <Latitud>${vertice.latReferencia}</Latitud>
-            <Longitud>${vertice.lonReferencia}</Longitud>            
-        </Elipsoidal_referencia>
-        <Gauss_referencia>
-            <Datum>MAGNA-SIRGAS</Datum>
-            <Norte>${vertice.norteKrugger}</Norte>
-            <Este>${vertice.esteKrugger}</Este>
-            <Origen>${vertice.originName}</Origen>
-        </Gauss_referencia>
-        <Origen>
-            <Datum>MAGNA-SIRGAS</Datum>
-            <Norte>${vertice.norte}</Norte>
-            <Este>${vertice.este}</Este>            
-        </Origen>
-        <Otros>
-          <Mascara>${vertice?.mascara}</Mascara>
-          <Satelites>${vertice?.satelites}</Satelites>
-          <LecturaAltura>${vertice?.lecturaAltura}</LecturaAltura>
-          <LecturaAntena>${vertice?.alturaAntena}</LecturaAntena>
-          <TipoSolucion>${vertice?.tipoSolucion}</TipoSolucion>
-          <M0>${vertice?.m0}</M0>
-          <Gdop>${vertice?.gdop}</Gdop>
-        </Otros>
-      </Set_de_Coordenadas>
-    </Punto>          
-`;
-
-  }
-
-  // ============ Fin calculos par tabular =========
-
-
-  // ============ calculos par tabular 2,3 =========
+  
+  // ============ calculos par tabular 1,2,3 =========
+  
+  
+  verticesCompletos.push({ nombre: baseVertNomen, altelips: baseVertAlt, ondula: baseVertondula })  
+  const HGPSFINALArray1 = calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVertondula, baseVertAltmsn, baseVertAltmsn, "calculos");
+  
   verticesCompletos2.push({ nombre: baseVertNomen2, altelips: baseVertAlt2, ondula: baseVertondula2 })
-  calculoPorTabular(verticesCompletos2, baseVertNomen2, baseVertAlt2, baseVertondula2, baseVertAltmsn2, baseVertAltmsn2, "calculos2");
-
+  const HGPSFINALArray2 =  calculoPorTabular(verticesCompletos2, baseVertNomen2, baseVertAlt2, baseVertondula2, baseVertAltmsn2, baseVertAltmsn2, "calculos2");
+  
   verticesCompletos3.push({ nombre: baseVertNomen2, altelips: baseVertAlt2, ondula: baseVertondula2 })
-  calculoPorTabular(verticesCompletos3, baseVertNomen, baseVertAlt, baseVertondula, baseVertAltmsn2, baseVertAltmsn, "calculos3");
+  const HGPSFINALArray3 = calculoPorTabular(verticesCompletos3, baseVertNomen, baseVertAlt, baseVertondula, baseVertAltmsn2, baseVertAltmsn, "calculos3");
   // ============ Fin calculos par tabular 2,3 =========
-
+  
   // ============ Tabular diferencias =========
   tabularDiferencias();
   // ============ Fin tabular diferencias =========
+  
+  // CUERPO DEL DOCUMENTO
+  datosXml += "<Puntos_Calculados>";
 
+  // for (const vertice of verticesCompletos) {
+    for (let i=0; i<verticesCompletos.length; i++) {
+    
 
-
+        datosXml += `
+        <Punto Nombre="${verticesCompletos[i].nombre}">
+        <Tipo_Punto>${tipoPunto(verticesCompletos[i].duracion)}</Tipo_Punto>      
+          <Epoca_Punto>Época 2018</Epoca_Punto>
+          <Altura_Ortométrica>
+              <Valor1>${HGPSFINALArray1[i]}</Valor1>          
+              <Valor2>${HGPSFINALArray2[i]}</Valor2>
+              <Valor3>${HGPSFINALArray3[i]}</Valor3>
+              <Metodo_Determinación>Geocol</Metodo_Determinación>
+          </Altura_Ortométrica>
+          <Ondulación_Geoidal>
+              <Valor>${verticesCompletos[i].ondula}</Valor>
+              <Modelo_Geoidal>GEOCOL</Modelo_Geoidal>
+          </Ondulación_Geoidal>
+          <Fecha_de_Captura>
+              <Fecha>${verticesCompletos[i].fecha}</Fecha>          
+          </Fecha_de_Captura>
+          <Velocidades>          
+              <X>${verticesCompletos[i].velx}</X>
+              <Y>${verticesCompletos[i].vely}</Y>
+              <Z>${verticesCompletos[i].velz}</Z>
+          </Velocidades>
+          <Set_de_Coordenadas>
+            <Cartesiana3d_referencia>
+                <Datum>MAGNA-SIRGAS</Datum>
+                <X>${verticesCompletos[i].xreferencia}</X>
+                <Y>${verticesCompletos[i].yreferencia}</Y>
+                <Z>${verticesCompletos[i].zreferencia}</Z>
+            </Cartesiana3d_referencia>
+            <Cartesiana3d_rastreo>
+                <Datum>MAGNA-SIRGAS</Datum>
+                <X>${verticesCompletos[i].x}</X>
+                <Y>${verticesCompletos[i].y}</Y>
+                <Z>${verticesCompletos[i].z}</Z>
+            </Cartesiana3d_rastreo>
+            <Elipsoidal_rastreo>
+                <Datum>MAGNA-SIRGAS</Datum>
+                <Latitud>${verticesCompletos[i].lat}</Latitud>
+                <Longitud>${verticesCompletos[i].long}</Longitud>
+                <Altura_Elipsoidal>${verticesCompletos[i].altelips}</Altura_Elipsoidal>
+            </Elipsoidal_rastreo>
+            <Elipsoidal_referencia>
+                <Datum>MAGNA-SIRGAS</Datum>
+                <Latitud>${verticesCompletos[i].latReferencia}</Latitud>
+                <Longitud>${verticesCompletos[i].lonReferencia}</Longitud>            
+            </Elipsoidal_referencia>
+            <Gauss_referencia>
+                <Datum>MAGNA-SIRGAS</Datum>
+                <Norte>${verticesCompletos[i].norteKrugger}</Norte>
+                <Este>${verticesCompletos[i].esteKrugger}</Este>
+                <Origen>${verticesCompletos[i].originName}</Origen>
+            </Gauss_referencia>
+            <Origen>
+                <Datum>MAGNA-SIRGAS</Datum>
+                <Norte>${verticesCompletos[i].norte}</Norte>
+                <Este>${verticesCompletos[i].este}</Este>            
+            </Origen>
+            <Otros>
+              <Mascara>${verticesCompletos[i]?.mascara}</Mascara>
+              <Satelites>${verticesCompletos[i]?.satelites}</Satelites>
+              <LecturaAltura>${verticesCompletos[i]?.lecturaAltura}</LecturaAltura>
+              <LecturaAntena>${verticesCompletos[i]?.alturaAntena}</LecturaAntena>
+              <TipoSolucion>${verticesCompletos[i]?.tipoSolucion}</TipoSolucion>
+              <M0>${verticesCompletos[i]?.m0}</M0>
+              <Gdop>${verticesCompletos[i]?.gdop}</Gdop>
+            </Otros>
+          </Set_de_Coordenadas>
+        </Punto>          
+    `;
+    
+      }
 
   datosXml += "</Puntos_Calculados>";
 
@@ -542,14 +504,13 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
           const resultado = await fetch('./../json/ondulacion.json');
           const arregloOndula = await resultado.json();
           for (let i of arregloOndula) {
-            if ((lat <= (i.lat + 0.033) && lat >= (i.lat - 0.0033)) && lon <= (i.lon + 0.033) && lon >= (i.lon - 0.0033)) {
-
+            if ((lat <= (i.lat + 0.033) && lat >= (i.lat - 0.0033)) && lon <= (i.lon + 0.033) && lon >= (i.lon - 0.0033)) {              
               verticeConOndulacion.push({
                 nombre: vertice.nombre, lat: vertice.lat, long: vertice.long, x: vertice.x, y: vertice.y, z: vertice.z,
                 tipo: vertice.tipo, ondula: i.alt
               });
             }
-          }
+          }          
 
         } catch (error) {
           console.log('error', error);
@@ -566,16 +527,33 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
 
     // ====== FIN =========
 
-    let verticeConOndulacionClean = [];
+    const agrupar = {};    
 
-    for (let resul of result) {
-      for (let vertice of verticeConOndulacion) {
-        if (resul.nombre === vertice.nombre) {
-          verticeConOndulacionClean.push(vertice);
-          break;
-        }
+    verticeConOndulacion.forEach(item => {
+      if (!agrupar[item.nombre]) {
+        agrupar[item.nombre] = { ...item, ondula: [item.ondula] };
+      } else {
+        agrupar[item.nombre].ondula.push(item.ondula);
       }
-    }
+    });
+    
+    const verticeConOndulacionClean = Object.values(agrupar).map(item => {
+      const sumaOndula = item.ondula.reduce((sum, val) => sum + val, 0);
+      const ondulaPromedio = sumaOndula / item.ondula.length;
+      return { ...item, ondula: ondulaPromedio };
+    });
+
+
+    // let verticeConOndulacionClean = [];
+
+    // for (let resul of result) {
+    //   for (let vertice of verticeConOndulacion) {
+    //     if (resul.nombre === vertice.nombre) {
+    //       verticeConOndulacionClean.push(vertice);
+    //       break;
+    //     }
+    //   }
+    // }
 
 
 

@@ -8,8 +8,8 @@ body {
                linear-gradient(127deg, rgba(47, 66, 47, 0.8), rgba(0,255,0,0) 70.71%),            
                linear-gradient(336deg, rgba(24, 24, 138, 0.8), rgba(0,0,255,0) 70.71%);               
 }
-.container {
-    margin-top: 25vh;
+.carga-container {
+    margin-top: 2vh;
 }
 .row {
     display: flex;
@@ -144,4 +144,10 @@ body {
         background-color: #19061e;
     }
     
+}
+
+.form-label {
+    color: white;
+    margin-top: 2vh;
+    font-size: large;
 }
