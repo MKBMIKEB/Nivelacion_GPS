@@ -797,4 +797,42 @@ async function guardarVelocidades() {
   localStorage.setItem('verticesOndula', JSON.stringify(arrTexto2));
 }
 
-
+function ajustarDecimales(vertice){
+  if(typeof vertice.anoEpoca == 'number'){
+    vertice.anoEpoca = vertice.anoEpoca.toFixed(2);
+  }
+  if(typeof vertice.este == 'number'){
+    vertice.este = vertice.este.toFixed(5);
+  }
+  if(typeof vertice.esteKrugger == 'number'){
+    vertice.esteKrugger = vertice.esteKrugger.toFixed(5);
+  }
+  if(typeof vertice.lat == 'number'){
+    vertice.lat = vertice.lat.toFixed(5);
+  }
+  if(typeof vertice.latReferencia == 'number'){
+    vertice.latReferencia = vertice.latReferencia.toFixed(5);
+  }
+  if(typeof vertice.lonReferencia == 'number'){
+    vertice.lonReferencia = vertice.lonReferencia.toFixed(5);   
+  }
+  if(typeof vertice.long == 'number'){
+    vertice.long = vertice.long.toFixed(5);
+  }
+  if(typeof vertice.norte == 'number'){
+    vertice.norte = vertice.norte.toFixed(5);
+  }
+  if(typeof vertice.norteKrugger == 'number'){
+    vertice.norteKrugger = vertice.norteKrugger.toFixed(5);
+  }
+  if(typeof vertice.xreferencia == 'number'){
+    vertice.xreferencia = vertice.xreferencia.toFixed(5);
+  }
+  if(typeof vertice.yreferencia == 'number'){
+    vertice.yreferencia = vertice.yreferencia.toFixed(5);
+  }
+  if(typeof vertice.zreferencia == 'number'){
+    vertice.zreferencia = vertice.zreferencia.toFixed(5);
+  }    
+  return vertice;
+}

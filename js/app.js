@@ -38,7 +38,8 @@ document.querySelector('#calcular').addEventListener('click', async function () 
 
   for (let ver of arrTexto) {
 
-    if (ver.tipo == 'CTRL') {
+    if (ver.tipo == 'CTRL') {      
+
       datosXml += `
           <Punto Nombre="${ver.nombre}">
                 <Tipo_Punto>Estación</Tipo_Punto>                                                
@@ -51,8 +52,8 @@ document.querySelector('#calcular').addEventListener('click', async function () 
                     </Cartesiana3d_rastreo>
                     <Elipsoidal_rastreo>
                         <Datum>MAGNA-SIRGAS</Datum>
-                        <Latitud>${ver.lat}</Latitud>
-                        <Longitud>${ver.long}</Longitud>
+                        <Latitud>${typeof ver.lat == 'number' ? ver.lat.toFixed(5) : ver.lat}</Latitud>
+                        <Longitud>${typeof ver.long == 'number' ? ver.long.toFixed(5) : ver.long}</Longitud>
                         <Ondula>${ver.ondula}</Ondula>
                     </Elipsoidal_rastreo>
                 </Set_de_Coordenadas>
@@ -178,8 +179,8 @@ document.querySelector('#calcular').addEventListener('click', async function () 
               <Set_de_Coordenadas>
                   <Ellipsoidal>
                       <Datum>MAGNA-SIRGAS</Datum>
-                      <Latitud>${baseLatitud}</Latitud>
-                      <Longitud>${baseLongitud}</Longitud>
+                      <Latitud>${typeof baseLatitud  == 'string' ? parseFloat( baseLatitud ).toFixed(5) : baseLatitud.toFixed(5)}</Latitud>
+                      <Longitud>${typeof baseLongitud == 'string' ? parseFloat( baseLongitud ).toFixed(5) : baseLongitud.toFixed(5)}</Longitud>
                       <Altura_Elipsoidal>${baseVertAlt}</Altura_Elipsoidal>
                   </Ellipsoidal>
               </Set_de_Coordenadas>
@@ -199,8 +200,8 @@ document.querySelector('#calcular').addEventListener('click', async function () 
               <Set_de_Coordenadas>
                   <Ellipsoidal>
                       <Datum>MAGNA-SIRGAS</Datum>
-                      <Latitud>${baseLatitud2}</Latitud>
-                      <Longitud>${baseLongitud2}</Longitud>
+                      <Latitud>${typeof baseLatitud2  == 'string' ? parseFloat( baseLatitud2 ).toFixed(5) : baseLatitud2.toFixed(5)}</Latitud>
+                      <Longitud>${typeof baseLongitud2 == 'string' ? parseFloat( baseLongitud2 ).toFixed(5) : baseLongitud2.toFixed(5)}</Longitud>
                       <Altura_Elipsoidal>${baseVertAlt2}</Altura_Elipsoidal>
                   </Ellipsoidal>
               </Set_de_Coordenadas>
@@ -209,10 +210,20 @@ document.querySelector('#calcular').addEventListener('click', async function () 
         `;
   datosXml += "</Puntos_Base_Nivelación>";
   // ====== FIN ============
+  
+
+
+  let verticesCompletosTemp = [];
+  for(let vertice of verticesCompletos){
+    verticesCompletosTemp.push(ajustarDecimales(vertice));
+  }
+
+  verticesCompletos = [];
+
 
 
   // ============ calculos par tabular =========
-
+  verticesCompletos = [...verticesCompletosTemp]
   let verticesCompletos2 = [...verticesCompletos];
   let verticesCompletos3 = [...verticesCompletos];
   
@@ -239,8 +250,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   datosXml += "<Puntos_Calculados>";
 
   // for (const vertice of verticesCompletos) {
-    for (let i=0; i<verticesCompletos.length; i++) {
-    
+    for (let i=0; i<verticesCompletos.length-1; i++) {    
 
         datosXml += `
         <Punto Nombre="${verticesCompletos[i].nombre}">
@@ -260,44 +270,44 @@ document.querySelector('#calcular').addEventListener('click', async function () 
               <Fecha>${verticesCompletos[i].fecha}</Fecha>          
           </Fecha_de_Captura>
           <Velocidades>          
-              <X>${verticesCompletos[i].velx}</X>
-              <Y>${verticesCompletos[i].vely}</Y>
-              <Z>${verticesCompletos[i].velz}</Z>
+              <X>${verticesCompletos[i].velx != undefined ? verticesCompletos[i].velx.toString().replace('.', ',') : verticesCompletos[i].velx}</X>
+              <Y>${verticesCompletos[i].vely != undefined ? verticesCompletos[i].vely.toString().replace('.', ',') : verticesCompletos[i].vely}</Y>
+              <Z>${verticesCompletos[i].velz != undefined ? verticesCompletos[i].velz.toString().replace('.', ',') : verticesCompletos[i].velz}</Z>
           </Velocidades>
           <Set_de_Coordenadas>
             <Cartesiana3d_referencia>
                 <Datum>MAGNA-SIRGAS</Datum>
-                <X>${verticesCompletos[i].xreferencia}</X>
-                <Y>${verticesCompletos[i].yreferencia}</Y>
-                <Z>${verticesCompletos[i].zreferencia}</Z>
+                <X>${verticesCompletos[i].xreferencia != undefined ? verticesCompletos[i].xreferencia.toString().replace('.', ',') : verticesCompletos[i].xreferencia}</X>
+                <Y>${verticesCompletos[i].yreferencia != undefined ? verticesCompletos[i].yreferencia.toString().replace('.', ',') : verticesCompletos[i].yreferencia}</Y>
+                <Z>${verticesCompletos[i].zreferencia != undefined ? verticesCompletos[i].zreferencia.toString().replace('.', ',') : verticesCompletos[i].zreferencia}</Z>
             </Cartesiana3d_referencia>
             <Cartesiana3d_rastreo>
                 <Datum>MAGNA-SIRGAS</Datum>
-                <X>${verticesCompletos[i].x}</X>
-                <Y>${verticesCompletos[i].y}</Y>
-                <Z>${verticesCompletos[i].z}</Z>
+                <X>${verticesCompletos[i].x != undefined ? verticesCompletos[i].x.toString().replace('.', ',') : verticesCompletos[i].x}</X>
+                <Y>${verticesCompletos[i].y != undefined ? verticesCompletos[i].y.toString().replace('.', ',') : verticesCompletos[i].y}</Y>
+                <Z>${verticesCompletos[i].z != undefined ? verticesCompletos[i].z.toString().replace('.', ',') : verticesCompletos[i].z}</Z>
             </Cartesiana3d_rastreo>
             <Elipsoidal_rastreo>
                 <Datum>MAGNA-SIRGAS</Datum>
-                <Latitud>${verticesCompletos[i].lat}</Latitud>
-                <Longitud>${verticesCompletos[i].long}</Longitud>
+                <Latitud>${verticesCompletos[i].lat != undefined ? verticesCompletos[i].lat.toString().replace('.', ',') : verticesCompletos[i].lat}</Latitud>
+                <Longitud>${verticesCompletos[i].long != undefined ? verticesCompletos[i].long.toString().replace('.', ',') : verticesCompletos[i].long}</Longitud>
                 <Altura_Elipsoidal>${verticesCompletos[i].altelips}</Altura_Elipsoidal>
             </Elipsoidal_rastreo>
             <Elipsoidal_referencia>
                 <Datum>MAGNA-SIRGAS</Datum>
-                <Latitud>${verticesCompletos[i].latReferencia}</Latitud>
-                <Longitud>${verticesCompletos[i].lonReferencia}</Longitud>            
+                <Latitud>${verticesCompletos[i].latReferencia != undefined ? verticesCompletos[i].latReferencia.toString().replace('.', ',') : verticesCompletos[i].latReferencia}</Latitud>
+                <Longitud>${verticesCompletos[i].lonReferencia != undefined ? verticesCompletos[i].lonReferencia.toString().replace('.', ',') : verticesCompletos[i].lonReferencia}</Longitud>            
             </Elipsoidal_referencia>
             <Gauss_referencia>
                 <Datum>MAGNA-SIRGAS</Datum>
-                <Norte>${verticesCompletos[i].norteKrugger}</Norte>
-                <Este>${verticesCompletos[i].esteKrugger}</Este>
+                <Norte>${verticesCompletos[i].norteKrugger != undefined ? verticesCompletos[i].norteKrugger.toString().replace('.', ',') : verticesCompletos[i].norteKrugger}</Norte>
+                <Este>${verticesCompletos[i].esteKrugger != undefined ? verticesCompletos[i].esteKrugger.toString().replace('.', ',') : verticesCompletos[i].esteKrugger}</Este>
                 <Origen>${verticesCompletos[i].originName}</Origen>
             </Gauss_referencia>
             <Origen>
                 <Datum>MAGNA-SIRGAS</Datum>
-                <Norte>${verticesCompletos[i].norte}</Norte>
-                <Este>${verticesCompletos[i].este}</Este>            
+                <Norte>${verticesCompletos[i].norte != undefined ? verticesCompletos[i].norte.toString().replace('.', ',') : verticesCompletos[i].norte}</Norte>
+                <Este>${verticesCompletos[i].este != undefined ? verticesCompletos[i].este.toString().replace('.', ',') : verticesCompletos[i].este}</Este>            
             </Origen>
             <Otros>
               <Mascara>${verticesCompletos[i]?.mascara}</Mascara>
@@ -527,33 +537,33 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
 
     // ====== FIN =========
 
-    const agrupar = {};    
+    // const agrupar = {};    
 
-    verticeConOndulacion.forEach(item => {
-      if (!agrupar[item.nombre]) {
-        agrupar[item.nombre] = { ...item, ondula: [item.ondula] };
-      } else {
-        agrupar[item.nombre].ondula.push(item.ondula);
-      }
-    });
-    
-    const verticeConOndulacionClean = Object.values(agrupar).map(item => {
-      const sumaOndula = item.ondula.reduce((sum, val) => sum + val, 0);
-      const ondulaPromedio = sumaOndula / item.ondula.length;
-      return { ...item, ondula: ondulaPromedio };
-    });
-
-
-    // let verticeConOndulacionClean = [];
-
-    // for (let resul of result) {
-    //   for (let vertice of verticeConOndulacion) {
-    //     if (resul.nombre === vertice.nombre) {
-    //       verticeConOndulacionClean.push(vertice);
-    //       break;
-    //     }
+    // verticeConOndulacion.forEach(item => {
+    //   if (!agrupar[item.nombre]) {
+    //     agrupar[item.nombre] = { ...item, ondula: [item.ondula] };
+    //   } else {
+    //     agrupar[item.nombre].ondula.push(item.ondula);
     //   }
-    // }
+    // });
+    
+    // const verticeConOndulacionClean = Object.values(agrupar).map(item => {
+    //   const sumaOndula = item.ondula.reduce((sum, val) => sum + val, 0);
+    //   const ondulaPromedio = sumaOndula / item.ondula.length;
+    //   return { ...item, ondula: ondulaPromedio };
+    // });
+
+
+    let verticeConOndulacionClean = [];
+
+    for (let resul of result) {
+      for (let vertice of verticeConOndulacion) {
+        if (resul.nombre === vertice.nombre) {
+          verticeConOndulacionClean.push(vertice);
+          break;
+        }
+      }
+    }
 
 
 
