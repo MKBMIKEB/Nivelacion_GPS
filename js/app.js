@@ -128,7 +128,16 @@ document.querySelector('#calcular').addEventListener('click', async function () 
             tipoSolucion: coordenada.tipoSolucion,
             m0: coordenada.m0,
             gdop: coordenada.gdop,
-            duracion: coordenada.duracion
+            duracion: coordenada.duracion,
+            name: coordenada.name,
+            frecuencia: coordenada.frecuencia,
+            efemerides: coordenada.efemerides,
+            inicioFin: coordenada.inicioFin,
+            nombreAntena: coordenada.nombreAntena,
+            cq1d: coordenada.cq1d,            
+            cq2d: coordenada.cq2d,
+            cq3d: coordenada.cq3d,
+            saltos: coordenada.saltos
           }
         );
         break;
@@ -251,7 +260,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
 
   // for (const vertice of verticesCompletos) {
     for (let i=0; i<verticesCompletos.length-1; i++) {    
-
+        
         datosXml += `
         <Punto Nombre="${verticesCompletos[i].nombre}">
         <Tipo_Punto>${tipoPunto(verticesCompletos[i].duracion)}</Tipo_Punto>      
@@ -317,6 +326,15 @@ document.querySelector('#calcular').addEventListener('click', async function () 
               <TipoSolucion>${verticesCompletos[i]?.tipoSolucion}</TipoSolucion>
               <M0>${verticesCompletos[i]?.m0}</M0>
               <Gdop>${verticesCompletos[i]?.gdop}</Gdop>
+              <NombreVector>${verticesCompletos[i]?.name}</NombreVector>
+              <Frecuencia>${verticesCompletos[i]?.frecuencia}</Frecuencia>
+              <Efemerides>${verticesCompletos[i]?.efemerides}</Efemerides>
+              <InicioFin>${verticesCompletos[i]?.inicioFin}</InicioFin>
+              <NombreAntena>${verticesCompletos[i]?.nombreAntena}</NombreAntena>
+              <Cq1d>${verticesCompletos[i]?.cq1d}</Cq1d>
+              <Cq2d>${verticesCompletos[i]?.cq2d}</Cq2d>
+              <Cq3d>${verticesCompletos[i]?.cq3d}</Cq3d>
+              <Saltos>${verticesCompletos[i]?.saltos}</Saltos>
             </Otros>
           </Set_de_Coordenadas>
         </Punto>          
@@ -688,6 +706,7 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
             for (let elemento of e.target.result.split("</tr>")) {
 
               if (elemento.indexOf("Hora Inicio - Hora Fin:") !== -1) {
+                
                 const fecha = elemento.substring(90, 100);
 
                 const ano = fecha.substring(6, 10);
@@ -704,6 +723,7 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
 
                 obj.anoEpoca = anoEpoca;
                 obj.fecha = `${ano}/${mes}/${dia}`;
+                obj.inicioFin = elemento.split('<td>')[1].split('</td>')[1].split('>')[1];                
 
               }
 
@@ -721,19 +741,26 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
               if (elemento.indexOf("Sistema de Sat&#233;lites:") !== -1) {
                 obj.satelites = elemento.split('<td>')[2].split('</td>')[0];
               }
-
-              if (elemento.indexOf("Lectura de Altura:") !== -1) {
-                obj.lecturaAltura = elemento.split('<td>')[2].split('</td>')[0];
+              
+              if (elemento.indexOf("Lectura de la Altura:") !== -1) {                         
+                obj.lecturaAltura = elemento.split('<td>')[3].split('</td>')[0];
               }
 
-              if (elemento.indexOf("Altura de Antena:") !== -1) {
-                obj.alturaAntena = elemento.split('<td>')[2].split('</td>')[0];
+              if (elemento.indexOf("Altura de Antena:") !== -1) {                
+                obj.alturaAntena = elemento.split('<td>')[3].split('</td>')[0];
               }
               if (elemento.indexOf("Tipo de Soluci&#243;n:") !== -1) {
                 obj.tipoSolucion = elemento.split('<td>')[2].split('</td>')[0];
               }
-              if (elemento.indexOf("M0:") !== -1) {
+              if (elemento.indexOf("M0:") !== -1) {                
+                obj.cq1d = elemento.split('<td>')[4].split('</td>')[0];
                 obj.m0 = elemento.split('<td>')[2].split('</td>')[0];
+              }
+              if (elemento.indexOf("Q11:") !== -1) {                
+                obj.cq2d = elemento.split('<td>')[4].split('</td>')[0];                
+              }
+              if (elemento.indexOf("Q12:") !== -1) {                
+                obj.cq3d = elemento.split('<td>')[4].split('</td>')[0];
               }
               if (elemento.indexOf("GDOP:") !== -1) {
                 obj.gdop = elemento.split('<td>')[4].split('</td>')[0];
@@ -741,6 +768,33 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
               if (elemento.indexOf("Duraci&#243;n:") !== -1) {
                 obj.duracion = elemento.split('<td>')[2].split('</td>')[0];
               }
+              
+              if (elemento.indexOf("Tipo de Efem&#233;rides:") !== -1) {
+                if(elemento.split('<td>').length == 4){                  
+                  obj.efemerides = elemento.split('<td>')[3].split('</td>')[0];
+                }
+              } 
+              if (elemento.indexOf("Frecuencia:") !== -1) {                                            
+                if(elemento.split('<td>').length == 4){                  
+                  obj.frecuencia = elemento.split('<td>')[3].split('</td>')[0];
+                }else{                  
+                  obj.frecuencia = elemento.split('<td>')[2].split('</td>')[0];
+                }
+              }           
+              if (elemento.indexOf("Frecuencias:") !== -1) {                
+                if(elemento.split('<td>').length == 4){                  
+                  obj.frecuencia = elemento.split('<td>')[3].split('</td>')[0];
+                }else{                  
+                  obj.frecuencia = elemento.split('<td>')[2].split('</td>')[0];
+                }                        
+              }                            
+              if (elemento.indexOf("Nombre de Antena / SN:") !== -1) {                
+                obj.nombreAntena = elemento.split('<td>')[3].split('</td>')[0];                
+              }
+              if (elemento.indexOf("Cuenta de Saltos de Ciclo:") !== -1) {                      
+                obj.saltos = elemento.split('<td>')[2].split('</td>')[0];                
+              }
+                           
 
             }
 
@@ -756,7 +810,7 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
             for (let elemento of e.target.result.split("</tr>")) {
 
               if (elemento.indexOf("Start Time - End Time:") !== -1) {
-                // console.log(elemento.substring(89, 100))
+                
                 const fecha = elemento.substring(89, 100);
 
                 const ano = fecha.substring(6, 10);
@@ -773,6 +827,7 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
 
                 obj.anoEpoca = anoEpoca;
                 obj.fecha = `${ano}/${mes}/${dia}`;
+                obj.inicioFin = elemento.split('<td>')[1].split('</td>')[1].split('>')[1];                     
 
               }
 
@@ -799,8 +854,15 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
               if (elemento.indexOf("Solution Type:") !== -1) {
                 obj.tipoSolucion = elemento.split('<td>')[2].split('</td>')[0];
               }
-              if (elemento.indexOf("M0:") !== -1) {
+              if (elemento.indexOf("M0:") !== -1) {                
+                obj.cq1d = elemento.split('<td>')[4].split('</td>')[0];
                 obj.m0 = elemento.split('<td>')[2].split('</td>')[0];
+              }
+              if (elemento.indexOf("Q11:") !== -1) {                
+                obj.cq2d = elemento.split('<td>')[4].split('</td>')[0];                
+              }
+              if (elemento.indexOf("Q12:") !== -1) {                
+                obj.cq3d = elemento.split('<td>')[4].split('</td>')[0];
               }
               if (elemento.indexOf("GDOP:") !== -1) {
                 obj.gdop = elemento.split('<td>')[4].split('</td>')[0];
@@ -808,6 +870,33 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
               if (elemento.indexOf("Duration:") !== -1) {
                 obj.duracion = elemento.split('<td>')[2].split('</td>')[0];
               }
+              if (elemento.indexOf("Ephemeris Type:") !== -1) {                
+                if(elemento.split('<td>').length == 4){                  
+                  obj.efemerides = elemento.split('<td>')[3].split('</td>')[0];
+                }
+              } 
+              if (elemento.indexOf("Frequency:") !== -1) {                                                       
+                if(elemento.split('<td>').length == 4){                  
+                  obj.frecuencia = elemento.split('<td>')[3].split('</td>')[0];
+                }else{                  
+                  obj.frecuencia = elemento.split('<td>')[2].split('</td>')[0];
+                }
+              }     
+              if (elemento.indexOf("Antenna Name / SN:") !== -1) {                       
+                obj.nombreAntena = elemento.split('<td>')[3].split('</td>')[0];                
+              }  
+              if (elemento.indexOf("Common Epochs:") !== -1) {                      
+                obj.saltos = elemento.split('<td>')[2].split('</td>')[0];                
+              }
+
+              // if (elemento.indexOf("Frecuencias:") !== -1) {                
+              //   if(elemento.split('<td>').length == 4){                  
+              //     obj.frecuencia = elemento.split('<td>')[3].split('</td>')[0];
+              //   }else{                  
+              //     obj.frecuencia = elemento.split('<td>')[2].split('</td>')[0];
+              //   }                        
+              // }                            
+              
 
 
 
