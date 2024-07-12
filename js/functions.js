@@ -11,18 +11,42 @@ function calcularDiaDelAno(fecha) {
 }
 
 function convertirCoordenadasITRF2020aITRF2014(x, y, z) {
+  // Parámetros de transformación
+  const T1 = -0.0014;
+  const T2 = -0.0014;
+  const T3 = 0.0024;
+  const D = -4.2e-10;  // Ajuste del factor D a positivo
+  const R1 = 0;
+  const R2 = 0;
+  const R3 = 0;
 
-  let xITRF2014 = parseFloat(x) * 0.00000000042
-  let yITRF2014 = parseFloat(y) * 0.00000000042
-  let zITRF2014 = parseFloat(z) * 0.00000000042
+  // Matriz de rotación y escala
+  const C = [
+      [D, -R3, R2],
+      [R3, D, -R1],
+      [-R2, R1, D]
+  ];
 
-  xITRF2014 = xITRF2014 + 0.0014 + parseFloat(x)
-  yITRF2014 = yITRF2014 + 0.0014 + parseFloat(y)
-  zITRF2014 = zITRF2014 - 0.0024 + parseFloat(z)
+  // Vector original
+  const d = [parseFloat(x), parseFloat(y), parseFloat(z)];
+
+  // Producto de la matriz C y el vector d
+  const Cd = [
+      C[0][0] * d[0] + C[0][1] * d[1] + C[0][2] * d[2],
+      C[1][0] * d[0] + C[1][1] * d[1] + C[1][2] * d[2],
+      C[2][0] * d[0] + C[2][1] * d[1] + C[2][2] * d[2]
+  ];
+
+  // Vector de traslación
+  const T = [T1, T2, T3];
+
+  // Ajuste final
+  const xITRF2014 = parseFloat((d[0] + T[0] + Cd[0]).toFixed(4));
+  const yITRF2014 = parseFloat((d[1] + T[1] + Cd[1]).toFixed(4));
+  const zITRF2014 = parseFloat((d[2] + T[2] + Cd[2]).toFixed(4));
 
   return [xITRF2014, yITRF2014, zITRF2014];
 }
-
 
 function eliminarEspacios(linea) {
   let arreglo = [];
