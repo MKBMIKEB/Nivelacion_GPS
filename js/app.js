@@ -519,72 +519,156 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
 
 
     // ====== BUSCAR Y AGREGAR LA ONDULACIÓN =========
-    let verticeConOndulacion = [];
-
-
-    for (let vertice of result) {
-
-      if (vertice.ondula === undefined) {
-        const lat = vertice.lat;
-        const lon = vertice.long;
-
-        try {
-          const resultado = await fetch('./../json/ondulacion.json');
-          const arregloOndula = await resultado.json();
-          for (let i of arregloOndula) {
-            if ((lat <= (i.lat + 0.033) && lat >= (i.lat - 0.0033)) && lon <= (i.lon + 0.033) && lon >= (i.lon - 0.0033)) {              
-              verticeConOndulacion.push({
-                nombre: vertice.nombre, lat: vertice.lat, long: vertice.long, x: vertice.x, y: vertice.y, z: vertice.z,
-                tipo: vertice.tipo, ondula: i.alt
-              });
-            }
-          }          
-
-        } catch (error) {
-          console.log('error', error);
-        }
-
-      } else {
-        verticeConOndulacion.push({
-          nombre: vertice.nombre, lat: vertice.lat, long: vertice.long, x: vertice.x, y: vertice.y, z: vertice.z,
-          tipo: vertice.tipo, ondula: vertice.ondula, velx: vertice.velx, vely: vertice.vely, velz: vertice.velz
-        });
+    async function fetchGeocol2004() {
+      console.log("fetchGeocol2004 disparado.");
+      const response = await fetch('../json/Geocol2004.txt');
+      if (!response.ok) {
+        throw new Error('No se pudo cargar el archivo Geocol2004.txt');
       }
-
+      const text = await response.text();
+      console.log("Contenido de Geocol2004.txt obtenido.");
+      return text;
     }
-
-    // ====== FIN =========
-
-    // const agrupar = {};    
-
-    // verticeConOndulacion.forEach(item => {
-    //   if (!agrupar[item.nombre]) {
-    //     agrupar[item.nombre] = { ...item, ondula: [item.ondula] };
-    //   } else {
-    //     agrupar[item.nombre].ondula.push(item.ondula);
-    //   }
-    // });
     
-    // const verticeConOndulacionClean = Object.values(agrupar).map(item => {
-    //   const sumaOndula = item.ondula.reduce((sum, val) => sum + val, 0);
-    //   const ondulaPromedio = sumaOndula / item.ondula.length;
-    //   return { ...item, ondula: ondulaPromedio };
-    // });
-
-
-    let verticeConOndulacionClean = [];
-
-    for (let resul of result) {
-      for (let vertice of verticeConOndulacion) {
-        if (resul.nombre === vertice.nombre) {
-          verticeConOndulacionClean.push(vertice);
-          break;
-        }
-      }
+    async function cabecero() {
+      console.log("cabecero disparado.");
+      const data = await fetchGeocol2004();
+      const lines = data.split("\n");
+      if (lines.length < 1) throw new Error("El archivo Geocol2004.txt está vacío o tiene un formato incorrecto.");
+      
+      const primera_linea = lines[0].trim().split(" ");
+      if (primera_linea.length < 6) throw new Error("La primera línea del archivo Geocol2004.txt tiene un formato incorrecto.");
+    
+      return {
+        minLatitud: parseFloat(primera_linea[0]),
+        maxLatitud: parseFloat(primera_linea[1]),
+        minLongitud: parseFloat(primera_linea[2]),
+        maxLongitud: parseFloat(primera_linea[3]),
+        incrementoLat: parseFloat(primera_linea[4]),
+        incrementoLon: parseFloat(primera_linea[5]),
+        norteOeste: null,
+        norteEste: null,
+        surOeste: null,
+        surEste: null
+      };
     }
+    
+    async function ondulacion_geoidal(latitud, longitud) {
+      console.log("ondulacion_geoidal disparado para latitud:", latitud, "y longitud:", longitud);
+      const datos = await cabecero();
+    
+      if (latitud < (datos.minLatitud + datos.incrementoLat) || latitud > (datos.maxLatitud - datos.incrementoLat)) {
+        console.log("latitud fuera del rango");
+        return null;
+      }
+      if (longitud < (datos.minLongitud + datos.incrementoLon) || longitud > (datos.maxLongitud - datos.incrementoLon)) {
+        console.log("longitud fuera del rango");
+        return null;
+      }
+    
+      const i = parseInt((datos.maxLatitud - latitud) / datos.incrementoLat);
+      const j = parseInt((longitud - datos.minLongitud) / datos.incrementoLon);
+    
+      const lat = parseFloat(datos.maxLatitud - i * datos.incrementoLat);
+      const lon = parseFloat(datos.minLongitud + j * datos.incrementoLon);
+    
+      const data = await fetchGeocol2004();
+      const lines = data.split("\n");
+      if (i + 2 >= lines.length) throw new Error("El archivo Geocol2004.txt no tiene suficientes datos para la interpolación.");
+    
+      const primera_linea = lines[i + 1]?.trim().split(" ");
+      const segunda_linea = lines[i + 2]?.trim().split(" ");
+      if (!primera_linea || !segunda_linea || primera_linea.length <= j + 1 || segunda_linea.length <= j + 1) {
+        throw new Error("El archivo Geocol2004.txt no tiene suficientes columnas para la interpolación.");
+      }
+    
+      datos.norteOeste = parseFloat(primera_linea[j]);
+      datos.norteEste = parseFloat(primera_linea[j + 1]);
+      datos.surOeste = parseFloat(segunda_linea[j]);
+      datos.surEste = parseFloat(segunda_linea[j + 1]);
+    
+      const ondulacion = interpolacion_bilineal(datos, lat, lon, latitud, longitud);
+      console.log("Ondulación geoidal calculada:", ondulacion);
+      return ondulacion;
+    }
+    
+    function interpolacion_bilineal(datos, maxLatitud, minLongitud, latitud, longitud) {
+      const v = parseFloat((maxLatitud - latitud) / datos.incrementoLat);
+      const u = parseFloat((longitud - minLongitud) / datos.incrementoLon);
+      const q = ((1 - u) * (1 - v) * datos.norteOeste) + (v * (1 - u) * datos.surOeste) + (u * v * datos.surEste) + ((1 - v) * u * datos.norteEste);
+      console.log('El valor de la ondulacion es: ', q);
+      console.log('El valor de la ondulacion es: ', q.toFixed(2));
+      
+      return q;
+    }
+     // ====== BUSCAR Y AGREGAR LA ONDULACIÓN =========
+     let verticeConOndulacion = [];
 
+     for (let vertice of result) {
+       if (vertice.ondula === undefined) {
+         const lat = vertice.lat;
+         const lon = vertice.long;
 
+         try {
+           const ondula = await ondulacion_geoidal(lat, lon);
+           verticeConOndulacion.push({
+             nombre: vertice.nombre,
+             lat: vertice.lat,
+             long: vertice.long,
+             x: vertice.x,
+             y: vertice.y,
+             z: vertice.z,
+             tipo: vertice.tipo,
+             ondula: ondula
+           });
+         } catch (error) {
+           console.log('error', error);
+         }
 
+       } else {
+         verticeConOndulacion.push({
+           nombre: vertice.nombre,
+           lat: vertice.lat,
+           long: vertice.long,
+           x: vertice.x,
+           y: vertice.y,
+           z: vertice.z,
+           tipo: vertice.tipo,
+           ondula: vertice.ondula,
+           velx: vertice.velx,
+           vely: vertice.vely,
+           velz: vertice.velz
+         });
+       }
+     }
+     // ====== FIN =========
+    
+     let verticeConOndulacionClean = [];
+
+     for (let resul of result) {
+       for (let vertice of verticeConOndulacion) {
+         if (resul.nombre === vertice.nombre) {
+           verticeConOndulacionClean.push(vertice);
+           break;
+         }
+       }
+     }
+
+     cambiosToggleHabilitar(false);
+     localStorage.setItem('verticesOndula', JSON.stringify(verticeConOndulacionClean));
+     guardarVelocidades();
+     
+     function guardarVelocidades() {
+      const verticesOndula = JSON.parse(localStorage.getItem('verticesOndula'));
+      const velocidades = verticesOndula.map(vertice => ({
+        nombre: vertice.nombre,
+        velx: vertice.velx,
+        vely: vertice.vely,
+        velz: vertice.velz
+      }));
+      
+      localStorage.setItem('velocidades', JSON.stringify(velocidades));
+    }
     // habilitar botones
     cambiosToggleHabilitar(false);
 
