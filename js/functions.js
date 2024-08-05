@@ -698,128 +698,377 @@ function tipoPunto(duracion) {
   }
 }
 
+// Clase para coordenadas 3D cartesiana
+class Cartesian3DCoordinate {
+    constructor(x, y, z) {
+        this.X = x;
+        this.Y = y;
+        this.Z = z;
+    }
+
+    toString() {
+        return `{X=${this.X} Y=${this.Y} Z=${this.Z}}`;
+    }
+}
+
+// Clase para coordenadas elipsoidales
+class EllipsoidalCoordinate {
+    constructor(latitude, longitude, ellipsoidalHeight) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.ellipsoidalHeight = ellipsoidalHeight;
+    }
+}
+
+// Clase para velocidades
+class Velocities {
+    constructor() {
+        this.velocitySN = 0;
+        this.velocityWE = 0;
+        this.velocityX = 0;
+        this.velocityY = 0;
+        this.velocityZ = 0;
+    }
+
+    setVelocitySN(velocity) {
+        this.velocitySN = velocity;
+    }
+
+    setVelocityWE(velocity) {
+        this.velocityWE = velocity;
+    }
+
+    setVelocityX(velocity) {
+        this.velocityX = velocity;
+    }
+
+    setVelocityY(velocity) {
+        this.velocityY = velocity;
+    }
+
+    setVelocityZ(velocity) {
+        this.velocityZ = velocity;
+    }
+
+    getVelocitySN() {
+        return this.velocitySN;
+    }
+
+    getVelocityWE() {
+        return this.velocityWE;
+    }
+
+    getVelocityX() {
+        return this.velocityX;
+    }
+
+    getVelocityY() {
+        return this.velocityY;
+    }
+
+    getVelocityZ() {
+        return this.velocityZ;
+    }
+}
+
+// Clase para leer y procesar el archivo de texto Velogrid2017.txt
+// Clase para leer y procesar el archivo de texto Velogrid2017.txt
+class VelocitiesReader {
+  constructor(lines) {
+      this.lines = lines;
+  }
+
+  getMatrix(latitude, longitude) {
+      const matrix = [];
+
+      this.lines.forEach(line => {
+          const parts = line.split(';');
+          const lat = parseFloat(parts[0]);
+          const lon = parseFloat(parts[1]);
+          if (lat < latitude + 1.0 && lat > latitude - 1.0 &&
+              lon < longitude + 1.0 && lon > longitude - 1.0) {
+              const coordinate2 = new EllipsoidalCoordinate(lat, lon, null);
+              const x = parseFloat(parts[2]);
+              const y = parseFloat(parts[3]);
+              const dist = calculateInverse(new EllipsoidalCoordinate(latitude, longitude, null), coordinate2)[0];
+              matrix.push([x, y, dist]);
+          }
+      });
+
+      return matrix;
+  }
+}
 
 
+// Función de interpolación de distancia inversa (IDW) basada en StatisticsCalculate.java
+function idwCalculate(matrix, posData) {
+    let r = 0.0;
+    if (matrix[0][2] === 0.0) {
+        r = matrix[0][posData];
+        return r;
+    }
+    let one = 0.0;
+    let two = 0.0;
+    for (let i = 0; i < matrix.length; i++) {
+        let value = matrix[i][posData] / matrix[i][2];
+        one += value;
+        value = 1.0 / matrix[i][2];
+        two += value;
+    }
+    r = one / two;
+    return r;
+}
 
+// Clase para manejar matrices y sus operaciones
+class Matrix {
+    constructor(data) {
+        this.data = data;
+    }
 
+    getElementAt(row, col) {
+        return this.data[row][col];
+    }
+
+    getRows() {
+        return this.data.length;
+    }
+
+    multiplication(matrix) {
+        const result = new Array(this.data.length).fill(0).map(() => new Array(matrix.data[0].length).fill(0));
+        for (let i = 0; i < this.data.length; i++) {
+            for (let j = 0; j < matrix.data[0].length; j++) {
+                for (let k = 0; k < this.data[0].length; k++) {
+                    result[i][j] += this.data[i][k] * matrix.data[k][j];
+                }
+            }
+        }
+        return new Matrix(result);
+    }
+
+    subtraction(matrix) {
+        const result = new Array(this.data.length).fill(0).map(() => new Array(this.data[0].length).fill(0));
+        for (let i = 0; i < this.data.length; i++) {
+            for (let j = 0; j < this.data[0].length; j++) {
+                result[i][j] = this.data[i][j] - matrix.data[i][j];
+            }
+        }
+        return new Matrix(result);
+    }
+
+    transpose() {
+        const result = new Array(this.data[0].length).fill(0).map(() => new Array(this.data.length).fill(0));
+        for (let i = 0; i < this.data.length; i++) {
+            for (let j = 0; j < this.data[0].length; j++) {
+                result[j][i] = this.data[i][j];
+            }
+        }
+        return new Matrix(result);
+    }
+
+    getInverse() {
+        const inverse = math.inv(this.data);  // Usando math.js
+        return new Matrix(inverse);
+    }
+
+    addition(matrix) {
+        const result = new Array(this.data.length).fill(0).map(() => new Array(this.data[0].length).fill(0));
+        for (let i = 0; i < this.data.length; i++) {
+            for (let j = 0; j < this.data[0].length; j++) {
+                result[i][j] = this.data[i][j] + matrix.data[i][j];
+            }
+        }
+        return new Matrix(result);
+    }
+}
+
+// Función para convertir a coordenadas cartesianas 3D
+function cartesian3DConversion(coordinate) {
+    const phi = coordinate.latitude * (Math.PI / 180); // Convertir grados a radianes
+    const lambda = coordinate.longitude * (Math.PI / 180); // Convertir grados a radianes
+    const h = coordinate.ellipsoidalHeight || 0.0;
+
+    const a = 6378137.0; // Radio ecuatorial de la Tierra en metros
+    const f = 1 / 298.257223563; // Aplanamiento de la Tierra
+    const e2 = 2 * f - Math.pow(f, 2); // Excentricidad cuadrada
+
+    const sinPhi = Math.sin(phi);
+    const cosPhi = Math.cos(phi);
+    const cosLambda = Math.cos(lambda);
+    const sinLambda = Math.sin(lambda);
+
+    // Radio del curvatura en la vertical prime
+    const N = a / Math.sqrt(1 - e2 * Math.pow(sinPhi, 2));
+
+    const X = (N + h) * cosPhi * cosLambda;
+    const Y = (N + h) * cosPhi * sinLambda;
+    const Z = ((1 - e2) * N + h) * sinPhi;
+
+    console.log(`Cartesian Coordinates: X=${X.toFixed(4)}, Y=${Y.toFixed(4)}, Z=${Z.toFixed(4)}`);
+    return new Cartesian3DCoordinate(X, Y, Z);
+}
+
+// Función de cálculo inverso
+function calculateInverse(coordinate1, coordinate2) {
+    const result = [0.0, 0.0, 0.0];
+
+    const a = 6378137.0; // Radio ecuatorial de la Tierra en metros
+    const f = 1 / 298.257223563; // Aplanamiento de la Tierra
+    const b = a * (1 - f);
+
+    const lat1 = coordinate1.latitude * (Math.PI / 180);
+    const lon1 = coordinate1.longitude * (Math.PI / 180);
+    const lat2 = coordinate2.latitude * (Math.PI / 180);
+    const lon2 = coordinate2.longitude * (Math.PI / 180);
+
+    const U1 = Math.atan((1 - f) * Math.tan(lat1));
+    const U2 = Math.atan((1 - f) * Math.tan(lat2));
+    const L = lon2 - lon1;
+    let lambda = L;
+    let lambdaP;
+    const iterLimit = 100;
+    let sinSigma, cosSigma, sigma, sinAlpha, cos2SigmaM, cosSqAlpha;
+    let cosLambda, sinLambda;
+    let i = 0;
+
+    do {
+        sinLambda = Math.sin(lambda);
+        cosLambda = Math.cos(lambda);
+        sinSigma = Math.sqrt(
+            (Math.cos(U2) * sinLambda) * (Math.cos(U2) * sinLambda) +
+            (Math.cos(U1) * Math.sin(U2) - Math.sin(U1) * Math.cos(U2) * cosLambda) *
+            (Math.cos(U1) * Math.sin(U2) - Math.sin(U1) * Math.cos(U2) * cosLambda)
+        );
+        if (sinSigma === 0) return result; // coincident points
+        cosSigma = Math.sin(U1) * Math.sin(U2) + Math.cos(U1) * Math.cos(U2) * cosLambda;
+        sigma = Math.atan2(sinSigma, cosSigma);
+        sinAlpha = Math.cos(U1) * Math.cos(U2) * sinLambda / sinSigma;
+        cosSqAlpha = 1 - sinAlpha * sinAlpha;
+        cos2SigmaM = cosSigma - 2 * Math.sin(U1) * Math.sin(U2) / cosSqAlpha;
+        if (isNaN(cos2SigmaM)) cos2SigmaM = 0; // equatorial line: cosSqAlpha=0 (§6)
+        const C = f / 16 * cosSqAlpha * (4 + f * (4 - 3 * cosSqAlpha));
+        lambdaP = lambda;
+        lambda = L + (1 - C) * f * sinAlpha * (sigma + C * sinSigma * (cos2SigmaM + C * cosSigma * (-1 + 2 * cos2SigmaM * cos2SigmaM)));
+        i++;
+    } while (Math.abs(lambda - lambdaP) > 1e-12 && i < iterLimit);
+
+    if (i >= iterLimit) return NaN; // formula failed to converge
+
+    const uSq = cosSqAlpha * (a * a - b * b) / (b * b);
+    const A = 1 + uSq / 16384 * (4096 + uSq * (-768 + uSq * (320 - 175 * uSq)));
+    const B = uSq / 1024 * (256 + uSq * (-128 + uSq * (74 - 47 * uSq)));
+    const deltaSigma = B * sinSigma * (cos2SigmaM + B / 4 * (cosSigma * (-1 + 2 * cos2SigmaM * cos2SigmaM) -
+        B / 6 * cos2SigmaM * (-3 + 4 * sinSigma * sinSigma) * (-3 + 4 * cos2SigmaM * cos2SigmaM)));
+
+    const s = (b * A * (sigma - deltaSigma)).toFixed(4);
+
+    const fwdAz = (Math.atan2(Math.cos(U2) * Math.sin(lambda), Math.cos(U1) * Math.sin(U2) - Math.sin(U1) * Math.cos(U2) * cosLambda) * (180 / Math.PI)).toFixed(4);
+    const revAz = (Math.atan2(Math.cos(U1) * Math.sin(lambda), -Math.sin(U1) * Math.cos(U2) + Math.cos(U1) * Math.sin(U2) * cosLambda) * (180 / Math.PI)).toFixed(4);
+
+    result[0] = parseFloat(s);
+    result[1] = parseFloat(fwdAz) < 0 ? parseFloat(fwdAz) + 360 : parseFloat(fwdAz);
+    result[2] = parseFloat(revAz) < 0 ? parseFloat(revAz) + 360 : parseFloat(revAz);
+
+    console.log(`Inverse Calculation: s=${result[0].toFixed(4)}, fwdAz=${result[1].toFixed(4)}, revAz=${result[2].toFixed(4)}`);
+    return result;
+}
+
+// Función para calcular las velocidades y convertirlas a coordenadas XYZ
+function calculateXYZ(vel, coordinate) {
+    let sn = vel.getVelocitySN();
+    let we = vel.getVelocityWE();
+    let h = coordinate.ellipsoidalHeight || 0.0;
+
+    // Ajuste de longitud
+    const adjustedLongitude = coordinate.longitude + 2.777777777777777E-4;
+    const dist = calculateInverse(new EllipsoidalCoordinate(coordinate.latitude, adjustedLongitude, h), coordinate)[0];
+
+    // Ajuste de las velocidades basado en la distancia
+    sn = Math.abs(sn / dist / 3600.0);
+    we = Math.abs(we / dist * Math.cos(coordinate.latitude * (Math.PI / 180)) / 3600.0);
+
+    console.log(`Adjusted velocities: sn=${sn.toFixed(3)}, we=${we.toFixed(3)}`);
+
+    // Nuevas coordenadas elipsoidales ajustadas
+    const adjustedLatitude = coordinate.latitude + sn;
+    const finalLongitude = coordinate.longitude + we;
+
+    const ellipsoidal = new EllipsoidalCoordinate(adjustedLatitude, finalLongitude, h);
+
+    // Convertir ambas coordenadas a cartesianas
+    const cartesian3D1 = cartesian3DConversion(coordinate);
+    const cartesian3D2 = cartesian3DConversion(ellipsoidal);
+
+    // Calcular las diferencias en coordenadas XYZ
+    const x = Math.abs(cartesian3D2.X - cartesian3D1.X).toFixed(6);
+    const y = Math.abs(cartesian3D2.Y - cartesian3D1.Y).toFixed(6);
+    const z = Math.abs(cartesian3D2.Z - cartesian3D1.Z).toFixed(6);
+
+    console.log(`Cartesian differences: x=${x}, y=${y}, z=${z}`);
+
+    vel.setVelocityX(parseFloat(x));
+    vel.setVelocityY(parseFloat(y));
+    vel.setVelocityZ(parseFloat(z));
+
+    return vel;
+}
 // ======== funciones para la velocidad ====================
+// Función para calcular las velocidades
+async function calculateVelocities(lat, lon, matrix) {
+  const velocitySN = Math.abs(idwCalculate(matrix, 0)); // Posición de velX
+  const velocityWE = Math.abs(idwCalculate(matrix, 1)); // Posición de velY
 
-// Function to find the exact match for velocity
-function findExactMatchVelocity(velocityData, lat, lon) {
-  for (let point of velocityData) {
-    if (point.Latitude !== undefined && point.Longitude !== undefined) {
-      if (Math.abs(point.Latitude - lat) < 1e-6 && Math.abs(point.Longitude - lon) < 1e-6) {
-        return {
-          vx: point.Vx,
-          vy: point.Vy,
-          vz: point.Vz
-        };
-      }
-    }
-  }
-  return null;
+  console.log(`Velocities calculated: velocitySN=${velocitySN.toFixed(6)}, velocityWE=${velocityWE.toFixed(6)}`);
+
+  const vel = new Velocities();
+  vel.setVelocitySN(velocitySN);
+  vel.setVelocityWE(velocityWE);
+
+  return calculateXYZ(vel, new EllipsoidalCoordinate(lat, lon, null));
 }
 
-// Function to find the nearest velocity point with detailed debugging
-function findNearestVelocity(velocityData, lat, lon) {
-  let nearestPoint = null;
-  let minDistance = Infinity;
+// Función principal para leer el archivo de texto, calcular las velocidades y convertirlas a XYZ
 
-  for (let point of velocityData) {
-    if (point.Latitude !== undefined && point.Longitude !== undefined) {
-      let distance = Math.sqrt(Math.pow(lat - point.Latitude, 2) + Math.pow(lon - point.Longitude, 2));
-      if (distance < minDistance) {
-        minDistance = distance;
-        nearestPoint = point;
-      }
-    }
-  }
+// Función principal para leer el archivo de texto, calcular las velocidades y convertirlas a XYZ
+async function getVelocitiesFromFile(lat, lon) {
+  // Ajusta la ruta al archivo Velogrid2017.txt
+  const filePath = 'json/Velogrid2017.txt';  // Asegúrate de que la ruta sea correcta y accesible desde el servidor
 
-  if (minDistance <= 1.0) {
-    return {
-      vx: nearestPoint.Vx,
-      vy: nearestPoint.Vy,
-      vz: nearestPoint.Vz
-    };
-  }
-  return null;
+  // Leer el archivo Velogrid2017.txt usando fetch
+  const response = await fetch(filePath);
+  const textData = await response.text();
+  const lines = textData.trim().split('\n');
+
+  // Procesar las líneas del archivo
+  const reader = new VelocitiesReader(lines);
+
+  // Obtener la matriz de datos
+  const matrix = reader.getMatrix(lat, lon);
+
+  // Calcular las velocidades y coordenadas XYZ
+  const velocities = await calculateVelocities(lat, lon, matrix);
+
+  return velocities;
 }
-
-// Function para calcular velocidades
-async function calcularVelocidades(lat, lon) {
-
-  if (isNaN(lat) || isNaN(lon)) {
-    return;
-  }
-
-  try {
-    const response = await fetch('json/velocidades4.json');
-    const text = await response.text();
-    let cleanText = text.replace(/\\"/g, '"').replace(/"\[/g, '[').replace(/\]"/g, ']').replace(/"\{/g, '{').replace(/\}"/g, '}');
-
-    try {
-      let data = JSON.parse(cleanText);
-
-      let velocity = findExactMatchVelocity(data, lat, lon);
-
-      if (velocity !== null) {
-        console.log('entro', velocity);
-        const velx = velocity.vx.toFixed(3);
-        const vely = velocity.vy.toFixed(3);
-        const velz = velocity.vz.toFixed(3);
-        return {
-          velx,
-          vely,
-          velz
-        }
-      } else {
-        velocity = findNearestVelocity(data, lat, lon);
-
-        if (velocity !== null) {
-
-          const velx = velocity.vx.toFixed(3);
-          const vely = velocity.vy.toFixed(3);
-          const velz = velocity.vz.toFixed(3);
-          return {
-            velx,
-            vely,
-            velz
-          }
-        } else {
-          return {
-            velx: 0.0,
-            vely: 0.0,
-            velz: 0.0
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Error al parsear el JSON:', error);
-    }
-  } catch (error) {
-    console.error('Error:', error);
-  }
-}
-
-
-
 async function guardarVelocidades() {
-  let arrTexto = JSON.parse(localStorage.getItem('verticesOndula'))
-  let arrTexto2 = []
-  console.log(arrTexto)
+  let arrTexto = JSON.parse(localStorage.getItem('verticesOndula'));
+  let arrTexto2 = [];
+  console.log(arrTexto);
+
   for (let vertice of arrTexto) {
-    if (vertice.velx) {
-      arrTexto2.push(vertice)
-    } else {
-      let velocidades = await calcularVelocidades(vertice.lat, vertice.long);
-      vertice.velx = velocidades.velx;
-      vertice.vely = velocidades.vely;
-      vertice.velz = velocidades.velz;
-      arrTexto2.push(vertice)
-    }
+      if (vertice.velx) {
+          arrTexto2.push(vertice);
+      } else {
+          let velocidades = await getVelocitiesFromFile(vertice.lat, vertice.long);
+          vertice.velx = velocidades.getVelocityX();
+          vertice.vely = velocidades.getVelocityY();
+          vertice.velz = velocidades.getVelocityZ();
+          arrTexto2.push(vertice);
+      }
   }
+
   localStorage.setItem('verticesOndula', JSON.stringify(arrTexto2));
 }
+
 
 function ajustarDecimales(vertice){
   if(typeof vertice.anoEpoca == 'number'){
@@ -860,3 +1109,4 @@ function ajustarDecimales(vertice){
   }    
   return vertice;
 }
+ 
