@@ -654,21 +654,8 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
        }
      }
 
-     cambiosToggleHabilitar(false);
-     localStorage.setItem('verticesOndula', JSON.stringify(verticeConOndulacionClean));
-     guardarVelocidades();
      
-     function guardarVelocidades() {
-      const verticesOndula = JSON.parse(localStorage.getItem('verticesOndula'));
-      const velocidades = verticesOndula.map(vertice => ({
-        nombre: vertice.nombre,
-        velx: vertice.velx,
-        vely: vertice.vely,
-        velz: vertice.velz
-      }));
-      
-      localStorage.setItem('velocidades', JSON.stringify(velocidades));
-    }
+     
     // habilitar botones
     cambiosToggleHabilitar(false);
 
