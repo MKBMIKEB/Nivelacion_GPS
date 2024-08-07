@@ -530,16 +530,19 @@ function geocentricas_elipsoidales(xreferencia, yreferencia, zreferencia) {
 
   var latDec = lat * 180 / Math.PI;
   var lonDec = lon * 180 / Math.PI;
-
-  // console.log(latDec, lonDec);
-  return { latDec, lonDec };
-
+ 
+  const formattedlatDec = parseFloat(latDec.toFixed(5));
+  const formattedlonDec = parseFloat(lonDec.toFixed(5));
+  
+  console.log(formattedlatDec, formattedlonDec);   
+  
+  return { latDec: formattedlatDec, lonDec: formattedlonDec }
 }
 // ====== FIN =========
 
 
 // Función para calcular la distancia meridiana
-function meridianDistance(lat) {
+function meridianDistance(latDec) {
 
   // Constantes WGS84
   const a = 6378137.0;  // Radio ecuatorial
@@ -550,17 +553,17 @@ function meridianDistance(lat) {
   const e4 = e2 * e2;
   const e6 = e4 * e2;
   return a * (
-    (1 - e2 / 4 - 3 * e4 / 64 - 5 * e6 / 256) * lat
-    - (3 * e2 / 8 + 3 * e4 / 32 + 45 * e6 / 1024) * Math.sin(2 * lat)
-    + (15 * e4 / 256 + 45 * e6 / 1024) * Math.sin(4 * lat)
-    - (35 * e6 / 3072) * Math.sin(6 * lat)
+    (1 - e2 / 4 - 3 * e4 / 64 - 5 * e6 / 256) * latDec
+    - (3 * e2 / 8 + 3 * e4 / 32 + 45 * e6 / 1024) * Math.sin(2 * latDec)
+    + (15 * e4 / 256 + 45 * e6 / 1024) * Math.sin(4 * latDec)
+    - (35 * e6 / 3072) * Math.sin(6 * latDec)
   );
 }
 
 
 // Función para transformar coordenadas
-function transformarAOrigenNac(lat, lon) {
-
+function transformarAOrigenNac(latDec, lonDec) {
+  console.log(latDec, lonDec)
   // Definir constantes de la proyección
   const lat_0 = 4.0 * (Math.PI / 180);  // Convertir grados a radianes
   const lon_0 = -73.0 * (Math.PI / 180); // Convertir grados a radianes
@@ -574,24 +577,31 @@ function transformarAOrigenNac(lat, lon) {
 
 
   // Convertir latitud y longitud a radianes
-  lat = lat * (Math.PI / 180);
-  lon = lon * (Math.PI / 180);
+  latDec *= (Math.PI / 180);
+  lonDec *= (Math.PI / 180);
   // Cálculo de coordenadas en la proyección Transverse Mercator
-  const N = a / Math.sqrt(1 - e2 * Math.sin(lat) * Math.sin(lat));
-  const T = Math.tan(lat) * Math.tan(lat);
-  const C = e2 * Math.cos(lat) * Math.cos(lat) / (1 - e2);
-  const A = (lon - lon_0) * Math.cos(lat);
-  const M = meridianDistance(lat);
+  const N = a / Math.sqrt(1 - e2 * Math.sin(latDec) * Math.sin(latDec));
+  const T = Math.tan(latDec) * Math.tan(latDec);
+  const C = e2 * Math.cos(latDec) * Math.cos(latDec) / (1 - e2);
+  const A = (lonDec - lon_0) * Math.cos(latDec);
+  const M = meridianDistance(latDec);
   const M0 = meridianDistance(lat_0);  // Distancia meridiana del origen
   const x = false_easting + k0 * N * (A + (1 - T + C) * Math.pow(A, 3) / 6 + (5 - 18 * T + T * T + 72 * C - 58 * e2) * Math.pow(A, 5) / 120);
-  const y = false_northing + k0 * (M - M0 + N * Math.tan(lat) * (A * A / 2 + (5 - T + 9 * C + 4 * C * C) * Math.pow(A, 4) / 24 + (61 - 58 * T + T * T + 600 * C - 330 * e2) * Math.pow(A, 6) / 720));
-  return { x, y };
+  const y = false_northing + k0 * (M - M0 + N * Math.tan(latDec) * (A * A / 2 + (5 - T + 9 * C + 4 * C * C) * Math.pow(A, 4) / 24 + (61 - 58 * T + T * T + 600 * C - 330 * e2) * Math.pow(A, 6) / 720));
+  const formattedX = parseFloat(x.toFixed(3));
+  const formattedY = parseFloat(y.toFixed(3));
+
+  console.log(formattedX, formattedY);
+  
+  // Devolver el objeto con x y y formateados
+  return { x: formattedX, y: formattedY }
 }
 
 
 
+
 // Función para transformar coordenadas
-function gaussKrugger(lat, lon) {
+function gaussKrugger(latDec, lonDec) {
 
   // Constantes WGS84
   const a = 6378137.0;  // Radio ecuatorial
@@ -599,19 +609,19 @@ function gaussKrugger(lat, lon) {
   const e2 = 2 * f - f * f;  // Excentricidad al cuadrado
 
   // Convertir latitud y longitud a radianes
-  lat = lat * (Math.PI / 180);
-  lon = lon * (Math.PI / 180);
+  latDec *= (Math.PI / 180);
+  lonDec *= (Math.PI / 180);
   // Identificar el origen adecuado
-  const origin = identifyOrigin(lon * (180 / Math.PI));
+  const origin = identifyOrigin(lonDec * (180 / Math.PI));
   // Cálculo de coordenadas en la proyección Transverse Mercator
-  const N = a / Math.sqrt(1 - e2 * Math.sin(lat) * Math.sin(lat));
-  const T = Math.tan(lat) * Math.tan(lat);
-  const C = e2 * Math.cos(lat) * Math.cos(lat) / (1 - e2);
-  const A = (lon - origin.lon_0) * Math.cos(lat);
-  const M = meridianDistance(lat);
+  const N = a / Math.sqrt(1 - e2 * Math.sin(latDec) * Math.sin(latDec));
+  const T = Math.tan(latDec) * Math.tan(latDec);
+  const C = e2 * Math.cos(latDec) * Math.cos(latDec) / (1 - e2);
+  const A = (lonDec - origin.lon_0) * Math.cos(latDec);
+  const M = meridianDistance(latDec);
   const M0 = meridianDistance(origin.lat_0);  // Distancia meridiana del origen
   const x = origin.false_easting + origin.k0 * N * (A + (1 - T + C) * Math.pow(A, 3) / 6 + (5 - 18 * T + T * T + 72 * C - 58 * e2) * Math.pow(A, 5) / 120);
-  const y = origin.false_northing + origin.k0 * (M - M0 + N * Math.tan(lat) * (A * A / 2 + (5 - T + 9 * C + 4 * C * C) * Math.pow(A, 4) / 24 + (61 - 58 * T + T * T + 600 * C - 330 * e2) * Math.pow(A, 6) / 720));
+  const y = origin.false_northing + origin.k0 * (M - M0 + N * Math.tan(latDec) * (A * A / 2 + (5 - T + 9 * C + 4 * C * C) * Math.pow(A, 4) / 24 + (61 - 58 * T + T * T + 600 * C - 330 * e2) * Math.pow(A, 6) / 720));
   // console.log('Origen identificado: ' + origin.name);
   const originName = origin.name;
   return { x, y, originName };
@@ -662,16 +672,16 @@ const origins = [
 ];
 
 // Función para identificar el origen adecuado basado en la longitud
-function identifyOrigin(lon) {
-  if (lon >= -76 && lon < -74) {
+function identifyOrigin(lonDec) {
+  if (lonDec >= -76 && lonDec < -74) {
     return origins[0]; // Bogotá-MAGNA
-  } else if (lon >= -74 && lon < -70) {
+  } else if (lonDec >= -74 && lonDec < -70) {
     return origins[1]; // Este Central - MAGNA
-  } else if (lon >= -70 && lon < -67) {
+  } else if (lonDec >= -70 && lonDec < -67) {
     return origins[2]; // Este Este - MAGNA
-  } else if (lon >= -78 && lon < -76) {
+  } else if (lonDec >= -78 && lonDec < -76) {
     return origins[3]; // Oeste - MAGNA
-  } else if (lon >= -81 && lon < -78) {
+  } else if (lonDec >= -81 && lonDec < -78) {
     return origins[4]; // Oeste Oeste - MAGNA
   } else {
     throw new Error("Longitud fuera del rango de los orígenes definidos.");
