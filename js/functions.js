@@ -387,13 +387,13 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
     sumatoria += DHO
   }
 
-  let diferencia = baseVertAltmsn - baseVertAltmsn2;
-  // console.log("sumatoria", sumatoria)
-  // console.log("diferencia", diferencia)
+  let diferencia = baseVertAltmsn2-baseVertAltmsn ;
+   console.log("sumatoria", sumatoria)
+   console.log("diferencia", diferencia)
 
   let correccion = (diferencia - sumatoria) / (verticesCompletos.length);
   // console.log("correcion", correccion)
-
+ 
 
   // Inicializar tabla resultados
   let texto = `
