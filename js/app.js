@@ -589,7 +589,7 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
     
       const ondulacion = interpolacion_bilineal(datos, lat, lon, latitud, longitud);
       console.log("Ondulación geoidal calculada:", ondulacion);
-      return ondulacion;
+      return ondulacion.toFixed(2);
     }
     
     function interpolacion_bilineal(datos, maxLatitud, minLongitud, latitud, longitud) {
