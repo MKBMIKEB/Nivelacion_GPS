@@ -86,7 +86,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   for (let coordenadas of arrTexto) {
     let anoEpocaInicial = buscarAnoDeCoordenada(coordenadas, arr); // ejem: 2023.3424
 
-    let deltaDeTiempo = 2020 - anoEpocaInicial;  // ejem: -5.27 
+    let deltaDeTiempo = 2018 - anoEpocaInicial;  // ejem: -5.27 
 
     for (let coordenada of arr) {
 
