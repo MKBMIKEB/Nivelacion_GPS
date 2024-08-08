@@ -514,7 +514,7 @@ function tabularDiferencias() {
 
 // ====== CONVERTIR CORDENADAS GEOCENTRICAS A LAT Y LONG =========
 function geocentricas_elipsoidales(xreferencia, yreferencia, zreferencia) {
-  // console.log(xreferencia, yreferencia, zreferencia);
+console.log(xreferencia, yreferencia, zreferencia);
   let x = parseFloat(xreferencia);
   let y = parseFloat(yreferencia);
   let z = parseFloat(zreferencia);
@@ -522,21 +522,35 @@ function geocentricas_elipsoidales(xreferencia, yreferencia, zreferencia) {
   var a = 6378137.0; // Semieje mayor de la Tierra en metros
   var f = 1.0 / 298.257223563; // Factor de achatamiento
   var e2 = 2 * f - f * f; // Excentricidad al cuadrado
-
   var lon = Math.atan2(y, x);
+  var latPrev = 0;
+  var iterations = 0;
+  var tolerance = 1e-12;
   var p = Math.sqrt(x * x + y * y);
   var lat = Math.atan2(z, p * (1 - e2));
-  var v = a / Math.sqrt(1 - e2 * Math.sin(lat) * Math.sin(lat));
+  
 
+    // Iterar hasta que la diferencia entre latitudes sucesivas sea menor que la tolerancia
+    while (Math.abs(lat - latPrev) > tolerance && iterations < 1000) {
+      latPrev = lat;
+      var N = a / Math.sqrt(1 - e2 * Math.sin(lat) * Math.sin(lat));
+      lat = Math.atan2(z + e2 * N * Math.sin(lat), p);
+      iterations++;
+  }
+  var N = a / Math.sqrt(1 - e2 * Math.sin(lat) * Math.sin(lat));
+  var HDEC = p / Math.cos(lat) - N;
   var latDec = lat * 180 / Math.PI;
   var lonDec = lon * 180 / Math.PI;
- 
-  const formattedlatDec = parseFloat(latDec.toFixed(5));
-  const formattedlonDec = parseFloat(lonDec.toFixed(5));
+  const formattedlatDec = parseFloat(latDec.toFixed(9));
+  const formattedlonDec = parseFloat(lonDec.toFixed(9));
+  const formattedHDEC = parseFloat(HDEC.toFixed(5));
+  const n = N;
+  const u = p;
+  console.log("n:", n)
+  console.log("p:", u)
+  console.log(formattedlatDec, formattedlonDec, formattedHDEC);   
   
-  console.log(formattedlatDec, formattedlonDec);   
-  
-  return { latDec: formattedlatDec, lonDec: formattedlonDec }
+  return { latDec: formattedlatDec, lonDec: formattedlonDec, HDEC: formattedHDEC}
 }
 // ====== FIN =========
 
@@ -1009,9 +1023,9 @@ function calculateXYZ(vel, coordinate) {
   const cartesian3D2 = cartesian3DConversion(ellipsoidal);
 
   // Calcular las diferencias en coordenadas XYZ
-  const x = Math.abs(cartesian3D2.X - cartesian3D1.X).toFixed(6);
-  const y = Math.abs(cartesian3D2.Y - cartesian3D1.Y).toFixed(6);
-  const z = Math.abs(cartesian3D2.Z - cartesian3D1.Z).toFixed(6);
+  const x = Math.abs(cartesian3D2.X - cartesian3D1.X).toFixed(5);
+  const y = Math.abs(cartesian3D2.Y - cartesian3D1.Y).toFixed(5);
+  const z = Math.abs(cartesian3D2.Z - cartesian3D1.Z).toFixed(5);
 
   console.log(`Cartesian differences: x=${x}, y=${y}, z=${z}`);
 
@@ -1092,16 +1106,16 @@ function ajustarDecimales(vertice){
     vertice.esteKrugger = vertice.esteKrugger.toFixed(5);
   }
   if(typeof vertice.lat == 'number'){
-    vertice.lat = vertice.lat.toFixed(5);
+    vertice.lat = vertice.lat.toFixed(9);
   }
   if(typeof vertice.latReferencia == 'number'){
-    vertice.latReferencia = vertice.latReferencia.toFixed(5);
+    vertice.latReferencia = vertice.latReferencia.toFixed(9);
   }
   if(typeof vertice.lonReferencia == 'number'){
-    vertice.lonReferencia = vertice.lonReferencia.toFixed(5);   
+    vertice.lonReferencia = vertice.lonReferencia.toFixed(9);   
   }
   if(typeof vertice.long == 'number'){
-    vertice.long = vertice.long.toFixed(5);
+    vertice.long = vertice.long.toFixed(9);
   }
   if(typeof vertice.norte == 'number'){
     vertice.norte = vertice.norte.toFixed(5);

@@ -52,8 +52,8 @@ document.querySelector('#calcular').addEventListener('click', async function () 
                     </Cartesiana3d_rastreo>
                     <Elipsoidal_rastreo>
                         <Datum>MAGNA-SIRGAS</Datum>
-                        <Latitud>${typeof ver.lat == 'number' ? ver.lat.toFixed(5) : ver.lat}</Latitud>
-                        <Longitud>${typeof ver.long == 'number' ? ver.long.toFixed(5) : ver.long}</Longitud>
+                        <Latitud>${typeof ver.lat == 'number' ? ver.lat.toFixed(6) : ver.lat}</Latitud>
+                        <Longitud>${typeof ver.long == 'number' ? ver.long.toFixed(6) : ver.long}</Longitud>
                         <Ondula>${ver.ondula}</Ondula>
                     </Elipsoidal_rastreo>
                 </Set_de_Coordenadas>
@@ -94,23 +94,37 @@ document.querySelector('#calcular').addEventListener('click', async function () 
 
         let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
 
-        let xreferencia = coordenadaAjustada[0] + (velx * deltaDeTiempo);
-        let yreferencia = coordenadaAjustada[1] + (vely * deltaDeTiempo);
-        let zreferencia = coordenadaAjustada[2] + (velz * deltaDeTiempo);
+        let xreferencia = (coordenadaAjustada[0] + (velx * deltaDeTiempo)).toFixed(5);
+        let yreferencia = (coordenadaAjustada[1] + (vely * deltaDeTiempo)).toFixed(5);
+        let zreferencia = (coordenadaAjustada[2] + (velz * deltaDeTiempo)).toFixed(5);
 
         let latlonreferencia = geocentricas_elipsoidales(xreferencia, yreferencia, zreferencia);
         let origenNac = transformarAOrigenNac(latlonreferencia.latDec, latlonreferencia.lonDec);
         let gauss = gaussKrugger(latlonreferencia.latDec, latlonreferencia.lonDec);
+        let xITRF2014 = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z); 
+        let yITRF2014 = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
+        let zITRF2014 = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
 
         verticesCompletos.push(
           {
-            lat: coordenadas.lat, long: coordenadas.long, nombre: coordenadas.nombre, ondula: coordenadas.ondula,
-            tipo: coordenadas.tipo, x: coordenadas.x, y: coordenadas.y, z: coordenadas.z, altelips: coordenada.altelips.replace(",", "."),
+            lat: coordenadas.lat, 
+            long: coordenadas.long, 
+            nombre: coordenadas.nombre, 
+            ondula: coordenadas.ondula,
+            tipo: coordenadas.tipo, 
+            x: coordenadas.x, 
+            y: coordenadas.y, 
+            z: coordenadas.z, 
+            altelips: coordenada.altelips.replace(",", "."),
             xreferencia: xreferencia,
             yreferencia: yreferencia,
             zreferencia: zreferencia,
+            xITRF2014: coordenadas.x,
+            yITRF2014: coordenadas.y,
+            zITRF2014: coordenadas.z,
             latReferencia: latlonreferencia.latDec,
             lonReferencia: latlonreferencia.lonDec,
+            hReferencia: latlonreferencia.HDEC,
             anoEpoca: coordenada.anoEpoca,
             velx: coordenadas.velx,
             vely: coordenadas.vely,
@@ -292,9 +306,10 @@ document.querySelector('#calcular').addEventListener('click', async function () 
             </Cartesiana3d_referencia>
             <Cartesiana3d_rastreo>
                 <Datum>MAGNA-SIRGAS</Datum>
-                <X>${verticesCompletos[i].x != undefined ? verticesCompletos[i].x.toString().replace('.', ',') : verticesCompletos[i].x}</X>
-                <Y>${verticesCompletos[i].y != undefined ? verticesCompletos[i].y.toString().replace('.', ',') : verticesCompletos[i].y}</Y>
-                <Z>${verticesCompletos[i].z != undefined ? verticesCompletos[i].z.toString().replace('.', ',') : verticesCompletos[i].z}</Z>
+      
+                <X>${verticesCompletos[i].xITRF2014 != undefined ? verticesCompletos[i].xITRF2014.toString().replace('.', ',') : verticesCompletos[i].xITRF2014}</X>
+                <Y>${verticesCompletos[i].yITRF2014 != undefined ? verticesCompletos[i].yITRF2014.toString().replace('.', ',') : verticesCompletos[i].yITRF2014}</Y>
+                <Z>${verticesCompletos[i].zITRF2014 != undefined ? verticesCompletos[i].zITRF2014.toString().replace('.', ',') : verticesCompletos[i].zITRF2014}</Z>
             </Cartesiana3d_rastreo>
             <Elipsoidal_rastreo>
                 <Datum>MAGNA-SIRGAS</Datum>
@@ -306,7 +321,8 @@ document.querySelector('#calcular').addEventListener('click', async function () 
                 <Datum>MAGNA-SIRGAS</Datum>
                 <Latitud>${verticesCompletos[i].latReferencia != undefined ? verticesCompletos[i].latReferencia.toString().replace('.', ',') : verticesCompletos[i].latReferencia}</Latitud>
                 <Longitud>${verticesCompletos[i].lonReferencia != undefined ? verticesCompletos[i].lonReferencia.toString().replace('.', ',') : verticesCompletos[i].lonReferencia}</Longitud>            
-            </Elipsoidal_referencia>
+                <Altura_Elipsoidal>${verticesCompletos[i].hReferencia != undefined ? verticesCompletos[i].hReferencia.toString().replace('.', ',') : verticesCompletos[i].hReferencia}</Altura_Elipsoidal>
+                </Elipsoidal_referencia>
             <Gauss_referencia>
                 <Datum>MAGNA-SIRGAS</Datum>
                 <Norte>${verticesCompletos[i].norteKrugger != undefined ? verticesCompletos[i].norteKrugger.toString().replace('.', ',') : verticesCompletos[i].norteKrugger}</Norte>
