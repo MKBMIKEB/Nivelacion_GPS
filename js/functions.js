@@ -548,8 +548,8 @@ console.log(xreferencia, yreferencia, zreferencia);
   const u = p;
   console.log("n:", n)
   console.log("p:", u)
-  console.log(formattedlatDec, formattedlonDec, formattedHDEC);   
-  
+    
+  console.log(`COORDENADAS ELIPSOIDALES REFERENCIA: LAT=${formattedlatDec}, LON=${formattedlonDec}, ALTURA=${formattedHDEC}`);
   return { latDec: formattedlatDec, lonDec: formattedlonDec, HDEC: formattedHDEC}
 }
 // ====== FIN =========
