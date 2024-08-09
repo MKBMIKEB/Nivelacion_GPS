@@ -101,9 +101,9 @@ document.querySelector('#calcular').addEventListener('click', async function () 
         let latlonreferencia = geocentricas_elipsoidales(xreferencia, yreferencia, zreferencia);
         let origenNac = transformarAOrigenNac(latlonreferencia.latDec, latlonreferencia.lonDec);
         let gauss = gaussKrugger(latlonreferencia.latDec, latlonreferencia.lonDec);
-        let xITRF2014 = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z); 
-        let yITRF2014 = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
-        let zITRF2014 = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
+        let xITRF2014 = coordenadaAjustada[0]; 
+        let yITRF2014 = coordenadaAjustada[1];
+        let zITRF2014 = coordenadaAjustada[2];
 
         verticesCompletos.push(
           {
@@ -119,9 +119,9 @@ document.querySelector('#calcular').addEventListener('click', async function () 
             xreferencia: xreferencia,
             yreferencia: yreferencia,
             zreferencia: zreferencia,
-            xITRF2014: coordenadas.x,
-            yITRF2014: coordenadas.y,
-            zITRF2014: coordenadas.z,
+            xITRF2014: xITRF2014 ,
+            yITRF2014: yITRF2014,
+            zITRF2014: zITRF2014,
             latReferencia: latlonreferencia.latDec,
             lonReferencia: latlonreferencia.lonDec,
             hReferencia: latlonreferencia.HDEC,
@@ -306,7 +306,6 @@ document.querySelector('#calcular').addEventListener('click', async function () 
             </Cartesiana3d_referencia>
             <Cartesiana3d_rastreo>
                 <Datum>MAGNA-SIRGAS</Datum>
-      
                 <X>${verticesCompletos[i].xITRF2014 != undefined ? verticesCompletos[i].xITRF2014.toString().replace('.', ',') : verticesCompletos[i].xITRF2014}</X>
                 <Y>${verticesCompletos[i].yITRF2014 != undefined ? verticesCompletos[i].yITRF2014.toString().replace('.', ',') : verticesCompletos[i].yITRF2014}</Y>
                 <Z>${verticesCompletos[i].zITRF2014 != undefined ? verticesCompletos[i].zITRF2014.toString().replace('.', ',') : verticesCompletos[i].zITRF2014}</Z>
