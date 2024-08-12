@@ -1,6 +1,5 @@
 
 
-
 function calcularDiaDelAno(fecha) {
   var inicioAño = new Date(fecha.getFullYear(), 0, 0);
   var tiempoTranscurrido = fecha - inicioAño;
@@ -369,8 +368,8 @@ const mostrarMensaje = (mensaje, tipo) => {
 
 
 
-function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVertondula, baseVertAltmsn, baseVertAltmsn2, tabla,) {
-   //console.log(verticesCompletos, tabla)
+function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVertondula, baseVertAltmsn, baseVertAltmsn2, tabla) {
+  // console.log(verticesCompletos, tabla)
 
   let sumatoria = 0;
   let DHG_ANTERIOR_prime = 0;
@@ -388,7 +387,7 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
     sumatoria += DHO
   }
 
-  let diferencia = baseVertAltmsn2-baseVertAltmsn;
+  let diferencia = baseVertAltmsn2-baseVertAltmsn ;
    console.log("sumatoria", sumatoria)
    console.log("diferencia", diferencia)
 
@@ -420,22 +419,10 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
   const HGPSFINALArray = [];
   // CALCULO ORTOMETRICA
   for (const vertice of verticesCompletos) {
-    let DHI;
-    if (vertice.hReferencia === undefined || isNaN(parseFloat(vertice.hReferencia))) {
-        // Si hReferencia es indefinida o no es un número válido, se utiliza el cálculo alternativo
-        DHI = parseFloat(vertice.altelips) - parseFloat(baseVertAlt);
-        console.log("Usando altelips para DHI:", DHI);
-    } else {
-        // Si hReferencia está definida y es válida, se utiliza para el cálculo
-        DHI = parseFloat(vertice.hReferencia) - parseFloat(baseVertAlt);
-        console.log("Usando hReferencia para DHI:", DHI);
-    }
-    
-    console.log("Valor de baseVertAlt:", baseVertAlt);
-    
-    console.log(vertice.HDEC, vertice.ondula, baseVertAlt, baseVertondula, baseVertAltmsn, correccion)
-    console.log("Valor de vert.HDEC:", vertice.hReferencia);
-    console.log("Valor de baseVertAlt:", baseVertAlt);
+
+    // console.log(vertice.altelips, vertice.ondula, baseVertAlt, baseVertondula, baseVertAltmsn, correccion)
+
+    const DHI = parseFloat(vertice.altelips) - parseFloat(baseVertAlt);
     const DNI = parseFloat(vertice.ondula) - parseFloat(baseVertondula);
     const DHG = DHI - DNI;
     const HGP = parseFloat(baseVertAltmsn) + DHG;
@@ -448,7 +435,7 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
     DHG_ANTERIOR = DHG;
     HGPSFINAL_ANTERIOR = HGPSFINAL;
 
-    // console.log( parseFloat(vertice.HDEC) - parseFloat(baseVertAlt);, DNI, DHG, HGP, DHO, DHGC, HGPSFINAL)   
+    // console.log(DHI, DNI, DHG, HGP, DHO, DHGC, HGPSFINAL)   
 
     tabular({ DHI, DNI, DHG, HGP, DHO, DHGC, HGPSFINAL }, vertice, tabla)
   }
@@ -556,12 +543,12 @@ console.log(xreferencia, yreferencia, zreferencia);
   var lonDec = lon * 180 / Math.PI;
   const formattedlatDec = parseFloat(latDec.toFixed(9));
   const formattedlonDec = parseFloat(lonDec.toFixed(9));
-  const formattedHDEC = parseFloat(HDEC.toFixed(3));
+  const formattedHDEC = parseFloat(HDEC.toFixed(5));
   const n = N;
   const u = p;
   console.log("n:", n)
   console.log("p:", u)
-  console.log(formattedlatDec, formattedlonDec, formattedHDEC);   
+    
   console.log(`COORDENADAS ELIPSOIDALES REFERENCIA: LAT=${formattedlatDec}, LON=${formattedlonDec}, ALTURA=${formattedHDEC}`);
   return { latDec: formattedlatDec, lonDec: formattedlonDec, hReferencia: formattedHDEC}
 }
@@ -639,7 +626,7 @@ function gaussKrugger(latDec, lonDec) {
   latDec *= (Math.PI / 180);
   lonDec *= (Math.PI / 180);
   // Identificar el origen adecuado
-  const origin = identifyOrigin(lonDec * (180 / Math.PI));
+  const origin = identifyOrigin(lonDec);
   // Cálculo de coordenadas en la proyección Transverse Mercator
   const N = a / Math.sqrt(1 - e2 * Math.sin(latDec) * Math.sin(latDec));
   const T = Math.tan(latDec) * Math.tan(latDec);
@@ -657,7 +644,7 @@ function gaussKrugger(latDec, lonDec) {
 // Definir los parámetros de los orígenes de Gauss-Krüger en Colombia
 const origins = [
   {
-    name: "Bogotá-MAGNA",
+    name: "Central-MAGNA",
     lat_0: 4.5962004167 * (Math.PI / 180), // Convertir grados a radianes
     lon_0: -74.0775079167 * (Math.PI / 180), // Convertir grados a radianes
     false_northing: 1000000,
@@ -673,7 +660,7 @@ const origins = [
     k0: 1.0
   },
   {
-    name: "Este - MAGNA",
+    name: "Este-Este - MAGNA",
     lat_0: 4.5962004167 * (Math.PI / 180), // Convertir grados a radianes
     lon_0: -68.0775079167 * (Math.PI / 180), // Convertir grados a radianes
     false_northing: 1000000,
@@ -699,19 +686,66 @@ const origins = [
 ];
 
 // Función para identificar el origen adecuado basado en la longitud
+
 function identifyOrigin(lonDec) {
-  if (lonDec >= -76 && lonDec < -74) {
-    return origins[0]; // Bogotá-MAGNA
-  } else if (lonDec >= -74 && lonDec < -70) {
-    return origins[1]; // Este Central - MAGNA
-  } else if (lonDec >= -70 && lonDec < -67) {
-    return origins[2]; // Este Este - MAGNA
-  } else if (lonDec >= -78 && lonDec < -76) {
-    return origins[3]; // Oeste - MAGNA
-  } else if (lonDec >= -81 && lonDec < -78) {
-    return origins[4]; // Oeste Oeste - MAGNA
+  console.log("Valor de longitud recibido:", lonDec);
+  
+  // Convertir la longitud de grados a radianes
+  const lonRad = lonDec ;
+  console.log("Longitud en radianes:", lonRad);
+  
+  // Mostrar el resultado de la conversión de todos los límites de los rangos a radianes
+  const radOesteOeste = -81.575283333 * (Math.PI / 180);
+  const radOeste = -78.575283333 * (Math.PI / 180);
+  const radCentral = -75.575283333 * (Math.PI / 180);
+  const radEste = -72.575283333 * (Math.PI / 180);
+  const radEsteEste = -69.575283333 * (Math.PI / 180);
+  
+  console.log("Resultado de -81.575283333 * (Math.PI / 180):", radOesteOeste);
+  console.log("Resultado de -78.575283333 * (Math.PI / 180):", radOeste);
+  console.log("Resultado de -75.575283333 * (Math.PI / 180):", radCentral);
+  console.log("Resultado de -72.575283333 * (Math.PI / 180):", radEste);
+  console.log("Resultado de -69.575283333 * (Math.PI / 180):", radEsteEste);
+
+  if (lonRad > radOesteOeste && lonRad <= radOeste) {
+    console.log("Condición cumplida: Oeste-Oeste MAGNA");
+    return origins[4]; // Oeste-Oeste MAGNA
+  } else if (lonRad > radOeste && lonRad <= radCentral) {
+    console.log("Condición cumplida: Oeste MAGNA");
+    return origins[3]; // Oeste MAGNA
+  } else if (lonRad > radCentral && lonRad <= radEste) {
+    console.log("Condición cumplida: Central MAGNA");
+    return origins[0]; // Central MAGNA
+  } else if (lonRad > radEste && lonRad <= radEsteEste) {
+    console.log("Condición cumplida: Este MAGNA");
+    return origins[1]; // Este MAGNA
+  } else if (lonRad > radEsteEste && lonRad <= (-66.575283333 * (Math.PI / 180))) {
+    console.log("Condición cumplida: Este-Este MAGNA");
+    return origins[2]; // Este-Este MAGNA
   } else {
+    console.error("Error: Longitud fuera del rango de los orígenes definidos.");
     throw new Error("Longitud fuera del rango de los orígenes definidos.");
+  }
+}
+
+
+function tipoPunto(duracion) {
+
+  if (duracion !== undefined) {
+
+    let tiempo = duracion.substring(0, 2);
+    tiempo = parseInt(tiempo);
+
+    if (tiempo < 5) {
+      return "Fotocontrol";
+    } else if (tiempo >= 5 && tiempo <= 6) {
+      return "Auxiliar";
+    } else {
+      return "Geodésico";
+    }
+
+  } else {
+    return "";
   }
 }
 
@@ -1147,6 +1181,4 @@ function ajustarDecimales(vertice){
   }    
   return vertice;
 }
- 
- 
  
