@@ -104,7 +104,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
         let xITRF2014 = coordenadaAjustada[0]; 
         let yITRF2014 = coordenadaAjustada[1];
         let zITRF2014 = coordenadaAjustada[2];
-
+        
         verticesCompletos.push(
           {
             lat: coordenadas.lat, 
@@ -124,7 +124,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
             zITRF2014: zITRF2014,
             latReferencia: latlonreferencia.latDec,
             lonReferencia: latlonreferencia.lonDec,
-            hReferencia: latlonreferencia.HDEC,
+            hReferencia: latlonreferencia.hReferencia,
             anoEpoca: coordenada.anoEpoca,
             velx: coordenadas.velx,
             vely: coordenadas.vely,
@@ -255,7 +255,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   // ============ calculos par tabular 1,2,3 =========
   
   
-  verticesCompletos.push({ nombre: baseVertNomen, altelips: baseVertAlt, ondula: baseVertondula })  
+  verticesCompletos.push({ nombre: baseVertNomen, altelips: baseVertAlt, ondula: baseVertondula,  })  
   const HGPSFINALArray1 = calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVertondula, baseVertAltmsn, baseVertAltmsn, "calculos");
   
   verticesCompletos2.push({ nombre: baseVertNomen2, altelips: baseVertAlt2, ondula: baseVertondula2 })
@@ -1125,4 +1125,6 @@ document.querySelector('#viewDiv').addEventListener('click', async function (e) 
 
 
 });
+
+
 

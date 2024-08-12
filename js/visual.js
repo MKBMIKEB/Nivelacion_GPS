@@ -143,6 +143,22 @@ function cargarMapa(longitude, latitude) {
           }
         }
       },
+      labelingInfo: [{
+        symbol: {
+          type: "text",
+          color: "black",
+          haloColor: "white",
+          haloSize: "1px",
+          font: {
+            size: 12,
+            family: "sans-serif"
+          }
+        },
+        labelPlacement: "above-center",
+        labelExpressionInfo: {
+          expression: "$feature.Nomenclatu"
+        }
+      }],
       popupTemplate: {
         title: "{Nomenclatu}",
         content: [

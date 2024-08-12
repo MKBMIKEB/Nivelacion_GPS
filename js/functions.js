@@ -1,5 +1,6 @@
 
 
+
 function calcularDiaDelAno(fecha) {
   var inicioAño = new Date(fecha.getFullYear(), 0, 0);
   var tiempoTranscurrido = fecha - inicioAño;
@@ -368,8 +369,8 @@ const mostrarMensaje = (mensaje, tipo) => {
 
 
 
-function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVertondula, baseVertAltmsn, baseVertAltmsn2, tabla) {
-  // console.log(verticesCompletos, tabla)
+function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVertondula, baseVertAltmsn, baseVertAltmsn2, tabla,) {
+   //console.log(verticesCompletos, tabla)
 
   let sumatoria = 0;
   let DHG_ANTERIOR_prime = 0;
@@ -378,7 +379,7 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
   for (const vert of verticesCompletos) {
 
 
-    const DHI = parseFloat(vert.altelips) - parseFloat(baseVertAlt);
+    const DHI = parseFloat(vert.hReferencia) - parseFloat(baseVertAlt);
     const DNI = parseFloat(vert.ondula) - parseFloat(baseVertondula);
     const DHG = DHI - DNI;
     const DHO = DHG - DHG_ANTERIOR_prime;
@@ -387,7 +388,7 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
     sumatoria += DHO
   }
 
-  let diferencia = baseVertAltmsn2-baseVertAltmsn ;
+  let diferencia = baseVertAltmsn2-baseVertAltmsn;
    console.log("sumatoria", sumatoria)
    console.log("diferencia", diferencia)
 
@@ -419,10 +420,13 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
   const HGPSFINALArray = [];
   // CALCULO ORTOMETRICA
   for (const vertice of verticesCompletos) {
+   
+    
+    console.log(vertice.HDEC, vertice.ondula, baseVertAlt, baseVertondula, baseVertAltmsn, correccion)
 
-    // console.log(vertice.altelips, vertice.ondula, baseVertAlt, baseVertondula, baseVertAltmsn, correccion)
-
-    const DHI = parseFloat(vertice.altelips) - parseFloat(baseVertAlt);
+    const DHI = parseFloat(vertice.hReferencia) - parseFloat(baseVertAlt);
+    console.log("Valor de vert.HDEC:", vertice.hReferencia);
+    console.log("Valor de baseVertAlt:", baseVertAlt);
     const DNI = parseFloat(vertice.ondula) - parseFloat(baseVertondula);
     const DHG = DHI - DNI;
     const HGP = parseFloat(baseVertAltmsn) + DHG;
@@ -435,7 +439,7 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
     DHG_ANTERIOR = DHG;
     HGPSFINAL_ANTERIOR = HGPSFINAL;
 
-    // console.log(DHI, DNI, DHG, HGP, DHO, DHGC, HGPSFINAL)   
+    // console.log( parseFloat(vertice.HDEC) - parseFloat(baseVertAlt);, DNI, DHG, HGP, DHO, DHGC, HGPSFINAL)   
 
     tabular({ DHI, DNI, DHG, HGP, DHO, DHGC, HGPSFINAL }, vertice, tabla)
   }
@@ -543,14 +547,14 @@ console.log(xreferencia, yreferencia, zreferencia);
   var lonDec = lon * 180 / Math.PI;
   const formattedlatDec = parseFloat(latDec.toFixed(9));
   const formattedlonDec = parseFloat(lonDec.toFixed(9));
-  const formattedHDEC = parseFloat(HDEC.toFixed(5));
+  const formattedHDEC = parseFloat(HDEC.toFixed(3));
   const n = N;
   const u = p;
   console.log("n:", n)
   console.log("p:", u)
-    
+  console.log(formattedlatDec, formattedlonDec, formattedHDEC);   
   console.log(`COORDENADAS ELIPSOIDALES REFERENCIA: LAT=${formattedlatDec}, LON=${formattedlonDec}, ALTURA=${formattedHDEC}`);
-  return { latDec: formattedlatDec, lonDec: formattedlonDec, HDEC: formattedHDEC}
+  return { latDec: formattedlatDec, lonDec: formattedlonDec, hReferencia: formattedHDEC}
 }
 // ====== FIN =========
 
@@ -1134,4 +1138,6 @@ function ajustarDecimales(vertice){
   }    
   return vertice;
 }
+ 
+ 
  
