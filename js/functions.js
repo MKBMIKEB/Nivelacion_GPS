@@ -379,7 +379,7 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
   for (const vert of verticesCompletos) {
 
 
-    const DHI = parseFloat(vert.hReferencia) - parseFloat(baseVertAlt);
+    const DHI = parseFloat(vert.altelips) - parseFloat(baseVertAlt);
     const DNI = parseFloat(vert.ondula) - parseFloat(baseVertondula);
     const DHG = DHI - DNI;
     const DHO = DHG - DHG_ANTERIOR_prime;
@@ -420,11 +420,20 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
   const HGPSFINALArray = [];
   // CALCULO ORTOMETRICA
   for (const vertice of verticesCompletos) {
-   
+    let DHI;
+    if (vertice.hReferencia === undefined || isNaN(parseFloat(vertice.hReferencia))) {
+        // Si hReferencia es indefinida o no es un número válido, se utiliza el cálculo alternativo
+        DHI = parseFloat(vertice.altelips) - parseFloat(baseVertAlt);
+        console.log("Usando altelips para DHI:", DHI);
+    } else {
+        // Si hReferencia está definida y es válida, se utiliza para el cálculo
+        DHI = parseFloat(vertice.hReferencia) - parseFloat(baseVertAlt);
+        console.log("Usando hReferencia para DHI:", DHI);
+    }
+    
+    console.log("Valor de baseVertAlt:", baseVertAlt);
     
     console.log(vertice.HDEC, vertice.ondula, baseVertAlt, baseVertondula, baseVertAltmsn, correccion)
-
-    const DHI = parseFloat(vertice.hReferencia) - parseFloat(baseVertAlt);
     console.log("Valor de vert.HDEC:", vertice.hReferencia);
     console.log("Valor de baseVertAlt:", baseVertAlt);
     const DNI = parseFloat(vertice.ondula) - parseFloat(baseVertondula);

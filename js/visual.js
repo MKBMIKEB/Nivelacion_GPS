@@ -61,11 +61,11 @@ function cambiosToggleHabilitar(estado) {
 
 
 function tabular(vertice, verticePunto, tabla) {
-
+ 
   let texto = `
         <tr>
           <th scope="row">${verticePunto.nombre}</th>
-          <td>${verticePunto.hReferencia}</td>
+           <td>${verticePunto.hReferencia !== undefined && !isNaN(parseFloat(verticePunto.hReferencia)) ? verticePunto.hReferencia : verticePunto.altelips}</td>
           <td>${verticePunto.ondula}</td>
           <td></td>
           <td>${vertice.DHI.toFixed(5)}</td>
