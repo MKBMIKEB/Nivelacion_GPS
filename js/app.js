@@ -1,167 +1,213 @@
 localStorage.setItem('verticesOndula', JSON.stringify([]));
 localStorage.setItem('anosPorHtml', JSON.stringify([]));
 
+function crearDropdownParaVertice(vertice) {
+  const container = document.getElementById('verticesContainer');
 
+  const div = document.createElement('div');
+  div.classList.add('vertice-item');
+
+  const label = document.createElement('label');
+  label.innerText = `Tipo de Punto para ${vertice.nombre}:`;
+
+  const select = document.createElement('select');
+  select.classList.add('form-control');
+  select.setAttribute('data-vertice', vertice.nombre);
+
+  const opciones = ['', 'Fotocontrol', 'Geodésico', 'Auxiliar'];  // Añadir una opción vacía por defecto
+  opciones.forEach(opcion => {
+      const optionElement = document.createElement('option');
+      optionElement.value = opcion;
+      optionElement.text = opcion === '' ? 'Seleccione un tipo de punto' : opcion;
+      select.appendChild(optionElement);
+  });
+
+ 
+  div.appendChild(label);
+  div.appendChild(select);
+  container.appendChild(div);
+}
+function validarSeleccionDePuntos() {
+  let valid = true;
+  document.querySelectorAll('select[data-vertice]').forEach(select => {
+      console.log(`Verificando selección para: ${select.dataset.vertice}, valor seleccionado: ${select.value}`);
+      if (select.value === '') {
+          valid = false;
+          console.log(`Valor no seleccionado para: ${select.dataset.vertice}`);
+          select.classList.add('error');
+      } else {
+          console.log(`Valor correctamente seleccionado para: ${select.dataset.vertice}`);
+          select.classList.remove('error');
+      }
+  });
+  console.log(`Resultado de la validación: ${valid}`);
+  return valid;
+}
 
 document.querySelector('#calcular').addEventListener('click', async function () {
+  // Crear los dropdowns solo si no han sido creados antes
+  let arrTexto2 = JSON.parse(localStorage.getItem('verticesOndula'));
+  arrTexto2.forEach(vertice => {
+      if (!document.querySelector(`select[data-vertice="${vertice.nombre}"]`)) {
+          crearDropdownParaVertice(vertice);
+      }
+  });
 
-  if (!document.querySelector("#verticeFuente")) {
-    mostrarMensaje('Debe elegir un vertice valido primero', 'info');
-    return
+  // Validar si todos los tipos de punto han sido seleccionados
+  if (!validarSeleccionDePuntos()) {
+      alert('Debe seleccionar un tipo de punto para cada vértice antes de proceder.');
+      return;  // Detener el proceso si no se han seleccionado todos los tipos de punto
   }
 
+  // Validaciones iniciales
+  if (!document.querySelector("#verticeFuente")) {
+      mostrarMensaje('Debe elegir un vertice valido primero', 'info');
+      return;
+  }
 
   if (JSON.parse(localStorage.getItem('verticesOndula')).length == 0 || JSON.parse(localStorage.getItem('anosPorHtml')).length == 0) {
-    mostrarMensaje('Debe ingresar el archivo .asc y la carpeta logfiles', 'info');
-    return
+      mostrarMensaje('Debe ingresar el archivo .asc y la carpeta logfiles', 'info');
+      return;
   }
 
-
+  // Preparar datos para procesamiento
   let verticesCompletos = [];
-
-  let arrTexto = JSON.parse(localStorage.getItem('verticesOndula'))
-  let arr = JSON.parse(localStorage.getItem('anosPorHtml'))
+  let arrTexto = JSON.parse(localStorage.getItem('verticesOndula'));
+  let arr = JSON.parse(localStorage.getItem('anosPorHtml'));
 
   const nombreCalculista = document.querySelector('#nombreCalculista').value;
   const nombreProyecto = document.querySelector('#nombreProyecto').value;
-  console.log(nombreCalculista === '', nombreProyecto);
 
   let datosXml = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-                          <Proyecto>
-                            <Nombre>${nombreProyecto === ''?'XML':nombreProyecto}</Nombre>
-                            <Calculista>${nombreCalculista === ''?'IGAC':nombreCalculista}</Calculista>
-                            <Versión>1.0 BETA</Versión>`
-    ;
+                            <Proyecto>
+                                <Nombre>${nombreProyecto === '' ? 'XML' : nombreProyecto}</Nombre>
+                                <Calculista>${nombreCalculista === '' ? 'IGAC' : nombreCalculista}</Calculista>
+                                <Versión>1.0 BETA</Versión>`;
 
-  // AGREGAR ESTACIONES CORS
+  // Agregar estaciones permanentes
   datosXml += "<Estaciones_Permanentes>";
-
   for (let ver of arrTexto) {
-
-    if (ver.tipo == 'CTRL') {      
-
-      datosXml += `
-          <Punto Nombre="${ver.nombre}">
-                <Tipo_Punto>Estación</Tipo_Punto>                                                
-                <Set_de_Coordenadas>
-                    <Cartesiana3d_rastreo>
-                        <Datum>MAGNA-SIRGAS</Datum>
-                        <X>${ver.x}</X>
-                        <Y>${ver.y}</Y>
-                        <Z>${ver.z}</Z>
-                    </Cartesiana3d_rastreo>
-                    <Elipsoidal_rastreo>
-                        <Datum>MAGNA-SIRGAS</Datum>
-                        <Latitud>${typeof ver.lat == 'number' ? ver.lat.toFixed(6) : ver.lat}</Latitud>
-                        <Longitud>${typeof ver.long == 'number' ? ver.long.toFixed(6) : ver.long}</Longitud>
-                        <Ondula>${ver.ondula}</Ondula>
-                    </Elipsoidal_rastreo>
-                </Set_de_Coordenadas>
-            </Punto>
-          `;
-    }
-
+      if (ver.tipo == 'CTRL') {
+          datosXml += `
+              <Punto Nombre="${ver.nombre}">
+                  <Tipo_Punto>Estación</Tipo_Punto>
+                  <Set_de_Coordenadas>
+                      <Cartesiana3d_rastreo>
+                          <Datum>MAGNA-SIRGAS</Datum>
+                          <X>${ver.x}</X>
+                          <Y>${ver.y}</Y>
+                          <Z>${ver.z}</Z>
+                      </Cartesiana3d_rastreo>
+                      <Elipsoidal_rastreo>
+                          <Datum>MAGNA-SIRGAS</Datum>
+                          <Latitud>${typeof ver.lat == 'number' ? ver.lat.toFixed(6) : ver.lat}</Latitud>
+                          <Longitud>${typeof ver.long == 'number' ? ver.long.toFixed(6) : ver.long}</Longitud>
+                          <Ondula>${ver.ondula}</Ondula>
+                      </Elipsoidal_rastreo>
+                  </Set_de_Coordenadas>
+              </Punto>`;
+      }
   }
-
   datosXml += "</Estaciones_Permanentes>";
-  // ========= FIN ==============
-
 
   // ===== OBTENER VELOCIDADES =======
   let velx = "";
   let vely = "";
   let velz = "";
   for (let vel of arrTexto) {
-
-    if (vel.velx != undefined) {
-      velx = parseFloat(typeof vel.velx == 'string' ? vel.velx.replace(",", ".") : vel.velx);
-      vely = parseFloat(typeof vel.vely == 'string' ? vel.vely.replace(",", ".") : vel.vely);
-      velz = parseFloat(typeof vel.velz == 'string' ? vel.velz.replace(",", ".") : vel.velz);
-      break;
-    }
+      if (vel.velx != undefined) {
+          velx = parseFloat(typeof vel.velx == 'string' ? vel.velx.replace(",", ".") : vel.velx);
+          vely = parseFloat(typeof vel.vely == 'string' ? vel.vely.replace(",", ".") : vel.vely);
+          velz = parseFloat(typeof vel.velz == 'string' ? vel.velz.replace(",", ".") : vel.velz);
+          break;
+      }
   }
   // ===== FIN =======
 
-
+  // Procesar vértices
+  let contadorVertices = new Map();
   for (let coordenadas of arrTexto) {
-    let anoEpocaInicial = buscarAnoDeCoordenada(coordenadas, arr); // ejem: 2023.3424
+      let anosEpoca = buscarAnoDeCoordenada(coordenadas, arr); // Devuelve un arreglo con todos los anosEpoca encontrados
 
-    let deltaDeTiempo = 2018 - anoEpocaInicial;  // ejem: -5.27 
+      if (anosEpoca.length > 0) {
+          anosEpoca.forEach(anoEpocaInicial => {
+              let deltaDeTiempo = 2018 - anoEpocaInicial;
 
-    for (let coordenada of arr) {
+              for (let coordenada of arr) {
+                  let nombreVertice = coordenadas.nombre.trim();
 
-      if (coordenadas.nombre === coordenada.name.split(' - ')[1].split('.')[0].trim()) {
+                  // Obtener el número de veces que este vértice ha sido procesado
+                  let count = contadorVertices.get(nombreVertice) || 0;
 
-        let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
+                  if (coordenadas.nombre === coordenada.name.split(' - ').pop().split('.')[0].trim()) {
+                      if (count < 2) {
+                          // Incrementar el contador
+                          contadorVertices.set(nombreVertice, count + 1);
+                          const tipoPuntoSeleccionado = document.querySelector(`select[data-vertice="${coordenadas.nombre}"]`).value;
 
-        let xreferencia = (coordenadaAjustada[0] + (velx * deltaDeTiempo)).toFixed(5);
-        let yreferencia = (coordenadaAjustada[1] + (vely * deltaDeTiempo)).toFixed(5);
-        let zreferencia = (coordenadaAjustada[2] + (velz * deltaDeTiempo)).toFixed(5);
+                          // Realizar el procesamiento
+                          let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
+                          let xreferencia = (coordenadaAjustada[0] + (coordenadas.velx * deltaDeTiempo)).toFixed(5);
+                          let yreferencia = (coordenadaAjustada[1] + (coordenadas.vely * deltaDeTiempo)).toFixed(5);
+                          let zreferencia = (coordenadaAjustada[2] + (coordenadas.velz * deltaDeTiempo)).toFixed(5);
 
-        let latlonreferencia = geocentricas_elipsoidales(xreferencia, yreferencia, zreferencia);
-        let origenNac = transformarAOrigenNac(latlonreferencia.latDec, latlonreferencia.lonDec);
-        let gauss = gaussKrugger(latlonreferencia.latDec, latlonreferencia.lonDec);
-        let xITRF2014 = coordenadaAjustada[0]; 
-        let yITRF2014 = coordenadaAjustada[1];
-        let zITRF2014 = coordenadaAjustada[2];
-        
-        verticesCompletos.push(
-          {
-            lat: coordenadas.lat, 
-            long: coordenadas.long, 
-            nombre: coordenadas.nombre, 
-            ondula: coordenadas.ondula,
-            tipo: coordenadas.tipo, 
-            x: coordenadas.x, 
-            y: coordenadas.y, 
-            z: coordenadas.z, 
-            altelips: coordenada.altelips.replace(",", "."),
-            xreferencia: xreferencia,
-            yreferencia: yreferencia,
-            zreferencia: zreferencia,
-            xITRF2014: xITRF2014 ,
-            yITRF2014: yITRF2014,
-            zITRF2014: zITRF2014,
-            latReferencia: latlonreferencia.latDec,
-            lonReferencia: latlonreferencia.lonDec,
-            hReferencia: latlonreferencia.hReferencia,
-            anoEpoca: coordenada.anoEpoca,
-            velx: coordenadas.velx,
-            vely: coordenadas.vely,
-            velz: coordenadas.velz,
-            fecha: coordenada.fecha,
-            este: origenNac.x,
-            norte: origenNac.y,
-            esteKrugger: gauss.x,
-            norteKrugger: gauss.y,
-            originName: gauss.originName,
-            mascara: coordenada.mascara,
-            satelites: coordenada.satelites,
-            lecturaAltura: coordenada.lecturaAltura,
-            alturaAntena: coordenada.alturaAntena,
-            tipoSolucion: coordenada.tipoSolucion,
-            m0: coordenada.m0,
-            gdop: coordenada.gdop,
-            duracion: coordenada.duracion,
-            name: coordenada.name,
-            frecuencia: coordenada.frecuencia,
-            efemerides: coordenada.efemerides,
-            inicioFin: coordenada.inicioFin,
-            nombreAntena: coordenada.nombreAntena,
-            cq1d: coordenada.cq1d,            
-            cq2d: coordenada.cq2d,
-            cq3d: coordenada.cq3d,
-            saltos: coordenada.saltos
-          }
-        );
-        break;
+                          let latlonreferencia = geocentricas_elipsoidales(xreferencia, yreferencia, zreferencia);
+                          let origenNac = transformarAOrigenNac(latlonreferencia.latDec, latlonreferencia.lonDec);
+                          let gauss = gaussKrugger(latlonreferencia.latDec, latlonreferencia.lonDec);
+
+                          verticesCompletos.push({
+                              lat: coordenadas.lat,
+                              long: coordenadas.long,
+                              nombre: coordenadas.nombre,
+                              ondula: coordenadas.ondula,
+                              tipo: tipoPuntoSeleccionado,
+                              x: coordenadas.x,
+                              y: coordenadas.y,
+                              z: coordenadas.z,
+                              altelips: coordenada.altelips.replace(",", "."),
+                              xreferencia: xreferencia,
+                              yreferencia: yreferencia,
+                              zreferencia: zreferencia,
+                              xITRF2014: coordenadaAjustada[0],
+                              yITRF2014: coordenadaAjustada[1],
+                              zITRF2014: coordenadaAjustada[2],
+                              latReferencia: latlonreferencia.latDec,
+                              lonReferencia: latlonreferencia.lonDec,
+                              hReferencia: latlonreferencia.hReferencia,
+                              anoEpoca: anoEpocaInicial,
+                              velx: coordenadas.velx,
+                              vely: coordenadas.vely,
+                              velz: coordenadas.velz,
+                              fecha: coordenada.fecha,
+                              este: origenNac.x,
+                              norte: origenNac.y,
+                              esteKrugger: gauss.x,
+                              norteKrugger: gauss.y,
+                              originName: gauss.originName,
+                              mascara: coordenada.mascara,
+                              satelites: coordenada.satelites,
+                              lecturaAltura: coordenada.lecturaAltura,
+                              alturaAntena: coordenada.alturaAntena,
+                              tipoSolucion: coordenada.tipoSolucion,
+                              m0: coordenada.m0,
+                              gdop: coordenada.gdop,
+                              duracion: coordenada.duracion,
+                              name: coordenada.name,
+                              frecuencia: coordenada.frecuencia,
+                              efemerides: coordenada.efemerides,
+                              inicioFin: coordenada.inicioFin,
+                              nombreAntena: coordenada.nombreAntena,
+                              cq1d: coordenada.cq1d,
+                              cq2d: coordenada.cq2d,
+                              cq3d: coordenada.cq3d,
+                              saltos: coordenada.saltos
+                          });
+                      }
+                  }
+              }
+          });
       }
-    }
-
   }
-
-  // INICIO XML CABEZERA       
-
   let baseVertNomen = document.querySelector("#verticeFuente").dataset.nomenclatura;
   let baseVertAlt = document.querySelector("#verticeFuente").dataset.altelips;
   let baseVertondula = document.querySelector("#verticeFuente").dataset.ondula;
@@ -232,52 +278,44 @@ document.querySelector('#calcular').addEventListener('click', async function () 
         
         `;
   datosXml += "</Puntos_Base_Nivelación>";
-  // ====== FIN ============
-  
-
-
+  // ===== INICIO LOGICA DE TABULACION ========
   let verticesCompletosTemp = [];
-  for(let vertice of verticesCompletos){
-    verticesCompletosTemp.push(ajustarDecimales(vertice));
+  for (let vertice of verticesCompletos) {
+      verticesCompletosTemp.push(ajustarDecimales(vertice));
   }
 
   verticesCompletos = [];
 
-
-
-  // ============ calculos par tabular =========
-  verticesCompletos = [...verticesCompletosTemp]
+  // ============ Cálculos para tabular =========
+  verticesCompletos = [...verticesCompletosTemp];
   let verticesCompletos2 = [...verticesCompletos];
   let verticesCompletos3 = [...verticesCompletos];
-  
+
   console.log(verticesCompletos);
-  
-  // ============ calculos par tabular 1,2,3 =========
-  
-  
-  verticesCompletos.push({ nombre: baseVertNomen, altelips: baseVertAlt, ondula: baseVertondula,  })  
+
+  // ============ Cálculos para tabular 1,2,3 =========
+  verticesCompletos.push({ nombre: baseVertNomen, altelips: baseVertAlt, ondula: baseVertondula });
   const HGPSFINALArray1 = calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVertondula, baseVertAltmsn, baseVertAltmsn, "calculos");
-  
-  verticesCompletos2.push({ nombre: baseVertNomen2, altelips: baseVertAlt2, ondula: baseVertondula2 })
-  const HGPSFINALArray2 =  calculoPorTabular(verticesCompletos2, baseVertNomen2, baseVertAlt2, baseVertondula2, baseVertAltmsn2, baseVertAltmsn2, "calculos2");
-  
-  verticesCompletos3.push({ nombre: baseVertNomen2, altelips: baseVertAlt2, ondula: baseVertondula2 })
+
+  verticesCompletos2.push({ nombre: baseVertNomen2, altelips: baseVertAlt2, ondula: baseVertondula2 });
+  const HGPSFINALArray2 = calculoPorTabular(verticesCompletos2, baseVertNomen2, baseVertAlt2, baseVertondula2, baseVertAltmsn2, baseVertAltmsn2, "calculos2");
+
+  verticesCompletos3.push({ nombre: baseVertNomen2, altelips: baseVertAlt2, ondula: baseVertondula2 });
   const HGPSFINALArray3 = calculoPorTabular(verticesCompletos3, baseVertNomen, baseVertAlt, baseVertondula, baseVertAltmsn, baseVertAltmsn2, "calculos3");
-  // ============ Fin calculos par tabular 2,3 =========
-  
+
+  // ============ Fin cálculos para tabular 2,3 =========
+
   // ============ Tabular diferencias =========
   tabularDiferencias();
   // ============ Fin tabular diferencias =========
-  
+
   // CUERPO DEL DOCUMENTO
   datosXml += "<Puntos_Calculados>";
 
-  // for (const vertice of verticesCompletos) {
-    for (let i=0; i<verticesCompletos.length-1; i++) {    
-        
-        datosXml += `
-        <Punto Nombre="${verticesCompletos[i].nombre}">
-        <Tipo_Punto>${tipoPunto(verticesCompletos[i].duracion)}</Tipo_Punto>      
+  for (let i = 0; i < verticesCompletos.length - 1; i++) {
+      datosXml += `
+          <Punto Nombre="${verticesCompletos[i].nombre}">
+          <Tipo_Punto>${tipoPunto(verticesCompletos[i].duracion)}</Tipo_Punto>      
           <Epoca_Punto>Época 2018</Epoca_Punto>
           <Altura_Ortométrica>
               <Valor1>${HGPSFINALArray1[i]}</Valor1>          
@@ -298,87 +336,82 @@ document.querySelector('#calcular').addEventListener('click', async function () 
               <Z>${verticesCompletos[i].velz != undefined ? verticesCompletos[i].velz.toString().replace('.', ',') : verticesCompletos[i].velz}</Z>
           </Velocidades>
           <Set_de_Coordenadas>
-            <Cartesiana3d_referencia>
-                <Datum>MAGNA-SIRGAS</Datum>
-                <X>${verticesCompletos[i].xreferencia != undefined ? verticesCompletos[i].xreferencia.toString().replace('.', ',') : verticesCompletos[i].xreferencia}</X>
-                <Y>${verticesCompletos[i].yreferencia != undefined ? verticesCompletos[i].yreferencia.toString().replace('.', ',') : verticesCompletos[i].yreferencia}</Y>
-                <Z>${verticesCompletos[i].zreferencia != undefined ? verticesCompletos[i].zreferencia.toString().replace('.', ',') : verticesCompletos[i].zreferencia}</Z>
-            </Cartesiana3d_referencia>
-            <Cartesiana3d_rastreo>
-                <Datum>MAGNA-SIRGAS</Datum>
-                <X>${verticesCompletos[i].xITRF2014 != undefined ? verticesCompletos[i].xITRF2014.toString().replace('.', ',') : verticesCompletos[i].xITRF2014}</X>
-                <Y>${verticesCompletos[i].yITRF2014 != undefined ? verticesCompletos[i].yITRF2014.toString().replace('.', ',') : verticesCompletos[i].yITRF2014}</Y>
-                <Z>${verticesCompletos[i].zITRF2014 != undefined ? verticesCompletos[i].zITRF2014.toString().replace('.', ',') : verticesCompletos[i].zITRF2014}</Z>
-            </Cartesiana3d_rastreo>
-            <Elipsoidal_rastreo>
-                <Datum>MAGNA-SIRGAS</Datum>
-                <Latitud>${verticesCompletos[i].lat != undefined ? verticesCompletos[i].lat.toString().replace('.', ',') : verticesCompletos[i].lat}</Latitud>
-                <Longitud>${verticesCompletos[i].long != undefined ? verticesCompletos[i].long.toString().replace('.', ',') : verticesCompletos[i].long}</Longitud>
-                <Altura_Elipsoidal>${verticesCompletos[i].altelips}</Altura_Elipsoidal>
-            </Elipsoidal_rastreo>
-            <Elipsoidal_referencia>
-                <Datum>MAGNA-SIRGAS</Datum>
-                <Latitud>${verticesCompletos[i].latReferencia != undefined ? verticesCompletos[i].latReferencia.toString().replace('.', ',') : verticesCompletos[i].latReferencia}</Latitud>
-                <Longitud>${verticesCompletos[i].lonReferencia != undefined ? verticesCompletos[i].lonReferencia.toString().replace('.', ',') : verticesCompletos[i].lonReferencia}</Longitud>            
-                <Altura_Elipsoidal>${verticesCompletos[i].hReferencia != undefined ? verticesCompletos[i].hReferencia.toString().replace('.', ',') : verticesCompletos[i].hReferencia}</Altura_Elipsoidal>
-                </Elipsoidal_referencia>
-            <Gauss_referencia>
-                <Datum>MAGNA-SIRGAS</Datum>
-                <Norte>${verticesCompletos[i].norteKrugger != undefined ? verticesCompletos[i].norteKrugger.toString().replace('.', ',') : verticesCompletos[i].norteKrugger}</Norte>
-                <Este>${verticesCompletos[i].esteKrugger != undefined ? verticesCompletos[i].esteKrugger.toString().replace('.', ',') : verticesCompletos[i].esteKrugger}</Este>
-                <Origen>${verticesCompletos[i].originName}</Origen>
-            </Gauss_referencia>
-            <Origen>
-                <Datum>MAGNA-SIRGAS</Datum>
-                <Norte>${verticesCompletos[i].norte != undefined ? verticesCompletos[i].norte.toString().replace('.', ',') : verticesCompletos[i].norte}</Norte>
-                <Este>${verticesCompletos[i].este != undefined ? verticesCompletos[i].este.toString().replace('.', ',') : verticesCompletos[i].este}</Este>            
-            </Origen>
-            <Otros>
-              <Mascara>${verticesCompletos[i]?.mascara}</Mascara>
-              <Satelites>${verticesCompletos[i]?.satelites}</Satelites>
-              <LecturaAltura>${verticesCompletos[i]?.lecturaAltura}</LecturaAltura>
-              <LecturaAntena>${verticesCompletos[i]?.alturaAntena}</LecturaAntena>
-              <TipoSolucion>${verticesCompletos[i]?.tipoSolucion}</TipoSolucion>
-              <M0>${verticesCompletos[i]?.m0}</M0>
-              <Gdop>${verticesCompletos[i]?.gdop}</Gdop>
-              <NombreVector>${verticesCompletos[i]?.name}</NombreVector>
-              <Frecuencia>${verticesCompletos[i]?.frecuencia}</Frecuencia>
-              <Efemerides>${verticesCompletos[i]?.efemerides}</Efemerides>
-              <InicioFin>${verticesCompletos[i]?.inicioFin}</InicioFin>
-              <NombreAntena>${verticesCompletos[i]?.nombreAntena}</NombreAntena>
-              <Cq1d>${verticesCompletos[i]?.cq1d}</Cq1d>
-              <Cq2d>${verticesCompletos[i]?.cq2d}</Cq2d>
-              <Cq3d>${verticesCompletos[i]?.cq3d}</Cq3d>
-              <Saltos>${verticesCompletos[i]?.saltos}</Saltos>
-            </Otros>
-          </Set_de_Coordenadas>
-        </Punto>          
-    `;
-    
-      }
+              <Cartesiana3d_referencia>
+                  <Datum>MAGNA-SIRGAS</Datum>
+                  <X>${verticesCompletos[i].xreferencia != undefined ? verticesCompletos[i].xreferencia.toString().replace('.', ',') : verticesCompletos[i].xreferencia}</X>
+                  <Y>${verticesCompletos[i].yreferencia != undefined ? verticesCompletos[i].yreferencia.toString().replace('.', ',') : verticesCompletos[i].yreferencia}</Y>
+                  <Z>${verticesCompletos[i].zreferencia != undefined ? verticesCompletos[i].zreferencia.toString().replace('.', ',') : verticesCompletos[i].zreferencia}</Z>
+              </Cartesiana3d_referencia>
+              <Cartesiana3d_rastreo>
+                  <Datum>MAGNA-SIRGAS</Datum>
+                  <X>${verticesCompletos[i].xITRF2014 != undefined ? verticesCompletos[i].xITRF2014.toString().replace('.', ',') : verticesCompletos[i].xITRF2014}</X>
+                  <Y>${verticesCompletos[i].yITRF2014 != undefined ? verticesCompletos[i].yITRF2014.toString().replace('.', ',') : verticesCompletos[i].yITRF2014}</Y>
+                  <Z>${verticesCompletos[i].zITRF2014 != undefined ? verticesCompletos[i].zITRF2014.toString().replace('.', ',') : verticesCompletos[i].zITRF2014}</Z>
+              </Cartesiana3d_rastreo>
+              <Elipsoidal_rastreo>
+                  <Datum>MAGNA-SIRGAS</Datum>
+                  <Latitud>${verticesCompletos[i].lat != undefined ? verticesCompletos[i].lat.toString().replace('.', ',') : verticesCompletos[i].lat}</Latitud>
+                  <Longitud>${verticesCompletos[i].long != undefined ? verticesCompletos[i].long.toString().replace('.', ',') : verticesCompletos[i].long}</Longitud>
+                  <Altura_Elipsoidal>${verticesCompletos[i].altelips}</Altura_Elipsoidal>
+              </Elipsoidal_rastreo>
+              <Elipsoidal_referencia>
+                  <Datum>MAGNA-SIRGAS</Datum>
+                  <Latitud>${verticesCompletos[i].latReferencia != undefined ? verticesCompletos[i].latReferencia.toString().replace('.', ',') : verticesCompletos[i].latReferencia}</Latitud>
+                  <Longitud>${verticesCompletos[i].lonReferencia != undefined ? verticesCompletos[i].lonReferencia.toString().replace('.', ',') : verticesCompletos[i].lonReferencia}</Longitud>            
+                  <Altura_Elipsoidal>${verticesCompletos[i].hReferencia != undefined ? verticesCompletos[i].hReferencia.toString().replace('.', ',') : verticesCompletos[i].hReferencia}</Altura_Elipsoidal>
+                  </Elipsoidal_referencia>
+              <Gauss_referencia>
+                  <Datum>MAGNA-SIRGAS</Datum>
+                  <Norte>${verticesCompletos[i].norteKrugger != undefined ? verticesCompletos[i].norteKrugger.toString().replace('.', ',') : verticesCompletos[i].norteKrugger}</Norte>
+                  <Este>${verticesCompletos[i].esteKrugger != undefined ? verticesCompletos[i].esteKrugger.toString().replace('.', ',') : verticesCompletos[i].esteKrugger}</Este>
+                  <Origen>${verticesCompletos[i].originName}</Origen>
+              </Gauss_referencia>
+              <Origen>
+                  <Datum>MAGNA-SIRGAS</Datum>
+                  <Norte>${verticesCompletos[i].norte != undefined ? verticesCompletos[i].norte.toString().replace('.', ',') : verticesCompletos[i].norte}</Norte>
+                  <Este>${verticesCompletos[i].este != undefined ? verticesCompletos[i].este.toString().replace('.', ',') : verticesCompletos[i].este}</Este>            
+              </Origen>
+              <Otros>
+                <Mascara>${verticesCompletos[i]?.mascara}</Mascara>
+                <Satelites>${verticesCompletos[i]?.satelites}</Satelites>
+                <LecturaAltura>${verticesCompletos[i]?.lecturaAltura}</LecturaAltura>
+                <LecturaAntena>${verticesCompletos[i]?.alturaAntena}</LecturaAntena>
+                <TipoSolucion>${verticesCompletos[i]?.tipoSolucion}</TipoSolucion>
+                <M0>${verticesCompletos[i]?.m0}</M0>
+                <Gdop>${verticesCompletos[i]?.gdop}</Gdop>
+                <NombreVector>${verticesCompletos[i]?.name}</NombreVector>
+                <Frecuencia>${verticesCompletos[i]?.frecuencia}</Frecuencia>
+                <Efemerides>${verticesCompletos[i]?.efemerides}</Efemerides>
+                <InicioFin>${verticesCompletos[i]?.inicioFin}</InicioFin>
+                <NombreAntena>${verticesCompletos[i]?.nombreAntena}</NombreAntena>
+                <Cq1d>${verticesCompletos[i]?.cq1d}</Cq1d>
+                <Cq2d>${verticesCompletos[i]?.cq2d}</Cq2d>
+                <Cq3d>${verticesCompletos[i]?.cq3d}</Cq3d>
+                <Saltos>${verticesCompletos[i]?.saltos}</Saltos>
+              </Otros>
+            </Set_de_Coordenadas>
+          </Punto>`;
+  }
 
   datosXml += "</Puntos_Calculados>";
+  datosXml += "</Proyecto>";
+  // Descargar el XML
+  descargarXML(datosXml);
+});
 
-  // ETIQUETA DE CIERRE        
-  datosXml += `</Proyecto>`;
-
-
-  // ======== DESCARGAR XML =========
+function descargarXML(datosXml) {
   var blob = new Blob([datosXml], {
-    type: 'text/xml'
+      type: 'text/xml'
   });
 
   var link = document.createElement("a");
   link.href = window.URL.createObjectURL(blob);
-  // link.download = archivoPlano.name.replace("20","14");
-  link.download = "xml";
+  link.download = "proyecto.xml";
   document.body.appendChild(link);
   link.click();
+}
 
-  // ======== FIN =========
 
-
-});
 
 
 

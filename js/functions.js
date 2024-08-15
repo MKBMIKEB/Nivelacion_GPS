@@ -195,16 +195,18 @@ function degreesToRadians(degrees) {
 
 
 // Función para buscar la fecha de una coordenada
-function buscarAnoDeCoordenada(coordenada, logsArray) {
+function buscarAnoDeCoordenada(coordenadas, logsArray) {
+  let coincidencias = [];  // Arreglo para almacenar todas las coincidencias
 
   for (let i = 0; i < logsArray.length; i++) {
-    if (logsArray[i].name.indexOf(coordenada.nombre) !== -1) {
-      return logsArray[i].anoEpoca;
+    if (coordenadas.nombre === logsArray[i].name.split(' - ').pop().split('.')[0].trim()) {
+      coincidencias.push(logsArray[i].anoEpoca);  // Agregar cada anoEpoca al arreglo de coincidencias
     }
   }
-
+  console.log("coincidencias:", coincidencias)
+  return coincidencias; 
+   // Devolver todos los anosEpoca encontrados
 }
-
 function espacioEstasdar(cadena) {
 
   for (let i = cadena.length; i < 6; i++) {
@@ -422,7 +424,12 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
 
     // console.log(vertice.altelips, vertice.ondula, baseVertAlt, baseVertondula, baseVertAltmsn, correccion)
 
-    const DHI = parseFloat(vertice.altelips) - parseFloat(baseVertAlt);
+    let DHI;
+    if (vertice.hReferencia) {
+    DHI = parseFloat(vertice.hReferencia) - parseFloat(baseVertAlt);
+      } else {
+    DHI = parseFloat(vertice.altelips) - parseFloat(baseVertAlt);
+    }
     const DNI = parseFloat(vertice.ondula) - parseFloat(baseVertondula);
     const DHG = DHI - DNI;
     const HGP = parseFloat(baseVertAltmsn) + DHG;

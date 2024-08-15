@@ -54,16 +54,31 @@ function cambiosToggleHabilitar(estado) {
     document.querySelector('#descargar').innerHTML = `
        <i class="bi bi-cloud-arrow-down"></i>  Descargar ITRF2014
     `;
+/**
+ * The function "tabular" generates a table row with specific data values for a given vertex point and
+ * vertex in a table specified by its ID.
+ * @param vertice - The `vertice` parameter in the `tabular` function seems to represent an object
+ * containing various properties related to a vertex or point. These properties include `DHI`, `DNI`,
+ * `DHG`, `HGP`, `DHO`, `DHGC`, and `HGPSFINAL
+ * @param verticePunto - The `verticePunto` parameter seems to represent a point on a vertex or node in
+ * a graph or network. It contains properties such as `nombre`, `hReferencia`, `altelips`, and
+ * `ondula`.
+ * @param tabla - The `tabla` parameter in the `tabular` function is used to specify the ID of the HTML
+ * table where the tabular data will be appended. This allows the function to dynamically add a new row
+ * of data to the specified table based on the provided `vertice` and `verticeP
+ */
 
   }
 
 }
+document.querySelectorAll('select[data-vertice]');
+
 
 
 function tabular(vertice, verticePunto, tabla) {
  
   let texto = `
-        <tr>
+        <tr>    
           <th scope="row">${verticePunto.nombre}</th>
           <td>${verticePunto.hReferencia !== undefined && !isNaN(parseFloat(verticePunto.hReferencia)) ? verticePunto.hReferencia : verticePunto.altelips}</td>
           <td>${verticePunto.ondula}</td>
