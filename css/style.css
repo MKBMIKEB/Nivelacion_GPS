@@ -1,72 +1,89 @@
+/* Estilo del fondo general en blanco */
 body {
-    /* background: linear-gradient(to bottom right, #618fa3,  #308690); */
-    animation: bgAnimation 55s infinite alternate linear;
+    background-color: #ffffff;
+    font-family: 'Roboto', sans-serif;
+    color: #333333;
 }
 
+/* Estilo de la barra de navegación */
 .navbar {
-   background: linear-gradient(217deg, rgba(69, 61, 114, 0.8), rgba(255,0,0,0) 70.71%),
-               linear-gradient(127deg, rgba(47, 66, 47, 0.8), rgba(0,255,0,0) 70.71%),            
-               linear-gradient(336deg, rgba(24, 24, 138, 0.8), rgba(0,0,255,0) 70.71%);               
+    background: rgba(69, 61, 114, 0.8);
+    border-bottom: 2px solid #ff4b2b;
+    padding: 10px 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
-.carga-container {
-    margin-top: 2vh;
+
+/* Contenedores translúcidos */
+.carga-container, .card {
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 20px;
+    box-shadow: 0 4px 30px rgba(255, 254, 254, 0.1);
+    transition: transform 0.3s ease;
+    margin: 20px;
 }
+
+.carga-container:hover, .card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Filas flexibles y centradas */
 .row {
     display: flex;
-    justify-content: space-between;
-    text-align: center;
-    
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
 }
 
-.card {
-    padding: 20px;
-    width: 20rem;
-    /* From https://css.glass */
-    background: rgba(255, 255, 255, 0.24);
-    border-radius: 16px;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    box-shadow: 8px 8px 15px rgba(0, 0, 255, .2);
-    backdrop-filter: blur(4.5px);
-    -webkit-backdrop-filter: blur(4.5px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-
-
+/* Contenedor del formulario con fondo blanco translúcido */
 .contenido-formulario {
-    background: #fff;
-    padding: 2vw;
-    border-radius: 2vw;    
-    box-shadow: 0 10px 20px #00000026;    
+    background: rgba(255, 255, 255, 0.7);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
 }
 
+/* Estilo para los labels del formulario */
 .formulario-label {
     cursor: pointer;
-    display:  flex;
+    display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 2vw;
-    border: 3px dashed #260049;
-    border-radius: 2vw;
+    padding: 20px;
+    border: 2px dashed #7730b9;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    transition: background 0.3s ease, border-color 0.3s ease;
 }
 
-.formulario {
-    position: relative;
+.formulario-label:hover {
+    background: rgba(255, 255, 255, 0.7);
+    border-color: #ff4b2b;
 }
 
+/* Iconos grandes y coloridos */
 .formulario-label i {
-    font-size: 9vh;
-    color: #7730b9;
-    margin-bottom: 1vh;
+    font-size: 6vh;
+    color: #ff4b2b;
+    margin-bottom: 10px;
 }
 
 .formulario-label span {
-    color: #3d3d3d;
+    color: #333333;
     text-align: center;
 }
 
+/* Inputs invisibles pero interactuables */
 #cargarTexto, #cargarCarpeta {
-    background-color: #fff;  
+    background-color: transparent;
     position: absolute;
     top: 0;
     left: 0;
@@ -74,37 +91,54 @@ body {
     opacity: 0;
 }
 
-.size-default {
-    width: 15rem;
-}
-
-#progress,#progress2 {
+/* Barra de progreso oculta por defecto */
+#progress, #progress2 {
     visibility: hidden;
 }
 
+/* Tabla de resultados con colores modernos */
 .table-resultados {
-    font-size: 15px;
+    width: 100%; /* Asegura que la tabla ocupe todo el ancho del contenedor */
+    border-collapse: collapse;
+    background: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+table-resultados th,
+.table-resultados td {
+    padding: 12px;
+    text-align: center;
+    color: #333333;
+    border-bottom: 1px solid #dddddd;
+    width: auto; /* Asegura que las celdas se ajusten al contenido */
 }
 
-.arcoiris {
-    border-image: linear-gradient(to right, rgb(125, 125, 206) 20%, rgb(166, 221, 166) 20%, rgb(156, 197, 156) 40%, rgb(226, 187, 226) 40%, rgb(183, 114, 183) 60%, rgb(215, 190, 142) 60%, rgb(199, 172, 121) 80%, rgb(215, 109, 109) 80%) 1;           
+/* Mantener el estilo de los encabezados */
+.table-resultados thead th {
+    background: #007bff;
+    color: #ffffff;
+    font-weight: bold;
+    text-align: center;
 }
 
-.titulo {    
-    color: rgb(167, 192, 218);
-    margin-top: 10vh;
+/* Eliminar cualquier margin o padding extra */
+.row, .col-sm-6 {
+    margin: 0;
+    padding: 0;
 }
-
 .table-resultados th {
-    color: #89decd !important;    
+    color: #333333;
+    border-bottom: 2px solid #ff4b2b;
+    padding: 10px;
 }
 
-.bi-file-earmark-plus {
-    margin-right: 1vw;
+.table-resultados td {
+    padding: 10px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-
-
+/* Botón flotante para recargar */
 #recargar {
     position: fixed;
     bottom: 20px; 
@@ -113,41 +147,191 @@ body {
     background-color: #20947b;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 10px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 #recargar:hover {
     background-color: #0056b3;
 }
 
-.agregar {
-    font-size: large;
-    color: rgb(13, 147, 66);
+/* Estilo futurista para el contenedor de vértices */
+#verticesContainer {
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    color: #333333;
+    font-size: 16px;
+    transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+    margin: 20px 0;
 }
 
-
-@keyframes bgAnimation {
-    0% {
-        background-color: #10332c;
-    } 
-    25%{
-        background-color: #172246;
-    } 
-    50%{
-        background-color: #1a0f33;        
-    } 
-    75%{
-        background-color: #310d0d;        
-    } 
-    100%{
-        background-color: #19061e;
-    }
-    
+#verticesContainer:hover {
+    transform: scale(1.02);
+    background: rgba(255, 255, 255, 0.7);
 }
 
-.form-label {
-    color: white;
-    margin-top: 2vh;
-    font-size: large;
+/* Barra superior futurista en verticesContainer */
+#verticesContainer::before {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(to right, #ff416c, #ff4b2b);
+    border-radius: 20px 20px 0 0;
+    margin-bottom: 10px;
+}
+
+/* Estilo de los selects dentro de verticesContainer */
+#verticesContainer .vertex-select {
+    background-color: rgba(255, 255, 255, 0.5);
+    color: #333333;
+    border: 1px solid #ff4b2b;
+    border-radius: 10px;
+    padding: 10px;
+    width: 100%;
+    margin: 10px 0;
+    font-size: 14px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+#verticesContainer .vertex-select:hover,
+#verticesContainer .vertex-select:focus {
+    background-color: rgba(255, 255, 255, 0.7);
+    outline: none;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilo de las etiquetas dentro de verticesContainer */
+#verticesContainer label {
+    color: #000000;
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+}
+/* Contenedor que distribuye los botones horizontalmente */
+.button-container {
+    display: flex;
+    justify-content: center; /* Centra los botones horizontalmente */
+    align-items: center;     /* Alinea los botones verticalmente al centro */
+    gap: 20px;               /* Espacio entre los botones */
+    margin-top: 20px;        /* Espacio superior para separar de otros elementos */
+}
+
+/* Estilos base para los botones */
+.btn {
+    padding: 10px 20px;
+    font-size: 14px;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Botón "Descargar" */
+.btn.descargar {
+    background-color: #f0f8ff;
+    color: #007bff;
+    border-color: #007bff;
+}
+
+.btn.descargar:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* Botón "Calcular" */
+.btn.calcular {
+    background-color: #e6ffe6;
+    color: #28a745;
+    border-color: #28a745;
+}
+
+.btn.calcular:hover {
+    background-color: #28a745;
+    color: #fff;
+}
+
+/* Botón "Elegir Vértice" */
+.btn.elegir-vertice {
+    background-color: #e0f7ff;
+    color: #17a2b8;
+    border-color: #17a2b8;
+}
+
+.btn.elegir-vertice:hover {
+    background-color: #17a2b8;
+    color: #fff;
+}
+/* Estilo de la sección de títulos */
+.titulo h2 {
+    font-family: 'Roboto', sans-serif;
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+    margin-top: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Estilo general de las tablas */
+.table-resultados {
+    width: 100%;
+    margin-bottom: 20px;
+    border-collapse: collapse;
+    background: rgba(255, 255, 255, 0.952);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+/* Encabezados de las tablas */
+.table-resultados thead th {
+    background: rgb(128, 155, 245);
+    color: #000000;
+    font-weight: bold;
+    text-align: center;
+    padding: 10px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Filas de la tabla */
+.table-resultados tbody tr {
+    transition: background 0.3s ease;
+}
+
+/* Celdas de las tablas */
+.table-resultados tbody td {
+    padding: 10px;
+    color: #f0f0f0;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Alternar colores en filas */
+.table-resultados tbody tr:nth-child(odd) {
+    background: rgb(0, 0, 0);
+}
+
+.table-resultados tbody tr:nth-child(even) {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+/* Efecto de hover en las filas */
+.table-resultados tbody tr:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Línea decorativa (arcoiris) */
+.arcoiris {
+    border: none;
+    height: 4px;
+    background: linear-gradient(to right, #ffdc19, #ff4b2b);
+    border-radius: 2px;
+    margin-top: 30px;
+    margin-bottom: 30px;
 }
