@@ -352,7 +352,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
                   <Datum>MAGNA-SIRGAS</Datum>
                   <Latitud>${verticesCompletos[i].lat != undefined ? verticesCompletos[i].lat.toString().replace('.', ',') : verticesCompletos[i].lat}</Latitud>
                   <Longitud>${verticesCompletos[i].long != undefined ? verticesCompletos[i].long.toString().replace('.', ',') : verticesCompletos[i].long}</Longitud>
-                  <Altura_Elipsoidal>${verticesCompletos[i].altelips}</Altura_Elipsoidal>
+                  <Altura_Elipsoidal>${verticesCompletos[i].hReferencia != undefined ? verticesCompletos[i].hReferencia.toString().replace('.', ',') : verticesCompletos[i].hReferencia}</Altura_Elipsoidal>
               </Elipsoidal_rastreo>
               <Elipsoidal_referencia>
                   <Datum>MAGNA-SIRGAS</Datum>
@@ -371,7 +371,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
                   <Norte>${verticesCompletos[i].norte != undefined ? verticesCompletos[i].norte.toString().replace('.', ',') : verticesCompletos[i].norte}</Norte>
                   <Este>${verticesCompletos[i].este != undefined ? verticesCompletos[i].este.toString().replace('.', ',') : verticesCompletos[i].este}</Este>            
               </Origen>
-              <Otros>
+              <Informacion Vectores>
                 <Mascara>${verticesCompletos[i]?.mascara}</Mascara>
                 <Satelites>${verticesCompletos[i]?.satelites}</Satelites>
                 <LecturaAltura>${verticesCompletos[i]?.lecturaAltura}</LecturaAltura>
@@ -379,7 +379,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
                 <TipoSolucion>${verticesCompletos[i]?.tipoSolucion}</TipoSolucion>
                 <M0>${verticesCompletos[i]?.m0}</M0>
                 <Gdop>${verticesCompletos[i]?.gdop}</Gdop>
-                <NombreVector>${verticesCompletos[i]?.name}</NombreVector>
+    
                 <Frecuencia>${verticesCompletos[i]?.frecuencia}</Frecuencia>
                 <Efemerides>${verticesCompletos[i]?.efemerides}</Efemerides>
                 <InicioFin>${verticesCompletos[i]?.inicioFin}</InicioFin>
@@ -388,7 +388,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
                 <Cq2d>${verticesCompletos[i]?.cq2d}</Cq2d>
                 <Cq3d>${verticesCompletos[i]?.cq3d}</Cq3d>
                 <Saltos>${verticesCompletos[i]?.saltos}</Saltos>
-              </Otros>
+              </Informacion_Vectores>
             </Set_de_Coordenadas>
           </Punto>`;
   }
