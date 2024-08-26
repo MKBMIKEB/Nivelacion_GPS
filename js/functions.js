@@ -375,18 +375,27 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
 
   let sumatoria = 0;
   let DHG_ANTERIOR_prime = 0;
-
+  // Crear un conjunto para rastrear los identificadores de CA ya procesados
+  let nombresProcesados1 = new Set();  // Aquí está la corrección
+  
   // PROMEDIO DHO
   for (const vert of verticesCompletos) {
-
-
+    let nombreBase = vert.nombre.split('-').slice(1).join('-').trim();
+    
+    if (nombresProcesados1.has(nombreBase)) {
+      continue; // Saltar este v
+    }
+    nombresProcesados1.add(nombreBase);
+    // Realizar el cálculo para el vértice actual
     const DHI = parseFloat(vert.altelips) - parseFloat(baseVertAlt);
     const DNI = parseFloat(vert.ondula) - parseFloat(baseVertondula);
     const DHG = DHI - DNI;
     const DHO = DHG - DHG_ANTERIOR_prime;
 
     DHG_ANTERIOR_prime = DHG;
-    sumatoria += DHO
+    sumatoria += DHO;
+
+  
   }
 
   let diferencia = baseVertAltmsn2-baseVertAltmsn ;
@@ -417,13 +426,18 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
 
   let DHG_ANTERIOR = 0;
   let HGPSFINAL_ANTERIOR = baseVertAltmsn;
-
+  let nombresProcesados = new Set();  // Aquí está la corrección
   const HGPSFINALArray = [];
+
   // CALCULO ORTOMETRICA
   for (const vertice of verticesCompletos) {
-
+    let nombreBase = vertice.nombre.split('-').slice(1).join('-').trim();
+    
+    if (nombresProcesados.has(nombreBase)) {
+      continue; // Saltar este vértice si ya ha sido procesado
+    }
     // console.log(vertice.altelips, vertice.ondula, baseVertAlt, baseVertondula, baseVertAltmsn, correccion)
-
+    nombresProcesados.add(nombreBase);
     let DHI;
     if (vertice.hReferencia) {
     DHI = parseFloat(vertice.hReferencia) - parseFloat(baseVertAlt);
