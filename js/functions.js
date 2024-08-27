@@ -395,17 +395,18 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
     DHG_ANTERIOR_prime = DHG;
     sumatoria += DHO;
 
-  
+  console.log("DHG_ANTERIOR_prime",DHG_ANTERIOR_prime)
+  console.log("sumatoria",sumatoria)
   }
 
   let diferencia = baseVertAltmsn2-baseVertAltmsn ;
    console.log("sumatoria", sumatoria)
    console.log("diferencia", diferencia)
 
-  let correccion = (diferencia - sumatoria) / (verticesCompletos.length);
-  // console.log("correcion", correccion)
- 
-
+  let correccion = (diferencia - sumatoria) / ((verticesCompletos.length/2)+0.5);
+   console.log("correcion", correccion)
+   console.log("verticesCompletos", verticesCompletos.length)
+   
   // Inicializar tabla resultados
   let texto = `
    <tr>
@@ -436,7 +437,7 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
     if (nombresProcesados.has(nombreBase)) {
       continue; // Saltar este vértice si ya ha sido procesado
     }
-    // console.log(vertice.altelips, vertice.ondula, baseVertAlt, baseVertondula, baseVertAltmsn, correccion)
+    console.log(vertice.altelips, vertice.ondula, baseVertAlt, baseVertondula, baseVertAltmsn, correccion)
     nombresProcesados.add(nombreBase);
     let DHI;
     if (vertice.hReferencia) {
