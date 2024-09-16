@@ -54,8 +54,8 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   });
 
   // Validar si todos los tipos de punto han sido seleccionados
-  if (!validarSeleccionDePuntos()) {
-      alert('Debe seleccionar un tipo de punto para cada vértice antes de proceder.');
+  if (!validarSeleccionDePuntos()) {      
+      mostrarMensaje('Debe seleccionar un tipo de punto para cada vértice antes de proceder.', 'info');
       return;  // Detener el proceso si no se han seleccionado todos los tipos de punto
   }
 
@@ -295,29 +295,33 @@ document.querySelector('#calcular').addEventListener('click', async function () 
 
   // ============ Cálculos para tabular 1,2,3 =========
   verticesCompletos.push({ nombre: baseVertNomen, altelips: baseVertAlt, ondula: baseVertondula });
-  const HGPSFINALArray1 = calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVertondula, baseVertAltmsn, baseVertAltmsn, "calculos");
+  let HGPSFINALArray1 = calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVertondula, baseVertAltmsn, baseVertAltmsn, "calculos");
 
   verticesCompletos2.push({ nombre: baseVertNomen2, altelips: baseVertAlt2, ondula: baseVertondula2 });
-  const HGPSFINALArray2 = calculoPorTabular(verticesCompletos2, baseVertNomen2, baseVertAlt2, baseVertondula2, baseVertAltmsn2, baseVertAltmsn2, "calculos2");
+  let HGPSFINALArray2 = calculoPorTabular(verticesCompletos2, baseVertNomen2, baseVertAlt2, baseVertondula2, baseVertAltmsn2, baseVertAltmsn2, "calculos2");
 
   verticesCompletos3.push({ nombre: baseVertNomen2, altelips: baseVertAlt2, ondula: baseVertondula2 });
-  const HGPSFINALArray3 = calculoPorTabular(verticesCompletos3, baseVertNomen, baseVertAlt, baseVertondula, baseVertAltmsn, baseVertAltmsn2, "calculos3");
+  let HGPSFINALArray3 = calculoPorTabular(verticesCompletos3, baseVertNomen, baseVertAlt, baseVertondula, baseVertAltmsn, baseVertAltmsn2, "calculos3");
 
   // ============ Fin cálculos para tabular 2,3 =========
 
   // ============ Tabular diferencias =========
   tabularDiferencias();
   // ============ Fin tabular diferencias =========
+ 
 
+  HGPSFINALArray1 = validarOrden(HGPSFINALArray1);
+  HGPSFINALArray2 = validarOrden(HGPSFINALArray2);
+  HGPSFINALArray3 = validarOrden(HGPSFINALArray3);
+  
   // CUERPO DEL DOCUMENTO
-  datosXml += "<Puntos_Calculados>";
-
-  for (let i = 0; i < verticesCompletos.length - 1; i++) {
+  datosXml += "<Puntos_Calculados>";  
+  for (let i = 0; i < verticesCompletos.length - 1; i++) {          
       datosXml += `
       <Punto Nombre="${verticesCompletos[i].nombre}">
       <Tipo_Punto>${tipoPunto(verticesCompletos[i].duracion)}</Tipo_Punto>      
         <Epoca_Punto>Época 2018</Epoca_Punto>
-        <Altura_Ortométrica>
+        <Altura_Ortométrica>            
             <Valor1>${HGPSFINALArray1[i]}</Valor1>          
             <Valor2>${HGPSFINALArray2[i]}</Valor2>
             <Valor3>${HGPSFINALArray3[i]}</Valor3>
@@ -858,8 +862,8 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
                 obj.mascara = elemento.substring(98, 106).split('&#176;')[0] + '°';
               }
 
-              if (elemento.indexOf("Sistema de Sat&#233;lites:") !== -1) {
-                obj.satelites = elemento.split('<td>')[2].split('</td>')[0];
+              if (elemento.indexOf("Sistema de Sat&#233;lites:") !== -1) {                
+                obj.satelites = elemento.split('<td>')[3].split('</td>')[0];
               }
               
               if (elemento.indexOf("Lectura de la Altura:") !== -1) {                         
@@ -894,7 +898,8 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
                   obj.efemerides = elemento.split('<td>')[3].split('</td>')[0];
                 }
               } 
-              if (elemento.indexOf("Frecuencia:") !== -1) {                                            
+              if (elemento.indexOf("Frecuencia:") !== -1) {    
+                console.log(elemento)                                        
                 if(elemento.split('<td>').length == 4){                  
                   obj.frecuencia = elemento.split('<td>')[3].split('</td>')[0];
                 }else{                  
@@ -902,9 +907,9 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
                 }
               }           
               if (elemento.indexOf("Frecuencias:") !== -1) {                
-                if(elemento.split('<td>').length == 4){                  
+                if(elemento.split('<td>').length == 4){                                    
                   obj.frecuencia = elemento.split('<td>')[3].split('</td>')[0];
-                }else{                  
+                }else{                                     
                   obj.frecuencia = elemento.split('<td>')[2].split('</td>')[0];
                 }                        
               }                            

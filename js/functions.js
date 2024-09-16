@@ -1204,3 +1204,18 @@ function ajustarDecimales(vertice){
   return vertice;
 }
  
+
+const validarOrden = (arreglo) => {
+  let newArreglo = [];
+  let contador = 0;
+  const longitud = (arreglo.length - 1) * 2 ;
+  for( let i = 0; i < longitud; i++){
+    if(i % 2 === 0 ){
+      newArreglo.push(arreglo[contador]);
+      contador++;
+    }else{
+      newArreglo.push('');
+    }      
+  }
+  return newArreglo;
+}
