@@ -76,6 +76,8 @@ document.querySelectorAll('select[data-vertice]');
 
 
 function tabular(vertice, verticePunto, tabla) {
+  // console.log(vertice)
+  // console.log(verticePunto.hReferencia !== undefined && !isNaN(parseFloat(verticePunto.hReferencia)) ? verticePunto.hReferencia : verticePunto.altelips)
  
   let texto = `
         <tr>    

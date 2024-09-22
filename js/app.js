@@ -54,10 +54,10 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   });
 
   // Validar si todos los tipos de punto han sido seleccionados
-  if (!validarSeleccionDePuntos()) {      
-      mostrarMensaje('Debe seleccionar un tipo de punto para cada vértice antes de proceder.', 'info');
-      return;  // Detener el proceso si no se han seleccionado todos los tipos de punto
-  }
+  // if (!validarSeleccionDePuntos()) {      
+  //     mostrarMensaje('Debe seleccionar un tipo de punto para cada vértice antes de proceder.', 'info');
+  //     return;  // Detener el proceso si no se han seleccionado todos los tipos de punto
+  // }
 
   // Validaciones iniciales
   if (!document.querySelector("#verticeFuente")) {
@@ -144,14 +144,22 @@ document.querySelector('#calcular').addEventListener('click', async function () 
                           // Incrementar el contador
                           contadorVertices.set(nombreVertice, count + 1);
                           const tipoPuntoSeleccionado = document.querySelector(`select[data-vertice="${coordenadas.nombre}"]`).value;
-
+                          
                           // Realizar el procesamiento
                           let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
+                          
+                          coordenadas.velx  =  typeof coordenadas.velx == "string" ? parseFloat(coordenadas.velx.replace(',', '.')) : coordenadas.velx;
+                          coordenadas.vely  =  typeof coordenadas.vely == "string" ? parseFloat(coordenadas.vely.replace(',', '.')) : coordenadas.vely;
+                          coordenadas.velz  =  typeof coordenadas.velz == "string" ? parseFloat(coordenadas.velz.replace(',', '.')) : coordenadas.velz;
                           let xreferencia = (coordenadaAjustada[0] + (coordenadas.velx * deltaDeTiempo)).toFixed(5);
                           let yreferencia = (coordenadaAjustada[1] + (coordenadas.vely * deltaDeTiempo)).toFixed(5);
                           let zreferencia = (coordenadaAjustada[2] + (coordenadas.velz * deltaDeTiempo)).toFixed(5);
-
+                          
                           let latlonreferencia = geocentricas_elipsoidales(xreferencia, yreferencia, zreferencia);
+                          
+                          //==== Modificar altura elipsoidal a la ya obtenida ==
+                          latlonreferencia.hReferencia = parseFloat( coordenada.altelips.replace(",", ".") );
+                          
                           let origenNac = transformarAOrigenNac(latlonreferencia.latDec, latlonreferencia.lonDec);
                           let gauss = gaussKrugger(latlonreferencia.latDec, latlonreferencia.lonDec);
 
@@ -291,7 +299,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   let verticesCompletos2 = [...verticesCompletos];
   let verticesCompletos3 = [...verticesCompletos];
 
-  console.log(verticesCompletos);
+  
 
   // ============ Cálculos para tabular 1,2,3 =========
   verticesCompletos.push({ nombre: baseVertNomen, altelips: baseVertAlt, ondula: baseVertondula });
@@ -309,14 +317,14 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   tabularDiferencias();
   // ============ Fin tabular diferencias =========
  
-
+  
   HGPSFINALArray1 = validarOrden(HGPSFINALArray1);
   HGPSFINALArray2 = validarOrden(HGPSFINALArray2);
   HGPSFINALArray3 = validarOrden(HGPSFINALArray3);
   
   // CUERPO DEL DOCUMENTO
   datosXml += "<Puntos_Calculados>";  
-  for (let i = 0; i < verticesCompletos.length - 1; i++) {          
+  for (let i = 0; i < verticesCompletos.length - 1; i++) {       
       datosXml += `
       <Punto Nombre="${verticesCompletos[i].nombre}">
       <Tipo_Punto>${tipoPunto(verticesCompletos[i].duracion)}</Tipo_Punto>      
@@ -458,7 +466,7 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
   let reader = new FileReader();
   reader.onload = async (e) => {
 
-    // console.log(e.target.result[0])
+    
 
     // valido si el primer caracter es @ o no, para saber
     // que version de archivo es y que función aplicarle
@@ -573,18 +581,18 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
 
     // ====== BUSCAR Y AGREGAR LA ONDULACIÓN =========
     async function fetchGeocol2004() {
-      console.log("fetchGeocol2004 disparado.");
+      
       const response = await fetch('../json/Geocol2004.txt');
       if (!response.ok) {
         throw new Error('No se pudo cargar el archivo Geocol2004.txt');
       }
       const text = await response.text();
-      console.log("Contenido de Geocol2004.txt obtenido.");
+      
       return text;
     }
     
     async function cabecero() {
-      console.log("cabecero disparado.");
+      
       const data = await fetchGeocol2004();
       const lines = data.split("\n");
       if (lines.length < 1) throw new Error("El archivo Geocol2004.txt está vacío o tiene un formato incorrecto.");
@@ -607,7 +615,7 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
     }
     
     async function ondulacion_geoidal(latitud, longitud) {
-      console.log("ondulacion_geoidal disparado para latitud:", latitud, "y longitud:", longitud);
+      
       const datos = await cabecero();
     
       if (latitud < (datos.minLatitud + datos.incrementoLat) || latitud > (datos.maxLatitud - datos.incrementoLat)) {
@@ -641,7 +649,7 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
       datos.surEste = parseFloat(segunda_linea[j + 1]);
     
       const ondulacion = interpolacion_bilineal(datos, lat, lon, latitud, longitud);
-      console.log("Ondulación geoidal calculada:", ondulacion);
+      
       return ondulacion.toFixed(2);
     }
     
@@ -649,8 +657,7 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
       const v = parseFloat((maxLatitud - latitud) / datos.incrementoLat);
       const u = parseFloat((longitud - minLongitud) / datos.incrementoLon);
       const q = ((1 - u) * (1 - v) * datos.norteOeste) + (v * (1 - u) * datos.surOeste) + (u * v * datos.surEste) + ((1 - v) * u * datos.norteEste);
-      console.log('El valor de la ondulacion es: ', q);
-      console.log('El valor de la ondulacion es: ', q.toFixed(2));
+      
       
       return q;
     }
@@ -778,8 +785,7 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
 
             for (let elemento of e.target.result.split("</tr>")) {
 
-              if (elemento.indexOf("Alt Elip.:") !== -1) {
-                console.log(elemento.split("</td>")[3].substring(4, 13))
+              if (elemento.indexOf("Alt Elip.:") !== -1) {                
                 obj.altelips = elemento.split("</td>")[3].substring(4, 13);
               }
 
@@ -789,7 +795,7 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
               }
 
               if (elemento.indexOf("Tipo de solución:") !== -1) {
-                console.log(elemento.split("</td>"));
+                
               }
 
               if (elemento.indexOf("Intervalo de observación:") !== -1) {
@@ -852,9 +858,7 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
               }
 
 
-              if (elemento.indexOf("Altura Elip WGS84:") !== -1) {
-                // obj.altelips = elemento.substring(77, 85).replace('.', '');
-                // console.log(elemento.split('<td>')[3].split('</td>')[0].split(' ')[0].replace('.', ''))
+              if (elemento.indexOf("Altura Elip WGS84:") !== -1) {                
                 obj.altelips = elemento.split('<td>')[3].split('</td>')[0].split(' ')[0].replace('.', '');
               }
 
@@ -898,8 +902,7 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
                   obj.efemerides = elemento.split('<td>')[3].split('</td>')[0];
                 }
               } 
-              if (elemento.indexOf("Frecuencia:") !== -1) {    
-                console.log(elemento)                                        
+              if (elemento.indexOf("Frecuencia:") !== -1) {                                                      
                 if(elemento.split('<td>').length == 4){                  
                   obj.frecuencia = elemento.split('<td>')[3].split('</td>')[0];
                 }else{                  
@@ -1091,7 +1094,7 @@ document.querySelector('#viewDiv').addEventListener('click', async function (e) 
 
       const tablaVertices = document.getElementById('tablaEntrada');
 
-      // console.log(tablaVertices?.childNodes.length);
+      
       if (tablaVertices?.childNodes.length > 3) {
         return mostrarMensaje('Ya se eligieron los vertices', 'warning');
       }

@@ -22,9 +22,9 @@ function convertirCoordenadasITRF2020aITRF2014(x, y, z) {
 
   // Matriz de rotación y escala
   const C = [
-      [D, -R3, R2],
-      [R3, D, -R1],
-      [-R2, R1, D]
+    [D, -R3, R2],
+    [R3, D, -R1],
+    [-R2, R1, D]
   ];
 
   // Vector original
@@ -32,9 +32,9 @@ function convertirCoordenadasITRF2020aITRF2014(x, y, z) {
 
   // Producto de la matriz C y el vector d
   const Cd = [
-      C[0][0] * d[0] + C[0][1] * d[1] + C[0][2] * d[2],
-      C[1][0] * d[0] + C[1][1] * d[1] + C[1][2] * d[2],
-      C[2][0] * d[0] + C[2][1] * d[1] + C[2][2] * d[2]
+    C[0][0] * d[0] + C[0][1] * d[1] + C[0][2] * d[2],
+    C[1][0] * d[0] + C[1][1] * d[1] + C[1][2] * d[2],
+    C[2][0] * d[0] + C[2][1] * d[1] + C[2][2] * d[2]
   ];
 
   // Vector de traslación
@@ -66,7 +66,7 @@ function eliminarEspacios(linea) {
   }
 
 
-
+  // console.log(arreglo[1], arreglo[2], arreglo[3])
   let objeto = {
     nombre: arreglo[0].substring(2, arreglo[0].length),
     x: arreglo[1],
@@ -90,10 +90,11 @@ function eliminarEspacios2(linea) {
   for (let i of o) {
     arreglo3 = arreglo3.concat(i.split('\t'));
   }
-
+  
 
   let latDd = dmsToDd(arreglo3[2], arreglo3[3], arreglo3[4], arreglo3[5]);
   let lonDd = dmsToDd(arreglo3[6], arreglo3[7], arreglo3[8], arreglo3[9]);
+
 
   // Radio de la Tierra en metros
   let R = 6371000;
@@ -116,6 +117,7 @@ function eliminarEspacios2(linea) {
     tipo = 'MEAN';
   }
 
+  // console.log(x, y ,z)
   let objeto = {
     nombre: arreglo3[0],
     x: x,
@@ -153,7 +155,7 @@ function eliminarEspacios3(linea) {
 function eliminarEspacios4(linea) {
 
   let arreglo = linea.split('\t');
-  // console.log(arreglo);
+
 
   let tipo = '';
   if (arreglo[1] === 'Control') {
@@ -203,9 +205,9 @@ function buscarAnoDeCoordenada(coordenadas, logsArray) {
       coincidencias.push(logsArray[i].anoEpoca);  // Agregar cada anoEpoca al arreglo de coincidencias
     }
   }
-  console.log("coincidencias:", coincidencias)
-  return coincidencias; 
-   // Devolver todos los anosEpoca encontrados
+
+  return coincidencias;
+  // Devolver todos los anosEpoca encontrados
 }
 function espacioEstasdar(cadena) {
 
@@ -226,7 +228,7 @@ const descargarItrf2014 = async () => {
   if (!archivoPlano) {
     return mostrarMensaje('Cargue archivo de texto', 'warning');
   }
-  
+
 
 
   let reader = new FileReader();
@@ -323,7 +325,7 @@ const descargarItrf2014 = async () => {
 
       } else {
         let nombreAjustado = espacioEstasdar(coordenadas.nombre);
-        datosTabla += `@#${nombreAjustado} \t  ${parseFloat( coordenadas.x ).toFixed(5)} ${parseFloat( coordenadas.y).toFixed(5)} \t  ${parseFloat( coordenadas.z ).toFixed(5)} \t ${coordenadas.tipo} \n`;
+        datosTabla += `@#${nombreAjustado} \t  ${parseFloat(coordenadas.x).toFixed(5)} ${parseFloat(coordenadas.y).toFixed(5)} \t  ${parseFloat(coordenadas.z).toFixed(5)} \t ${coordenadas.tipo} \n`;
       }
     }
 
@@ -371,22 +373,23 @@ const mostrarMensaje = (mensaje, tipo) => {
 
 
 function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVertondula, baseVertAltmsn, baseVertAltmsn2, tabla) {
-  // console.log(verticesCompletos, tabla)
 
+  // console.log(verticesCompletos, baseVertAlt, baseVertAltmsn, baseVertAltmsn2);
   let sumatoria = 0;
   let DHG_ANTERIOR_prime = 0;
   // Crear un conjunto para rastrear los identificadores de CA ya procesados
   let nombresProcesados1 = new Set();  // Aquí está la corrección
-  
+
   // PROMEDIO DHO
   for (const vert of verticesCompletos) {
     let nombreBase = vert.nombre.split('-').slice(1).join('-').trim();
-    
+
     if (nombresProcesados1.has(nombreBase)) {
       continue; // Saltar este v
     }
     nombresProcesados1.add(nombreBase);
     // Realizar el cálculo para el vértice actual
+
     const DHI = parseFloat(vert.altelips) - parseFloat(baseVertAlt);
     const DNI = parseFloat(vert.ondula) - parseFloat(baseVertondula);
     const DHG = DHI - DNI;
@@ -395,18 +398,15 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
     DHG_ANTERIOR_prime = DHG;
     sumatoria += DHO;
 
-  console.log("DHG_ANTERIOR_prime",DHG_ANTERIOR_prime)
-  console.log("sumatoria",sumatoria)
+
   }
 
-  let diferencia = baseVertAltmsn2-baseVertAltmsn ;
-   console.log("sumatoria", sumatoria)
-   console.log("diferencia", diferencia)
+  let diferencia = baseVertAltmsn2 - baseVertAltmsn;
 
-  let correccion = (diferencia - sumatoria) / ((verticesCompletos.length/2)+0.5);
-   console.log("correcion", correccion)
-   console.log("verticesCompletos", verticesCompletos.length)
-   
+
+  let correccion = (diferencia - sumatoria) / ((verticesCompletos.length / 2) + 0.5);
+
+
   // Inicializar tabla resultados
   let texto = `
    <tr>
@@ -432,18 +432,21 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
 
   // CALCULO ORTOMETRICA
   for (const vertice of verticesCompletos) {
+    // console.log(vertice)
     let nombreBase = vertice.nombre.split('-').slice(1).join('-').trim();
-    
+
     if (nombresProcesados.has(nombreBase)) {
       continue; // Saltar este vértice si ya ha sido procesado
     }
-    console.log(vertice.altelips, vertice.ondula, baseVertAlt, baseVertondula, baseVertAltmsn, correccion)
+
     nombresProcesados.add(nombreBase);
     let DHI;
     if (vertice.hReferencia) {
-    DHI = parseFloat(vertice.hReferencia) - parseFloat(baseVertAlt);
-      } else {
-    DHI = parseFloat(vertice.altelips) - parseFloat(baseVertAlt);
+      console.log(vertice.hReferencia, "hreferencia");
+      DHI = parseFloat(vertice.hReferencia) - parseFloat(baseVertAlt);
+    } else {
+      // console.log(vertice.hReferencia, "hreferencia else");
+      DHI = parseFloat(vertice.altelips) - parseFloat(baseVertAlt);
     }
     const DNI = parseFloat(vertice.ondula) - parseFloat(baseVertondula);
     const DHG = DHI - DNI;
@@ -457,7 +460,7 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
     DHG_ANTERIOR = DHG;
     HGPSFINAL_ANTERIOR = HGPSFINAL;
 
-    // console.log(DHI, DNI, DHG, HGP, DHO, DHGC, HGPSFINAL)   
+
 
     tabular({ DHI, DNI, DHG, HGP, DHO, DHGC, HGPSFINAL }, vertice, tabla)
   }
@@ -511,7 +514,7 @@ function tabularDiferencias() {
 
   }
   listaVertices = listaVertices.slice(1, listaVertices.length - 1);
-  // console.log(listaVertices)
+
 
   let texto = '';
   for (let ver of listaVertices) {
@@ -536,7 +539,7 @@ function tabularDiferencias() {
 
 // ====== CONVERTIR CORDENADAS GEOCENTRICAS A LAT Y LONG =========
 function geocentricas_elipsoidales(xreferencia, yreferencia, zreferencia) {
-console.log(xreferencia, yreferencia, zreferencia);
+
   let x = parseFloat(xreferencia);
   let y = parseFloat(yreferencia);
   let z = parseFloat(zreferencia);
@@ -549,18 +552,24 @@ console.log(xreferencia, yreferencia, zreferencia);
   var iterations = 0;
   var tolerance = 1e-12;
   var p = Math.sqrt(x * x + y * y);
+  console.log("p", p)
   var lat = Math.atan2(z, p * (1 - e2));
   
 
-    // Iterar hasta que la diferencia entre latitudes sucesivas sea menor que la tolerancia
-    while (Math.abs(lat - latPrev) > tolerance && iterations < 1000) {
-      latPrev = lat;
-      var N = a / Math.sqrt(1 - e2 * Math.sin(lat) * Math.sin(lat));
-      lat = Math.atan2(z + e2 * N * Math.sin(lat), p);
-      iterations++;
+
+  // Iterar hasta que la diferencia entre latitudes sucesivas sea menor que la tolerancia
+  while (Math.abs(lat - latPrev) > tolerance && iterations < 1000) {
+    latPrev = lat;
+    var N = a / Math.sqrt(1 - e2 * Math.sin(lat) * Math.sin(lat));    
+    lat = Math.atan2(z + e2 * N * Math.sin(lat), p);
+    iterations++;
   }
+  console.log("N", N)
+  console.log("lat", lat)
   var N = a / Math.sqrt(1 - e2 * Math.sin(lat) * Math.sin(lat));
+  console.log("p / Math.cos(lat) - N", p, lat, N)
   var HDEC = p / Math.cos(lat) - N;
+  console.log("HDEC", HDEC)  
   var latDec = lat * 180 / Math.PI;
   var lonDec = lon * 180 / Math.PI;
   const formattedlatDec = parseFloat(latDec.toFixed(9));
@@ -568,11 +577,8 @@ console.log(xreferencia, yreferencia, zreferencia);
   const formattedHDEC = parseFloat(HDEC.toFixed(5));
   const n = N;
   const u = p;
-  console.log("n:", n)
-  console.log("p:", u)
-    
-  console.log(`COORDENADAS ELIPSOIDALES REFERENCIA: LAT=${formattedlatDec}, LON=${formattedlonDec}, ALTURA=${formattedHDEC}`);
-  return { latDec: formattedlatDec, lonDec: formattedlonDec, hReferencia: formattedHDEC}
+  
+  return { latDec: formattedlatDec, lonDec: formattedlonDec, hReferencia: formattedHDEC }
 }
 // ====== FIN =========
 
@@ -599,7 +605,7 @@ function meridianDistance(latDec) {
 
 // Función para transformar coordenadas
 function transformarAOrigenNac(latDec, lonDec) {
-  console.log(latDec, lonDec)
+
   // Definir constantes de la proyección
   const lat_0 = 4.0 * (Math.PI / 180);  // Convertir grados a radianes
   const lon_0 = -73.0 * (Math.PI / 180); // Convertir grados a radianes
@@ -627,8 +633,8 @@ function transformarAOrigenNac(latDec, lonDec) {
   const formattedX = parseFloat(x.toFixed(3));
   const formattedY = parseFloat(y.toFixed(3));
 
-  console.log(formattedX, formattedY);
-  
+
+
   // Devolver el objeto con x y y formateados
   return { x: formattedX, y: formattedY }
 }
@@ -638,7 +644,7 @@ function transformarAOrigenNac(latDec, lonDec) {
 
 // Función para transformar coordenadas
 function gaussKrugger(latDec, lonDec) {
-
+  // console.log(latDec, lonDec);
   // Constantes WGS84
   const a = 6378137.0;  // Radio ecuatorial
   const f = 1 / 298.257223563;  // Aplanamiento
@@ -658,7 +664,7 @@ function gaussKrugger(latDec, lonDec) {
   const M0 = meridianDistance(origin.lat_0);  // Distancia meridiana del origen
   const x = origin.false_easting + origin.k0 * N * (A + (1 - T + C) * Math.pow(A, 3) / 6 + (5 - 18 * T + T * T + 72 * C - 58 * e2) * Math.pow(A, 5) / 120);
   const y = origin.false_northing + origin.k0 * (M - M0 + N * Math.tan(latDec) * (A * A / 2 + (5 - T + 9 * C + 4 * C * C) * Math.pow(A, 4) / 24 + (61 - 58 * T + T * T + 600 * C - 330 * e2) * Math.pow(A, 6) / 720));
-  // console.log('Origen identificado: ' + origin.name);
+
   const originName = origin.name;
   return { x, y, originName };
 }
@@ -710,39 +716,35 @@ const origins = [
 // Función para identificar el origen adecuado basado en la longitud
 
 function identifyOrigin(lonDec) {
-  console.log("Valor de longitud recibido:", lonDec);
-  
+  // console.log("Valor de longitud recibido:", lonDec);
+
   // Convertir la longitud de grados a radianes
-  const lonRad = lonDec ;
-  console.log("Longitud en radianes:", lonRad);
-  
+  const lonRad = lonDec;
+  // console.log("Longitud en radianes:", lonRad);
+
   // Mostrar el resultado de la conversión de todos los límites de los rangos a radianes
   const radOesteOeste = -81.575283333 * (Math.PI / 180);
   const radOeste = -78.575283333 * (Math.PI / 180);
   const radCentral = -75.575283333 * (Math.PI / 180);
   const radEste = -72.575283333 * (Math.PI / 180);
   const radEsteEste = -69.575283333 * (Math.PI / 180);
-  
-  console.log("Resultado de -81.575283333 * (Math.PI / 180):", radOesteOeste);
-  console.log("Resultado de -78.575283333 * (Math.PI / 180):", radOeste);
-  console.log("Resultado de -75.575283333 * (Math.PI / 180):", radCentral);
-  console.log("Resultado de -72.575283333 * (Math.PI / 180):", radEste);
-  console.log("Resultado de -69.575283333 * (Math.PI / 180):", radEsteEste);
+
+
 
   if (lonRad > radOesteOeste && lonRad <= radOeste) {
-    console.log("Condición cumplida: Oeste-Oeste MAGNA");
+
     return origins[4]; // Oeste-Oeste MAGNA
   } else if (lonRad > radOeste && lonRad <= radCentral) {
-    console.log("Condición cumplida: Oeste MAGNA");
+
     return origins[3]; // Oeste MAGNA
   } else if (lonRad > radCentral && lonRad <= radEste) {
-    console.log("Condición cumplida: Central MAGNA");
+
     return origins[0]; // Central MAGNA
   } else if (lonRad > radEste && lonRad <= radEsteEste) {
-    console.log("Condición cumplida: Este MAGNA");
+
     return origins[1]; // Este MAGNA
   } else if (lonRad > radEsteEste && lonRad <= (-66.575283333 * (Math.PI / 180))) {
-    console.log("Condición cumplida: Este-Este MAGNA");
+
     return origins[2]; // Este-Este MAGNA
   } else {
     console.error("Error: Longitud fuera del rango de los orígenes definidos.");
@@ -794,102 +796,102 @@ function tipoPunto(duracion) {
 // Clase para coordenadas 3D cartesiana
 class Cartesian3DCoordinate {
   constructor(x, y, z) {
-      this.X = x;
-      this.Y = y;
-      this.Z = z;
+    this.X = x;
+    this.Y = y;
+    this.Z = z;
   }
 
   toString() {
-      return `{X=${this.X} Y=${this.Y} Z=${this.Z}}`;
+    return `{X=${this.X} Y=${this.Y} Z=${this.Z}}`;
   }
 }
 
 // Clase para coordenadas elipsoidales
 class EllipsoidalCoordinate {
   constructor(latitude, longitude, ellipsoidalHeight) {
-      this.latitude = latitude;
-      this.longitude = longitude;
-      this.ellipsoidalHeight = ellipsoidalHeight;
+    this.latitude = latitude;
+    this.longitude = longitude;
+    this.ellipsoidalHeight = ellipsoidalHeight;
   }
 }
 
 // Clase para velocidades
 class Velocities {
   constructor() {
-      this.velocitySN = 0;
-      this.velocityWE = 0;
-      this.velocityX = 0;
-      this.velocityY = 0;
-      this.velocityZ = 0;
+    this.velocitySN = 0;
+    this.velocityWE = 0;
+    this.velocityX = 0;
+    this.velocityY = 0;
+    this.velocityZ = 0;
   }
 
   setVelocitySN(velocity) {
-      this.velocitySN = velocity;
+    this.velocitySN = velocity;
   }
 
   setVelocityWE(velocity) {
-      this.velocityWE = velocity;
+    this.velocityWE = velocity;
   }
 
   setVelocityX(velocity) {
-      this.velocityX = velocity;
+    this.velocityX = velocity;
   }
 
   setVelocityY(velocity) {
-      this.velocityY = velocity;
+    this.velocityY = velocity;
   }
 
   setVelocityZ(velocity) {
-      this.velocityZ = velocity;
+    this.velocityZ = velocity;
   }
 
   getVelocitySN() {
-      return this.velocitySN;
+    return this.velocitySN;
   }
 
   getVelocityWE() {
-      return this.velocityWE;
+    return this.velocityWE;
   }
 
   getVelocityX() {
-      return this.velocityX;
+    return this.velocityX;
   }
 
   getVelocityY() {
-      return this.velocityY;
+    return this.velocityY;
   }
 
   getVelocityZ() {
-      return this.velocityZ;
+    return this.velocityZ;
   }
 }
 
 // Clase para leer y procesar el archivo de texto Velogrid2017.txt
 // Clase para leer y procesar el archivo de texto Velogrid2017.txt
 class VelocitiesReader {
-constructor(lines) {
+  constructor(lines) {
     this.lines = lines;
-}
+  }
 
-getMatrix(latitude, longitude) {
+  getMatrix(latitude, longitude) {
     const matrix = [];
 
     this.lines.forEach(line => {
-        const parts = line.split(';');
-        const lat = parseFloat(parts[0]);
-        const lon = parseFloat(parts[1]);
-        if (lat < latitude + 1.0 && lat > latitude - 1.0 &&
-            lon < longitude + 1.0 && lon > longitude - 1.0) {
-            const coordinate2 = new EllipsoidalCoordinate(lat, lon, null);
-            const x = parseFloat(parts[2]);
-            const y = parseFloat(parts[3]);
-            const dist = calculateInverse(new EllipsoidalCoordinate(latitude, longitude, null), coordinate2)[0];
-            matrix.push([x, y, dist]);
-        }
+      const parts = line.split(';');
+      const lat = parseFloat(parts[0]);
+      const lon = parseFloat(parts[1]);
+      if (lat < latitude + 1.0 && lat > latitude - 1.0 &&
+        lon < longitude + 1.0 && lon > longitude - 1.0) {
+        const coordinate2 = new EllipsoidalCoordinate(lat, lon, null);
+        const x = parseFloat(parts[2]);
+        const y = parseFloat(parts[3]);
+        const dist = calculateInverse(new EllipsoidalCoordinate(latitude, longitude, null), coordinate2)[0];
+        matrix.push([x, y, dist]);
+      }
     });
 
     return matrix;
-}
+  }
 }
 
 
@@ -897,16 +899,16 @@ getMatrix(latitude, longitude) {
 function idwCalculate(matrix, posData) {
   let r = 0.0;
   if (matrix[0][2] === 0.0) {
-      r = matrix[0][posData];
-      return r;
+    r = matrix[0][posData];
+    return r;
   }
   let one = 0.0;
   let two = 0.0;
   for (let i = 0; i < matrix.length; i++) {
-      let value = matrix[i][posData] / matrix[i][2];
-      one += value;
-      value = 1.0 / matrix[i][2];
-      two += value;
+    let value = matrix[i][posData] / matrix[i][2];
+    one += value;
+    value = 1.0 / matrix[i][2];
+    two += value;
   }
   r = one / two;
   return r;
@@ -915,62 +917,62 @@ function idwCalculate(matrix, posData) {
 // Clase para manejar matrices y sus operaciones
 class Matrix {
   constructor(data) {
-      this.data = data;
+    this.data = data;
   }
 
   getElementAt(row, col) {
-      return this.data[row][col];
+    return this.data[row][col];
   }
 
   getRows() {
-      return this.data.length;
+    return this.data.length;
   }
 
   multiplication(matrix) {
-      const result = new Array(this.data.length).fill(0).map(() => new Array(matrix.data[0].length).fill(0));
-      for (let i = 0; i < this.data.length; i++) {
-          for (let j = 0; j < matrix.data[0].length; j++) {
-              for (let k = 0; k < this.data[0].length; k++) {
-                  result[i][j] += this.data[i][k] * matrix.data[k][j];
-              }
-          }
+    const result = new Array(this.data.length).fill(0).map(() => new Array(matrix.data[0].length).fill(0));
+    for (let i = 0; i < this.data.length; i++) {
+      for (let j = 0; j < matrix.data[0].length; j++) {
+        for (let k = 0; k < this.data[0].length; k++) {
+          result[i][j] += this.data[i][k] * matrix.data[k][j];
+        }
       }
-      return new Matrix(result);
+    }
+    return new Matrix(result);
   }
 
   subtraction(matrix) {
-      const result = new Array(this.data.length).fill(0).map(() => new Array(this.data[0].length).fill(0));
-      for (let i = 0; i < this.data.length; i++) {
-          for (let j = 0; j < this.data[0].length; j++) {
-              result[i][j] = this.data[i][j] - matrix.data[i][j];
-          }
+    const result = new Array(this.data.length).fill(0).map(() => new Array(this.data[0].length).fill(0));
+    for (let i = 0; i < this.data.length; i++) {
+      for (let j = 0; j < this.data[0].length; j++) {
+        result[i][j] = this.data[i][j] - matrix.data[i][j];
       }
-      return new Matrix(result);
+    }
+    return new Matrix(result);
   }
 
   transpose() {
-      const result = new Array(this.data[0].length).fill(0).map(() => new Array(this.data.length).fill(0));
-      for (let i = 0; i < this.data.length; i++) {
-          for (let j = 0; j < this.data[0].length; j++) {
-              result[j][i] = this.data[i][j];
-          }
+    const result = new Array(this.data[0].length).fill(0).map(() => new Array(this.data.length).fill(0));
+    for (let i = 0; i < this.data.length; i++) {
+      for (let j = 0; j < this.data[0].length; j++) {
+        result[j][i] = this.data[i][j];
       }
-      return new Matrix(result);
+    }
+    return new Matrix(result);
   }
 
   getInverse() {
-      const inverse = math.inv(this.data);  // Usando math.js
-      return new Matrix(inverse);
+    const inverse = math.inv(this.data);  // Usando math.js
+    return new Matrix(inverse);
   }
 
   addition(matrix) {
-      const result = new Array(this.data.length).fill(0).map(() => new Array(this.data[0].length).fill(0));
-      for (let i = 0; i < this.data.length; i++) {
-          for (let j = 0; j < this.data[0].length; j++) {
-              result[i][j] = this.data[i][j] + matrix.data[i][j];
-          }
+    const result = new Array(this.data.length).fill(0).map(() => new Array(this.data[0].length).fill(0));
+    for (let i = 0; i < this.data.length; i++) {
+      for (let j = 0; j < this.data[0].length; j++) {
+        result[i][j] = this.data[i][j] + matrix.data[i][j];
       }
-      return new Matrix(result);
+    }
+    return new Matrix(result);
   }
 }
 
@@ -996,7 +998,7 @@ function cartesian3DConversion(coordinate) {
   const Y = (N + h) * cosPhi * sinLambda;
   const Z = ((1 - e2) * N + h) * sinPhi;
 
-  console.log(`Cartesian Coordinates: X=${X.toFixed(4)}, Y=${Y.toFixed(4)}, Z=${Z.toFixed(4)}`);
+
   return new Cartesian3DCoordinate(X, Y, Z);
 }
 
@@ -1024,24 +1026,24 @@ function calculateInverse(coordinate1, coordinate2) {
   let i = 0;
 
   do {
-      sinLambda = Math.sin(lambda);
-      cosLambda = Math.cos(lambda);
-      sinSigma = Math.sqrt(
-          (Math.cos(U2) * sinLambda) * (Math.cos(U2) * sinLambda) +
-          (Math.cos(U1) * Math.sin(U2) - Math.sin(U1) * Math.cos(U2) * cosLambda) *
-          (Math.cos(U1) * Math.sin(U2) - Math.sin(U1) * Math.cos(U2) * cosLambda)
-      );
-      if (sinSigma === 0) return result; // coincident points
-      cosSigma = Math.sin(U1) * Math.sin(U2) + Math.cos(U1) * Math.cos(U2) * cosLambda;
-      sigma = Math.atan2(sinSigma, cosSigma);
-      sinAlpha = Math.cos(U1) * Math.cos(U2) * sinLambda / sinSigma;
-      cosSqAlpha = 1 - sinAlpha * sinAlpha;
-      cos2SigmaM = cosSigma - 2 * Math.sin(U1) * Math.sin(U2) / cosSqAlpha;
-      if (isNaN(cos2SigmaM)) cos2SigmaM = 0; // equatorial line: cosSqAlpha=0 (§6)
-      const C = f / 16 * cosSqAlpha * (4 + f * (4 - 3 * cosSqAlpha));
-      lambdaP = lambda;
-      lambda = L + (1 - C) * f * sinAlpha * (sigma + C * sinSigma * (cos2SigmaM + C * cosSigma * (-1 + 2 * cos2SigmaM * cos2SigmaM)));
-      i++;
+    sinLambda = Math.sin(lambda);
+    cosLambda = Math.cos(lambda);
+    sinSigma = Math.sqrt(
+      (Math.cos(U2) * sinLambda) * (Math.cos(U2) * sinLambda) +
+      (Math.cos(U1) * Math.sin(U2) - Math.sin(U1) * Math.cos(U2) * cosLambda) *
+      (Math.cos(U1) * Math.sin(U2) - Math.sin(U1) * Math.cos(U2) * cosLambda)
+    );
+    if (sinSigma === 0) return result; // coincident points
+    cosSigma = Math.sin(U1) * Math.sin(U2) + Math.cos(U1) * Math.cos(U2) * cosLambda;
+    sigma = Math.atan2(sinSigma, cosSigma);
+    sinAlpha = Math.cos(U1) * Math.cos(U2) * sinLambda / sinSigma;
+    cosSqAlpha = 1 - sinAlpha * sinAlpha;
+    cos2SigmaM = cosSigma - 2 * Math.sin(U1) * Math.sin(U2) / cosSqAlpha;
+    if (isNaN(cos2SigmaM)) cos2SigmaM = 0; // equatorial line: cosSqAlpha=0 (§6)
+    const C = f / 16 * cosSqAlpha * (4 + f * (4 - 3 * cosSqAlpha));
+    lambdaP = lambda;
+    lambda = L + (1 - C) * f * sinAlpha * (sigma + C * sinSigma * (cos2SigmaM + C * cosSigma * (-1 + 2 * cos2SigmaM * cos2SigmaM)));
+    i++;
   } while (Math.abs(lambda - lambdaP) > 1e-12 && i < iterLimit);
 
   if (i >= iterLimit) return NaN; // formula failed to converge
@@ -1050,7 +1052,7 @@ function calculateInverse(coordinate1, coordinate2) {
   const A = 1 + uSq / 16384 * (4096 + uSq * (-768 + uSq * (320 - 175 * uSq)));
   const B = uSq / 1024 * (256 + uSq * (-128 + uSq * (74 - 47 * uSq)));
   const deltaSigma = B * sinSigma * (cos2SigmaM + B / 4 * (cosSigma * (-1 + 2 * cos2SigmaM * cos2SigmaM) -
-      B / 6 * cos2SigmaM * (-3 + 4 * sinSigma * sinSigma) * (-3 + 4 * cos2SigmaM * cos2SigmaM)));
+    B / 6 * cos2SigmaM * (-3 + 4 * sinSigma * sinSigma) * (-3 + 4 * cos2SigmaM * cos2SigmaM)));
 
   const s = (b * A * (sigma - deltaSigma)).toFixed(4);
 
@@ -1061,7 +1063,6 @@ function calculateInverse(coordinate1, coordinate2) {
   result[1] = parseFloat(fwdAz) < 0 ? parseFloat(fwdAz) + 360 : parseFloat(fwdAz);
   result[2] = parseFloat(revAz) < 0 ? parseFloat(revAz) + 360 : parseFloat(revAz);
 
-  console.log(`Inverse Calculation: s=${result[0].toFixed(4)}, fwdAz=${result[1].toFixed(4)}, revAz=${result[2].toFixed(4)}`);
   return result;
 }
 
@@ -1079,7 +1080,7 @@ function calculateXYZ(vel, coordinate) {
   sn = Math.abs(sn / dist / 3600.0);
   we = Math.abs(we / dist * Math.cos(coordinate.latitude * (Math.PI / 180)) / 3600.0);
 
-  console.log(`Adjusted velocities: sn=${sn.toFixed(3)}, we=${we.toFixed(3)}`);
+
 
   // Nuevas coordenadas elipsoidales ajustadas
   const adjustedLatitude = coordinate.latitude + sn;
@@ -1096,7 +1097,7 @@ function calculateXYZ(vel, coordinate) {
   const y = Math.abs(cartesian3D2.Y - cartesian3D1.Y).toFixed(5);
   const z = Math.abs(cartesian3D2.Z - cartesian3D1.Z).toFixed(5);
 
-  console.log(`Cartesian differences: x=${x}, y=${y}, z=${z}`);
+
 
   vel.setVelocityX(parseFloat(x));
   vel.setVelocityY(parseFloat(y));
@@ -1107,115 +1108,115 @@ function calculateXYZ(vel, coordinate) {
 // ======== funciones para la velocidad ====================
 // Función para calcular las velocidades
 async function calculateVelocities(lat, lon, matrix) {
-const velocitySN = Math.abs(idwCalculate(matrix, 0)); // Posición de velX
-const velocityWE = Math.abs(idwCalculate(matrix, 1)); // Posición de velY
+  const velocitySN = Math.abs(idwCalculate(matrix, 0)); // Posición de velX
+  const velocityWE = Math.abs(idwCalculate(matrix, 1)); // Posición de velY
 
-console.log(`Velocities calculated: velocitySN=${velocitySN.toFixed(6)}, velocityWE=${velocityWE.toFixed(6)}`);
 
-const vel = new Velocities();
-vel.setVelocitySN(velocitySN);
-vel.setVelocityWE(velocityWE);
 
-return calculateXYZ(vel, new EllipsoidalCoordinate(lat, lon, null));
+  const vel = new Velocities();
+  vel.setVelocitySN(velocitySN);
+  vel.setVelocityWE(velocityWE);
+
+  return calculateXYZ(vel, new EllipsoidalCoordinate(lat, lon, null));
 }
 
 // Función principal para leer el archivo de texto, calcular las velocidades y convertirlas a XYZ
 
 // Función principal para leer el archivo de texto, calcular las velocidades y convertirlas a XYZ
 async function getVelocitiesFromFile(lat, lon) {
-// Ajusta la ruta al archivo Velogrid2017.txt
-const filePath = 'json/Velogrid2017.txt';  // Asegúrate de que la ruta sea correcta y accesible desde el servidor
+  // Ajusta la ruta al archivo Velogrid2017.txt
+  const filePath = 'json/Velogrid2017.txt';  // Asegúrate de que la ruta sea correcta y accesible desde el servidor
 
-// Leer el archivo Velogrid2017.txt usando fetch
-const response = await fetch(filePath);
-const textData = await response.text();
-const lines = textData.trim().split('\n');
+  // Leer el archivo Velogrid2017.txt usando fetch
+  const response = await fetch(filePath);
+  const textData = await response.text();
+  const lines = textData.trim().split('\n');
 
-// Procesar las líneas del archivo
-const reader = new VelocitiesReader(lines);
+  // Procesar las líneas del archivo
+  const reader = new VelocitiesReader(lines);
 
-// Obtener la matriz de datos
-const matrix = reader.getMatrix(lat, lon);
+  // Obtener la matriz de datos
+  const matrix = reader.getMatrix(lat, lon);
 
-// Calcular las velocidades y coordenadas XYZ
-const velocities = await calculateVelocities(lat, lon, matrix);
+  // Calcular las velocidades y coordenadas XYZ
+  const velocities = await calculateVelocities(lat, lon, matrix);
 
-return velocities;
+  return velocities;
 }
 async function guardarVelocidades() {
-let arrTexto = JSON.parse(localStorage.getItem('verticesOndula'));
-let arrTexto2 = [];
-console.log(arrTexto);
+  let arrTexto = JSON.parse(localStorage.getItem('verticesOndula'));
+  let arrTexto2 = [];
+  console.log(arrTexto);
 
-for (let vertice of arrTexto) {
+  for (let vertice of arrTexto) {
     if (vertice.velx) {
-        arrTexto2.push(vertice);
+      arrTexto2.push(vertice);
     } else {
-        let velocidades = await getVelocitiesFromFile(vertice.lat, vertice.long);
-        vertice.velx = velocidades.getVelocityX();
-        vertice.vely = velocidades.getVelocityY();
-        vertice.velz = velocidades.getVelocityZ();
-        arrTexto2.push(vertice);
+      let velocidades = await getVelocitiesFromFile(vertice.lat, vertice.long);
+      vertice.velx = velocidades.getVelocityX();
+      vertice.vely = velocidades.getVelocityY();
+      vertice.velz = velocidades.getVelocityZ();
+      arrTexto2.push(vertice);
     }
+  }
+
+  localStorage.setItem('verticesOndula', JSON.stringify(arrTexto2));
 }
 
-localStorage.setItem('verticesOndula', JSON.stringify(arrTexto2));
-}
 
 
-
-function ajustarDecimales(vertice){
-  if(typeof vertice.anoEpoca == 'number'){
+function ajustarDecimales(vertice) {
+  if (typeof vertice.anoEpoca == 'number') {
     vertice.anoEpoca = vertice.anoEpoca.toFixed(2);
   }
-  if(typeof vertice.este == 'number'){
+  if (typeof vertice.este == 'number') {
     vertice.este = vertice.este.toFixed(5);
   }
-  if(typeof vertice.esteKrugger == 'number'){
+  if (typeof vertice.esteKrugger == 'number') {
     vertice.esteKrugger = vertice.esteKrugger.toFixed(5);
   }
-  if(typeof vertice.lat == 'number'){
+  if (typeof vertice.lat == 'number') {
     vertice.lat = vertice.lat.toFixed(9);
   }
-  if(typeof vertice.latReferencia == 'number'){
+  if (typeof vertice.latReferencia == 'number') {
     vertice.latReferencia = vertice.latReferencia.toFixed(9);
   }
-  if(typeof vertice.lonReferencia == 'number'){
-    vertice.lonReferencia = vertice.lonReferencia.toFixed(9);   
+  if (typeof vertice.lonReferencia == 'number') {
+    vertice.lonReferencia = vertice.lonReferencia.toFixed(9);
   }
-  if(typeof vertice.long == 'number'){
+  if (typeof vertice.long == 'number') {
     vertice.long = vertice.long.toFixed(9);
   }
-  if(typeof vertice.norte == 'number'){
+  if (typeof vertice.norte == 'number') {
     vertice.norte = vertice.norte.toFixed(5);
   }
-  if(typeof vertice.norteKrugger == 'number'){
+  if (typeof vertice.norteKrugger == 'number') {
     vertice.norteKrugger = vertice.norteKrugger.toFixed(5);
   }
-  if(typeof vertice.xreferencia == 'number'){
+  if (typeof vertice.xreferencia == 'number') {
     vertice.xreferencia = vertice.xreferencia.toFixed(5);
   }
-  if(typeof vertice.yreferencia == 'number'){
+  if (typeof vertice.yreferencia == 'number') {
     vertice.yreferencia = vertice.yreferencia.toFixed(5);
   }
-  if(typeof vertice.zreferencia == 'number'){
+  if (typeof vertice.zreferencia == 'number') {
     vertice.zreferencia = vertice.zreferencia.toFixed(5);
-  }    
+  }
   return vertice;
 }
- 
+
 
 const validarOrden = (arreglo) => {
   let newArreglo = [];
   let contador = 0;
-  const longitud = (arreglo.length - 1) * 2 ;
-  for( let i = 0; i < longitud; i++){
-    if(i % 2 === 0 ){
+  const longitud = (arreglo.length) * 2;
+  for (let i = 0; i < longitud; i++) {
+    if (i % 2 === 0) {
       newArreglo.push(arreglo[contador]);
       contador++;
-    }else{
+    } else {
       newArreglo.push('');
-    }      
+    }
   }
   return newArreglo;
 }
