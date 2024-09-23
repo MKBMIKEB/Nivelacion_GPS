@@ -16,13 +16,13 @@ function crearDropdownParaVertice(vertice) {
 
   const opciones = ['', 'Fotocontrol', 'Geodésico', 'Auxiliar'];  // Añadir una opción vacía por defecto
   opciones.forEach(opcion => {
-      const optionElement = document.createElement('option');
-      optionElement.value = opcion;
-      optionElement.text = opcion === '' ? 'Seleccione un tipo de punto' : opcion;
-      select.appendChild(optionElement);
+    const optionElement = document.createElement('option');
+    optionElement.value = opcion;
+    optionElement.text = opcion === '' ? 'Seleccione un tipo de punto' : opcion;
+    select.appendChild(optionElement);
   });
 
- 
+
   div.appendChild(label);
   div.appendChild(select);
   container.appendChild(div);
@@ -30,15 +30,15 @@ function crearDropdownParaVertice(vertice) {
 function validarSeleccionDePuntos() {
   let valid = true;
   document.querySelectorAll('select[data-vertice]').forEach(select => {
-      console.log(`Verificando selección para: ${select.dataset.vertice}, valor seleccionado: ${select.value}`);
-      if (select.value === '') {
-          valid = false;
-          console.log(`Valor no seleccionado para: ${select.dataset.vertice}`);
-          select.classList.add('error');
-      } else {
-          console.log(`Valor correctamente seleccionado para: ${select.dataset.vertice}`);
-          select.classList.remove('error');
-      }
+    console.log(`Verificando selección para: ${select.dataset.vertice}, valor seleccionado: ${select.value}`);
+    if (select.value === '') {
+      valid = false;
+      console.log(`Valor no seleccionado para: ${select.dataset.vertice}`);
+      select.classList.add('error');
+    } else {
+      console.log(`Valor correctamente seleccionado para: ${select.dataset.vertice}`);
+      select.classList.remove('error');
+    }
   });
   console.log(`Resultado de la validación: ${valid}`);
   return valid;
@@ -48,9 +48,9 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   // Crear los dropdowns solo si no han sido creados antes
   let arrTexto2 = JSON.parse(localStorage.getItem('verticesOndula'));
   arrTexto2.forEach(vertice => {
-      if (!document.querySelector(`select[data-vertice="${vertice.nombre}"]`)) {
-          crearDropdownParaVertice(vertice);
-      }
+    if (!document.querySelector(`select[data-vertice="${vertice.nombre}"]`)) {
+      crearDropdownParaVertice(vertice);
+    }
   });
 
   // Validar si todos los tipos de punto han sido seleccionados
@@ -61,13 +61,13 @@ document.querySelector('#calcular').addEventListener('click', async function () 
 
   // Validaciones iniciales
   if (!document.querySelector("#verticeFuente")) {
-      mostrarMensaje('Debe elegir un vertice valido primero', 'info');
-      return;
+    mostrarMensaje('Debe elegir un vertice valido primero', 'info');
+    return;
   }
 
   if (JSON.parse(localStorage.getItem('verticesOndula')).length == 0 || JSON.parse(localStorage.getItem('anosPorHtml')).length == 0) {
-      mostrarMensaje('Debe ingresar el archivo .asc y la carpeta logfiles', 'info');
-      return;
+    mostrarMensaje('Debe ingresar el archivo .asc y la carpeta logfiles', 'info');
+    return;
   }
 
   // Preparar datos para procesamiento
@@ -87,8 +87,8 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   // Agregar estaciones permanentes
   datosXml += "<Estaciones_Permanentes>";
   for (let ver of arrTexto) {
-      if (ver.tipo == 'CTRL') {
-          datosXml += `
+    if (ver.tipo == 'CTRL') {
+      datosXml += `
               <Punto Nombre="${ver.nombre}">
                   <Tipo_Punto>Estación</Tipo_Punto>
                   <Set_de_Coordenadas>
@@ -106,7 +106,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
                       </Elipsoidal_rastreo>
                   </Set_de_Coordenadas>
               </Punto>`;
-      }
+    }
   }
   datosXml += "</Estaciones_Permanentes>";
 
@@ -115,106 +115,106 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   let vely = "";
   let velz = "";
   for (let vel of arrTexto) {
-      if (vel.velx != undefined) {
-          velx = parseFloat(typeof vel.velx == 'string' ? vel.velx.replace(",", ".") : vel.velx);
-          vely = parseFloat(typeof vel.vely == 'string' ? vel.vely.replace(",", ".") : vel.vely);
-          velz = parseFloat(typeof vel.velz == 'string' ? vel.velz.replace(",", ".") : vel.velz);
-          break;
-      }
+    if (vel.velx != undefined) {
+      velx = parseFloat(typeof vel.velx == 'string' ? vel.velx.replace(",", ".") : vel.velx);
+      vely = parseFloat(typeof vel.vely == 'string' ? vel.vely.replace(",", ".") : vel.vely);
+      velz = parseFloat(typeof vel.velz == 'string' ? vel.velz.replace(",", ".") : vel.velz);
+      break;
+    }
   }
   // ===== FIN =======
 
   // Procesar vértices
   let contadorVertices = new Map();
   for (let coordenadas of arrTexto) {
-      let anosEpoca = buscarAnoDeCoordenada(coordenadas, arr); // Devuelve un arreglo con todos los anosEpoca encontrados
+    let anosEpoca = buscarAnoDeCoordenada(coordenadas, arr); // Devuelve un arreglo con todos los anosEpoca encontrados
 
-      if (anosEpoca.length > 0) {
-          anosEpoca.forEach(anoEpocaInicial => {
-              let deltaDeTiempo = 2018 - anoEpocaInicial;
+    if (anosEpoca.length > 0) {
+      anosEpoca.forEach(anoEpocaInicial => {
+        let deltaDeTiempo = 2018 - anoEpocaInicial;
 
-              for (let coordenada of arr) {
-                  let nombreVertice = coordenadas.nombre.trim();
+        for (let coordenada of arr) {
+          let nombreVertice = coordenadas.nombre.trim();
 
-                  // Obtener el número de veces que este vértice ha sido procesado
-                  let count = contadorVertices.get(nombreVertice) || 0;
+          // Obtener el número de veces que este vértice ha sido procesado
+          let count = contadorVertices.get(nombreVertice) || 0;
 
-                  if (coordenadas.nombre === coordenada.name.split(' - ').pop().split('.')[0].trim()) {
-                      if (count < 2) {
-                          // Incrementar el contador
-                          contadorVertices.set(nombreVertice, count + 1);
-                          const tipoPuntoSeleccionado = document.querySelector(`select[data-vertice="${coordenadas.nombre}"]`).value;
-                          
-                          // Realizar el procesamiento
-                          let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
-                          
-                          coordenadas.velx  =  typeof coordenadas.velx == "string" ? parseFloat(coordenadas.velx.replace(',', '.')) : coordenadas.velx;
-                          coordenadas.vely  =  typeof coordenadas.vely == "string" ? parseFloat(coordenadas.vely.replace(',', '.')) : coordenadas.vely;
-                          coordenadas.velz  =  typeof coordenadas.velz == "string" ? parseFloat(coordenadas.velz.replace(',', '.')) : coordenadas.velz;
-                          let xreferencia = (coordenadaAjustada[0] + (coordenadas.velx * deltaDeTiempo)).toFixed(5);
-                          let yreferencia = (coordenadaAjustada[1] + (coordenadas.vely * deltaDeTiempo)).toFixed(5);
-                          let zreferencia = (coordenadaAjustada[2] + (coordenadas.velz * deltaDeTiempo)).toFixed(5);
-                          
-                          let latlonreferencia = geocentricas_elipsoidales(xreferencia, yreferencia, zreferencia);
-                          
-                          //==== Modificar altura elipsoidal a la ya obtenida ==
-                          latlonreferencia.hReferencia = parseFloat( coordenada.altelips.replace(",", ".") );
-                          
-                          let origenNac = transformarAOrigenNac(latlonreferencia.latDec, latlonreferencia.lonDec);
-                          let gauss = gaussKrugger(latlonreferencia.latDec, latlonreferencia.lonDec);
+          if (coordenadas.nombre === coordenada.name.split(' - ').pop().split('.')[0].trim()) {
+            if (count < 2) {
+              // Incrementar el contador
+              contadorVertices.set(nombreVertice, count + 1);
+              const tipoPuntoSeleccionado = document.querySelector(`select[data-vertice="${coordenadas.nombre}"]`).value;
 
-                          verticesCompletos.push({
-                              lat: coordenadas.lat,
-                              long: coordenadas.long,
-                              nombre: coordenadas.nombre,
-                              ondula: coordenadas.ondula,
-                              tipo: tipoPuntoSeleccionado,
-                              x: coordenadas.x,
-                              y: coordenadas.y,
-                              z: coordenadas.z,
-                              altelips: coordenada.altelips.replace(",", "."),
-                              xreferencia: xreferencia,
-                              yreferencia: yreferencia,
-                              zreferencia: zreferencia,
-                              xITRF2014: coordenadaAjustada[0],
-                              yITRF2014: coordenadaAjustada[1],
-                              zITRF2014: coordenadaAjustada[2],
-                              latReferencia: latlonreferencia.latDec,
-                              lonReferencia: latlonreferencia.lonDec,
-                              hReferencia: latlonreferencia.hReferencia,
-                              anoEpoca: anoEpocaInicial,
-                              velx: coordenadas.velx,
-                              vely: coordenadas.vely,
-                              velz: coordenadas.velz,
-                              fecha: coordenada.fecha,
-                              este: origenNac.x,
-                              norte: origenNac.y,
-                              esteKrugger: gauss.x,
-                              norteKrugger: gauss.y,
-                              originName: gauss.originName,
-                              mascara: coordenada.mascara,
-                              satelites: coordenada.satelites,
-                              lecturaAltura: coordenada.lecturaAltura,
-                              alturaAntena: coordenada.alturaAntena,
-                              tipoSolucion: coordenada.tipoSolucion,
-                              m0: coordenada.m0,
-                              gdop: coordenada.gdop,
-                              duracion: coordenada.duracion,
-                              name: coordenada.name,
-                              frecuencia: coordenada.frecuencia,
-                              efemerides: coordenada.efemerides,
-                              inicioFin: coordenada.inicioFin,
-                              nombreAntena: coordenada.nombreAntena,
-                              cq1d: coordenada.cq1d,
-                              cq2d: coordenada.cq2d,
-                              cq3d: coordenada.cq3d,
-                              saltos: coordenada.saltos
-                          });
-                      }
-                  }
-              }
-          });
-      }
+              // Realizar el procesamiento
+              let coordenadaAjustada = convertirCoordenadasITRF2020aITRF2014(coordenadas.x, coordenadas.y, coordenadas.z);
+
+              coordenadas.velx = typeof coordenadas.velx == "string" ? parseFloat(coordenadas.velx.replace(',', '.')) : coordenadas.velx;
+              coordenadas.vely = typeof coordenadas.vely == "string" ? parseFloat(coordenadas.vely.replace(',', '.')) : coordenadas.vely;
+              coordenadas.velz = typeof coordenadas.velz == "string" ? parseFloat(coordenadas.velz.replace(',', '.')) : coordenadas.velz;
+              let xreferencia = (coordenadaAjustada[0] + (coordenadas.velx * deltaDeTiempo)).toFixed(5);
+              let yreferencia = (coordenadaAjustada[1] + (coordenadas.vely * deltaDeTiempo)).toFixed(5);
+              let zreferencia = (coordenadaAjustada[2] + (coordenadas.velz * deltaDeTiempo)).toFixed(5);
+
+              let latlonreferencia = geocentricas_elipsoidales(xreferencia, yreferencia, zreferencia);
+
+              //==== Modificar altura elipsoidal a la ya obtenida ==
+              // latlonreferencia.hReferencia = parseFloat( coordenada.altelips.replace(",", ".") );
+
+              let origenNac = transformarAOrigenNac(latlonreferencia.latDec, latlonreferencia.lonDec);
+              let gauss = gaussKrugger(latlonreferencia.latDec, latlonreferencia.lonDec);
+
+              verticesCompletos.push({
+                lat: coordenadas.lat,
+                long: coordenadas.long,
+                nombre: coordenadas.nombre,
+                ondula: coordenadas.ondula,
+                tipo: tipoPuntoSeleccionado,
+                x: coordenadas.x,
+                y: coordenadas.y,
+                z: coordenadas.z,
+                altelips: coordenada.altelips.replace(",", "."),
+                xreferencia: xreferencia,
+                yreferencia: yreferencia,
+                zreferencia: zreferencia,
+                xITRF2014: coordenadaAjustada[0],
+                yITRF2014: coordenadaAjustada[1],
+                zITRF2014: coordenadaAjustada[2],
+                latReferencia: latlonreferencia.latDec,
+                lonReferencia: latlonreferencia.lonDec,
+                hReferencia: latlonreferencia.hReferencia,
+                anoEpoca: anoEpocaInicial,
+                velx: coordenadas.velx,
+                vely: coordenadas.vely,
+                velz: coordenadas.velz,
+                fecha: coordenada.fecha,
+                este: origenNac.x,
+                norte: origenNac.y,
+                esteKrugger: gauss.x,
+                norteKrugger: gauss.y,
+                originName: gauss.originName,
+                mascara: coordenada.mascara,
+                satelites: coordenada.satelites,
+                lecturaAltura: coordenada.lecturaAltura,
+                alturaAntena: coordenada.alturaAntena,
+                tipoSolucion: coordenada.tipoSolucion,
+                m0: coordenada.m0,
+                gdop: coordenada.gdop,
+                duracion: coordenada.duracion,
+                name: coordenada.name,
+                frecuencia: coordenada.frecuencia,
+                efemerides: coordenada.efemerides,
+                inicioFin: coordenada.inicioFin,
+                nombreAntena: coordenada.nombreAntena,
+                cq1d: coordenada.cq1d,
+                cq2d: coordenada.cq2d,
+                cq3d: coordenada.cq3d,
+                saltos: coordenada.saltos
+              });
+            }
+          }
+        }
+      });
+    }
   }
   let baseVertNomen = document.querySelector("#verticeFuente").dataset.nomenclatura;
   let baseVertAlt = document.querySelector("#verticeFuente").dataset.altelips;
@@ -230,7 +230,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   let baseVertondula2 = document.querySelector("#verticeFuente2").dataset.ondula2;
   let baseVertAltmsn2 = document.querySelector("#verticeFuente2").dataset.altmsnmm2;
 
-  
+
   let baseLatitud2 = document.querySelector("#verticeFuente2").dataset.latitud2;
   let baseLongitud2 = document.querySelector("#verticeFuente2").dataset.longitud2;
   let baseAno2 = document.querySelector("#verticeFuente2").dataset.ano2;
@@ -256,8 +256,8 @@ document.querySelector('#calcular').addEventListener('click', async function () 
               <Set_de_Coordenadas>
                   <Ellipsoidal>
                       <Datum>MAGNA-SIRGAS</Datum>
-                      <Latitud>${typeof baseLatitud  == 'string' ? parseFloat( baseLatitud ).toFixed(5) : baseLatitud.toFixed(5)}</Latitud>
-                      <Longitud>${typeof baseLongitud == 'string' ? parseFloat( baseLongitud ).toFixed(5) : baseLongitud.toFixed(5)}</Longitud>
+                      <Latitud>${typeof baseLatitud == 'string' ? parseFloat(baseLatitud).toFixed(5) : baseLatitud.toFixed(5)}</Latitud>
+                      <Longitud>${typeof baseLongitud == 'string' ? parseFloat(baseLongitud).toFixed(5) : baseLongitud.toFixed(5)}</Longitud>
                       <Altura_Elipsoidal>${baseVertAlt}</Altura_Elipsoidal>
                   </Ellipsoidal>
               </Set_de_Coordenadas>
@@ -277,8 +277,8 @@ document.querySelector('#calcular').addEventListener('click', async function () 
               <Set_de_Coordenadas>
                   <Ellipsoidal>
                       <Datum>MAGNA-SIRGAS</Datum>
-                      <Latitud>${typeof baseLatitud2  == 'string' ? parseFloat( baseLatitud2 ).toFixed(5) : baseLatitud2.toFixed(5)}</Latitud>
-                      <Longitud>${typeof baseLongitud2 == 'string' ? parseFloat( baseLongitud2 ).toFixed(5) : baseLongitud2.toFixed(5)}</Longitud>
+                      <Latitud>${typeof baseLatitud2 == 'string' ? parseFloat(baseLatitud2).toFixed(5) : baseLatitud2.toFixed(5)}</Latitud>
+                      <Longitud>${typeof baseLongitud2 == 'string' ? parseFloat(baseLongitud2).toFixed(5) : baseLongitud2.toFixed(5)}</Longitud>
                       <Altura_Elipsoidal>${baseVertAlt2}</Altura_Elipsoidal>
                   </Ellipsoidal>
               </Set_de_Coordenadas>
@@ -289,7 +289,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   // ===== INICIO LOGICA DE TABULACION ========
   let verticesCompletosTemp = [];
   for (let vertice of verticesCompletos) {
-      verticesCompletosTemp.push(ajustarDecimales(vertice));
+    verticesCompletosTemp.push(ajustarDecimales(vertice));
   }
 
   verticesCompletos = [];
@@ -299,7 +299,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   let verticesCompletos2 = [...verticesCompletos];
   let verticesCompletos3 = [...verticesCompletos];
 
-  
+
 
   // ============ Cálculos para tabular 1,2,3 =========
   verticesCompletos.push({ nombre: baseVertNomen, altelips: baseVertAlt, ondula: baseVertondula });
@@ -316,17 +316,18 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   // ============ Tabular diferencias =========
   tabularDiferencias();
   // ============ Fin tabular diferencias =========
- 
-  
+
+
   HGPSFINALArray1 = validarOrden(HGPSFINALArray1);
   HGPSFINALArray2 = validarOrden(HGPSFINALArray2);
   HGPSFINALArray3 = validarOrden(HGPSFINALArray3);
-  
+
   // CUERPO DEL DOCUMENTO
-  datosXml += "<Puntos_Calculados>";  
-  for (let i = 0; i < verticesCompletos.length - 1; i++) {       
-      datosXml += `
-      <Punto Nombre="${verticesCompletos[i].nombre}">
+  datosXml += "<Puntos_Calculados>";
+  for (let i = 0; i < verticesCompletos.length - 1; i++) {
+    // <Punto Nombre="${verticesCompletos[i].nombre}"></Punto>
+    datosXml += `
+      <Punto Nombre="${verticesCompletos[i]?.name}">
       <Tipo_Punto>${tipoPunto(verticesCompletos[i].duracion)}</Tipo_Punto>      
         <Epoca_Punto>Época 2018</Epoca_Punto>
         <Altura_Ortométrica>            
@@ -354,12 +355,12 @@ document.querySelector('#calcular').addEventListener('click', async function () 
               <Y>${verticesCompletos[i].yreferencia != undefined ? verticesCompletos[i].yreferencia.toString().replace('.', ',') : verticesCompletos[i].yreferencia}</Y>
               <Z>${verticesCompletos[i].zreferencia != undefined ? verticesCompletos[i].zreferencia.toString().replace('.', ',') : verticesCompletos[i].zreferencia}</Z>
           </Cartesiana3d_referencia>
-          <Cartesiana3d_rastreo>
+          <ITRF_EPOCAREFERENCIA>
               <Datum>MAGNA-SIRGAS</Datum>
               <X>${verticesCompletos[i].xITRF2014 != undefined ? verticesCompletos[i].xITRF2014.toString().replace('.', ',') : verticesCompletos[i].xITRF2014}</X>
               <Y>${verticesCompletos[i].yITRF2014 != undefined ? verticesCompletos[i].yITRF2014.toString().replace('.', ',') : verticesCompletos[i].yITRF2014}</Y>
               <Z>${verticesCompletos[i].zITRF2014 != undefined ? verticesCompletos[i].zITRF2014.toString().replace('.', ',') : verticesCompletos[i].zITRF2014}</Z>
-          </Cartesiana3d_rastreo>
+          </ITRF_EPOCAREFERENCIA>
           <Elipsoidal_rastreo>
               <Datum>MAGNA-SIRGAS</Datum>
               <Latitud>${verticesCompletos[i].lat != undefined ? verticesCompletos[i].lat.toString().replace('.', ',') : verticesCompletos[i].lat}</Latitud>
@@ -390,8 +391,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
             <LecturaAntena>${verticesCompletos[i]?.alturaAntena}</LecturaAntena>
             <TipoSolucion>${verticesCompletos[i]?.tipoSolucion}</TipoSolucion>
             <M0>${verticesCompletos[i]?.m0}</M0>
-            <Gdop>${verticesCompletos[i]?.gdop}</Gdop>
-            <NombreVector>${verticesCompletos[i]?.name}</NombreVector>
+            <Gdop>${verticesCompletos[i]?.gdop}</Gdop>            
             <Frecuencia>${verticesCompletos[i]?.frecuencia}</Frecuencia>
             <Efemerides>${verticesCompletos[i]?.efemerides}</Efemerides>
             <InicioFin>${verticesCompletos[i]?.inicioFin}</InicioFin>
@@ -403,7 +403,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
           </Otros>
         </Set_de_Coordenadas>
       </Punto>    
-      `;      
+      `;
   }
 
   datosXml += "</Puntos_Calculados>";
@@ -414,7 +414,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
 
 function descargarXML(datosXml) {
   var blob = new Blob([datosXml], {
-      type: 'text/xml'
+    type: 'text/xml'
   });
 
   var link = document.createElement("a");
@@ -466,7 +466,7 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
   let reader = new FileReader();
   reader.onload = async (e) => {
 
-    
+
 
     // valido si el primer caracter es @ o no, para saber
     // que version de archivo es y que función aplicarle
@@ -581,25 +581,25 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
 
     // ====== BUSCAR Y AGREGAR LA ONDULACIÓN =========
     async function fetchGeocol2004() {
-      
+
       const response = await fetch('../json/Geocol2004.txt');
       if (!response.ok) {
         throw new Error('No se pudo cargar el archivo Geocol2004.txt');
       }
       const text = await response.text();
-      
+
       return text;
     }
-    
+
     async function cabecero() {
-      
+
       const data = await fetchGeocol2004();
       const lines = data.split("\n");
       if (lines.length < 1) throw new Error("El archivo Geocol2004.txt está vacío o tiene un formato incorrecto.");
-      
+
       const primera_linea = lines[0].trim().split(" ");
       if (primera_linea.length < 6) throw new Error("La primera línea del archivo Geocol2004.txt tiene un formato incorrecto.");
-    
+
       return {
         minLatitud: parseFloat(primera_linea[0]),
         maxLatitud: parseFloat(primera_linea[1]),
@@ -613,11 +613,11 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
         surEste: null
       };
     }
-    
+
     async function ondulacion_geoidal(latitud, longitud) {
-      
+
       const datos = await cabecero();
-    
+
       if (latitud < (datos.minLatitud + datos.incrementoLat) || latitud > (datos.maxLatitud - datos.incrementoLat)) {
         console.log("latitud fuera del rango");
         return null;
@@ -626,96 +626,96 @@ document.querySelector('#cargarTexto').addEventListener('change', (e) => {
         console.log("longitud fuera del rango");
         return null;
       }
-    
+
       const i = parseInt((datos.maxLatitud - latitud) / datos.incrementoLat);
       const j = parseInt((longitud - datos.minLongitud) / datos.incrementoLon);
-    
+
       const lat = parseFloat(datos.maxLatitud - i * datos.incrementoLat);
       const lon = parseFloat(datos.minLongitud + j * datos.incrementoLon);
-    
+
       const data = await fetchGeocol2004();
       const lines = data.split("\n");
       if (i + 2 >= lines.length) throw new Error("El archivo Geocol2004.txt no tiene suficientes datos para la interpolación.");
-    
+
       const primera_linea = lines[i + 1]?.trim().split(" ");
       const segunda_linea = lines[i + 2]?.trim().split(" ");
       if (!primera_linea || !segunda_linea || primera_linea.length <= j + 1 || segunda_linea.length <= j + 1) {
         throw new Error("El archivo Geocol2004.txt no tiene suficientes columnas para la interpolación.");
       }
-    
+
       datos.norteOeste = parseFloat(primera_linea[j]);
       datos.norteEste = parseFloat(primera_linea[j + 1]);
       datos.surOeste = parseFloat(segunda_linea[j]);
       datos.surEste = parseFloat(segunda_linea[j + 1]);
-    
+
       const ondulacion = interpolacion_bilineal(datos, lat, lon, latitud, longitud);
-      
+
       return ondulacion.toFixed(2);
     }
-    
+
     function interpolacion_bilineal(datos, maxLatitud, minLongitud, latitud, longitud) {
       const v = parseFloat((maxLatitud - latitud) / datos.incrementoLat);
       const u = parseFloat((longitud - minLongitud) / datos.incrementoLon);
       const q = ((1 - u) * (1 - v) * datos.norteOeste) + (v * (1 - u) * datos.surOeste) + (u * v * datos.surEste) + ((1 - v) * u * datos.norteEste);
-      
-      
+
+
       return q;
     }
-     // ====== BUSCAR Y AGREGAR LA ONDULACIÓN =========
-     let verticeConOndulacion = [];
+    // ====== BUSCAR Y AGREGAR LA ONDULACIÓN =========
+    let verticeConOndulacion = [];
 
-     for (let vertice of result) {
-       if (vertice.ondula === undefined) {
-         const lat = vertice.lat;
-         const lon = vertice.long;
+    for (let vertice of result) {
+      if (vertice.ondula === undefined) {
+        const lat = vertice.lat;
+        const lon = vertice.long;
 
-         try {
-           const ondula = await ondulacion_geoidal(lat, lon);
-           verticeConOndulacion.push({
-             nombre: vertice.nombre,
-             lat: vertice.lat,
-             long: vertice.long,
-             x: vertice.x,
-             y: vertice.y,
-             z: vertice.z,
-             tipo: vertice.tipo,
-             ondula: ondula
-           });
-         } catch (error) {
-           console.log('error', error);
-         }
+        try {
+          const ondula = await ondulacion_geoidal(lat, lon);
+          verticeConOndulacion.push({
+            nombre: vertice.nombre,
+            lat: vertice.lat,
+            long: vertice.long,
+            x: vertice.x,
+            y: vertice.y,
+            z: vertice.z,
+            tipo: vertice.tipo,
+            ondula: ondula
+          });
+        } catch (error) {
+          console.log('error', error);
+        }
 
-       } else {
-         verticeConOndulacion.push({
-           nombre: vertice.nombre,
-           lat: vertice.lat,
-           long: vertice.long,
-           x: vertice.x,
-           y: vertice.y,
-           z: vertice.z,
-           tipo: vertice.tipo,
-           ondula: vertice.ondula,
-           velx: vertice.velx,
-           vely: vertice.vely,
-           velz: vertice.velz
-         });
-       }
-     }
-     // ====== FIN =========
-    
-     let verticeConOndulacionClean = [];
+      } else {
+        verticeConOndulacion.push({
+          nombre: vertice.nombre,
+          lat: vertice.lat,
+          long: vertice.long,
+          x: vertice.x,
+          y: vertice.y,
+          z: vertice.z,
+          tipo: vertice.tipo,
+          ondula: vertice.ondula,
+          velx: vertice.velx,
+          vely: vertice.vely,
+          velz: vertice.velz
+        });
+      }
+    }
+    // ====== FIN =========
 
-     for (let resul of result) {
-       for (let vertice of verticeConOndulacion) {
-         if (resul.nombre === vertice.nombre) {
-           verticeConOndulacionClean.push(vertice);
-           break;
-         }
-       }
-     }
+    let verticeConOndulacionClean = [];
 
-     
-     
+    for (let resul of result) {
+      for (let vertice of verticeConOndulacion) {
+        if (resul.nombre === vertice.nombre) {
+          verticeConOndulacionClean.push(vertice);
+          break;
+        }
+      }
+    }
+
+
+
     // habilitar botones
     cambiosToggleHabilitar(false);
 
@@ -785,7 +785,7 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
 
             for (let elemento of e.target.result.split("</tr>")) {
 
-              if (elemento.indexOf("Alt Elip.:") !== -1) {                
+              if (elemento.indexOf("Alt Elip.:") !== -1) {
                 obj.altelips = elemento.split("</td>")[3].substring(4, 13);
               }
 
@@ -795,7 +795,7 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
               }
 
               if (elemento.indexOf("Tipo de solución:") !== -1) {
-                
+
               }
 
               if (elemento.indexOf("Intervalo de observación:") !== -1) {
@@ -836,7 +836,7 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
             for (let elemento of e.target.result.split("</tr>")) {
 
               if (elemento.indexOf("Hora Inicio - Hora Fin:") !== -1) {
-                
+
                 const fecha = elemento.substring(90, 100);
 
                 const ano = fecha.substring(6, 10);
@@ -853,12 +853,12 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
 
                 obj.anoEpoca = anoEpoca;
                 obj.fecha = `${ano}/${mes}/${dia}`;
-                obj.inicioFin = elemento.split('<td>')[1].split('</td>')[1].split('>')[1];                
+                obj.inicioFin = elemento.split('<td>')[1].split('</td>')[1].split('>')[1];
 
               }
 
 
-              if (elemento.indexOf("Altura Elip WGS84:") !== -1) {                
+              if (elemento.indexOf("Altura Elip WGS84:") !== -1) {
                 obj.altelips = elemento.split('<td>')[3].split('</td>')[0].split(' ')[0].replace('.', '');
               }
 
@@ -866,28 +866,32 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
                 obj.mascara = elemento.substring(98, 106).split('&#176;')[0] + '°';
               }
 
-              if (elemento.indexOf("Sistema de Sat&#233;lites:") !== -1) {                
-                obj.satelites = elemento.split('<td>')[3].split('</td>')[0];
-              }
-              
-              if (elemento.indexOf("Lectura de la Altura:") !== -1) {                         
+              if (elemento.indexOf("Sistema de Sat&#233;lites:") !== -1) {
+
+                if (elemento.split('<td>')[3] == undefined) {
+                  obj.satelites = "Sin información";
+                } else {
+                  obj.satelites = elemento.split('<td>')[3].split('</td>')[0];
+                }
+              }              
+              if (elemento.indexOf("Lectura de la Altura:") !== -1 || elemento.indexOf("Lectura de Altura:") !== -1) {                
                 obj.lecturaAltura = elemento.split('<td>')[3].split('</td>')[0];
               }
 
-              if (elemento.indexOf("Altura de Antena:") !== -1) {                
+              if (elemento.indexOf("Altura de Antena:") !== -1) {
                 obj.alturaAntena = elemento.split('<td>')[3].split('</td>')[0];
               }
               if (elemento.indexOf("Tipo de Soluci&#243;n:") !== -1) {
                 obj.tipoSolucion = elemento.split('<td>')[2].split('</td>')[0];
               }
-              if (elemento.indexOf("M0:") !== -1) {                
+              if (elemento.indexOf("M0:") !== -1) {
                 obj.cq1d = elemento.split('<td>')[4].split('</td>')[0];
                 obj.m0 = elemento.split('<td>')[2].split('</td>')[0];
               }
-              if (elemento.indexOf("Q11:") !== -1) {                
-                obj.cq2d = elemento.split('<td>')[4].split('</td>')[0];                
+              if (elemento.indexOf("Q11:") !== -1) {
+                obj.cq2d = elemento.split('<td>')[4].split('</td>')[0];
               }
-              if (elemento.indexOf("Q12:") !== -1) {                
+              if (elemento.indexOf("Q12:") !== -1) {
                 obj.cq3d = elemento.split('<td>')[4].split('</td>')[0];
               }
               if (elemento.indexOf("GDOP:") !== -1) {
@@ -896,33 +900,33 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
               if (elemento.indexOf("Duraci&#243;n:") !== -1) {
                 obj.duracion = elemento.split('<td>')[2].split('</td>')[0];
               }
-              
+
               if (elemento.indexOf("Tipo de Efem&#233;rides:") !== -1) {
-                if(elemento.split('<td>').length == 4){                  
+                if (elemento.split('<td>').length == 4) {
                   obj.efemerides = elemento.split('<td>')[3].split('</td>')[0];
                 }
-              } 
-              if (elemento.indexOf("Frecuencia:") !== -1) {                                                      
-                if(elemento.split('<td>').length == 4){                  
+              }
+              if (elemento.indexOf("Frecuencia:") !== -1) {
+                if (elemento.split('<td>').length == 4) {
                   obj.frecuencia = elemento.split('<td>')[3].split('</td>')[0];
-                }else{                  
+                } else {
                   obj.frecuencia = elemento.split('<td>')[2].split('</td>')[0];
                 }
-              }           
-              if (elemento.indexOf("Frecuencias:") !== -1) {                
-                if(elemento.split('<td>').length == 4){                                    
+              }
+              if (elemento.indexOf("Frecuencias:") !== -1) {
+                if (elemento.split('<td>').length == 4) {
                   obj.frecuencia = elemento.split('<td>')[3].split('</td>')[0];
-                }else{                                     
+                } else {
                   obj.frecuencia = elemento.split('<td>')[2].split('</td>')[0];
-                }                        
-              }                            
-              if (elemento.indexOf("Nombre de Antena / SN:") !== -1) {                
-                obj.nombreAntena = elemento.split('<td>')[3].split('</td>')[0];                
+                }
               }
-              if (elemento.indexOf("Cuenta de Saltos de Ciclo:") !== -1) {                      
-                obj.saltos = elemento.split('<td>')[2].split('</td>')[0];                
+              if (elemento.indexOf("Nombre de Antena / SN:") !== -1) {
+                obj.nombreAntena = elemento.split('<td>')[3].split('</td>')[0];
               }
-                           
+              if (elemento.indexOf("Cuenta de Saltos de Ciclo:") !== -1) {
+                obj.saltos = elemento.split('<td>')[2].split('</td>')[0];
+              }
+
 
             }
 
@@ -938,7 +942,7 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
             for (let elemento of e.target.result.split("</tr>")) {
 
               if (elemento.indexOf("Start Time - End Time:") !== -1) {
-                
+
                 const fecha = elemento.substring(89, 100);
 
                 const ano = fecha.substring(6, 10);
@@ -955,12 +959,12 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
 
                 obj.anoEpoca = anoEpoca;
                 obj.fecha = `${ano}/${mes}/${dia}`;
-                obj.inicioFin = elemento.split('<td>')[1].split('</td>')[1].split('>')[1];                     
+                obj.inicioFin = elemento.split('<td>')[1].split('</td>')[1].split('>')[1];
 
               }
 
 
-              if (elemento.indexOf("WGS84 Ellip. Height:") !== -1) {                
+              if (elemento.indexOf("WGS84 Ellip. Height:") !== -1) {
                 obj.altelips = elemento.split('<td>')[3].split('</td>')[0].split(' ')[0].replace('.', '');
               }
 
@@ -982,14 +986,14 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
               if (elemento.indexOf("Solution Type:") !== -1) {
                 obj.tipoSolucion = elemento.split('<td>')[2].split('</td>')[0];
               }
-              if (elemento.indexOf("M0:") !== -1) {                
+              if (elemento.indexOf("M0:") !== -1) {
                 obj.cq1d = elemento.split('<td>')[4].split('</td>')[0];
                 obj.m0 = elemento.split('<td>')[2].split('</td>')[0];
               }
-              if (elemento.indexOf("Q11:") !== -1) {                
-                obj.cq2d = elemento.split('<td>')[4].split('</td>')[0];                
+              if (elemento.indexOf("Q11:") !== -1) {
+                obj.cq2d = elemento.split('<td>')[4].split('</td>')[0];
               }
-              if (elemento.indexOf("Q12:") !== -1) {                
+              if (elemento.indexOf("Q12:") !== -1) {
                 obj.cq3d = elemento.split('<td>')[4].split('</td>')[0];
               }
               if (elemento.indexOf("GDOP:") !== -1) {
@@ -998,23 +1002,23 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
               if (elemento.indexOf("Duration:") !== -1) {
                 obj.duracion = elemento.split('<td>')[2].split('</td>')[0];
               }
-              if (elemento.indexOf("Ephemeris Type:") !== -1) {                
-                if(elemento.split('<td>').length == 4){                  
+              if (elemento.indexOf("Ephemeris Type:") !== -1) {
+                if (elemento.split('<td>').length == 4) {
                   obj.efemerides = elemento.split('<td>')[3].split('</td>')[0];
                 }
-              } 
-              if (elemento.indexOf("Frequency:") !== -1) {                                                       
-                if(elemento.split('<td>').length == 4){                  
+              }
+              if (elemento.indexOf("Frequency:") !== -1) {
+                if (elemento.split('<td>').length == 4) {
                   obj.frecuencia = elemento.split('<td>')[3].split('</td>')[0];
-                }else{                  
+                } else {
                   obj.frecuencia = elemento.split('<td>')[2].split('</td>')[0];
                 }
-              }     
-              if (elemento.indexOf("Antenna Name / SN:") !== -1) {                       
-                obj.nombreAntena = elemento.split('<td>')[3].split('</td>')[0];                
-              }  
-              if (elemento.indexOf("Common Epochs:") !== -1) {                      
-                obj.saltos = elemento.split('<td>')[2].split('</td>')[0];                
+              }
+              if (elemento.indexOf("Antenna Name / SN:") !== -1) {
+                obj.nombreAntena = elemento.split('<td>')[3].split('</td>')[0];
+              }
+              if (elemento.indexOf("Common Epochs:") !== -1) {
+                obj.saltos = elemento.split('<td>')[2].split('</td>')[0];
               }
 
               // if (elemento.indexOf("Frecuencias:") !== -1) {                
@@ -1024,7 +1028,7 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
               //     obj.frecuencia = elemento.split('<td>')[2].split('</td>')[0];
               //   }                        
               // }                            
-              
+
 
 
 
@@ -1094,7 +1098,7 @@ document.querySelector('#viewDiv').addEventListener('click', async function (e) 
 
       const tablaVertices = document.getElementById('tablaEntrada');
 
-      
+
       if (tablaVertices?.childNodes.length > 3) {
         return mostrarMensaje('Ya se eligieron los vertices', 'warning');
       }

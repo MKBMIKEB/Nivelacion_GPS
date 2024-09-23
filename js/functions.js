@@ -441,8 +441,7 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
 
     nombresProcesados.add(nombreBase);
     let DHI;
-    if (vertice.hReferencia) {
-      console.log(vertice.hReferencia, "hreferencia");
+    if (vertice.hReferencia) {      
       DHI = parseFloat(vertice.hReferencia) - parseFloat(baseVertAlt);
     } else {
       // console.log(vertice.hReferencia, "hreferencia else");
