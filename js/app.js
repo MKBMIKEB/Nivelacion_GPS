@@ -14,7 +14,7 @@ function crearDropdownParaVertice(vertice) {
   select.classList.add('form-control');
   select.setAttribute('data-vertice', vertice.nombre);
 
-  const opciones = ['', 'Fotocontrol', 'Geodésico', 'Auxiliar','Geodesico'];  // Añadir una opción vacía por defecto
+  const opciones = ['', 'Fotocontrol', 'Geodésico', 'Auxiliar','Estación'];  // Añadir una opción vacía por defecto
   opciones.forEach(opcion => {
     const optionElement = document.createElement('option');
     optionElement.value = opcion;
