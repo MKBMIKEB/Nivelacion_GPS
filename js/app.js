@@ -168,7 +168,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
                 long: coordenadas.long,
                 nombre: coordenadas.nombre,
                 ondula: coordenadas.ondula,
-                tipo: tipoPuntoSeleccionado,
+                tipo_p: tipoPuntoSeleccionado,
                 x: coordenadas.x,
                 y: coordenadas.y,
                 z: coordenadas.z,
@@ -328,7 +328,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
     // <Punto Nombre="${verticesCompletos[i].nombre}"></Punto>
     datosXml += `
       <Punto Nombre="${verticesCompletos[i]?.name}">
-      <Tipo_Punto>${tipoPunto(verticesCompletos[i].duracion)}</Tipo_Punto>      
+      <Tipo_Punto>${tipoPunto(verticesCompletos[i].tipo_p)}</Tipo_Punto>      
         <Epoca_Punto>Época 2018</Epoca_Punto>
         <Altura_Ortométrica>            
             <Valor1>${HGPSFINALArray1[i]}</Valor1>          
