@@ -54,10 +54,10 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   });
 
   // Validar si todos los tipos de punto han sido seleccionados
-  // if (!validarSeleccionDePuntos()) {      
-  //     mostrarMensaje('Debe seleccionar un tipo de punto para cada vértice antes de proceder.', 'info');
-  //     return;  // Detener el proceso si no se han seleccionado todos los tipos de punto
-  // }
+   if (!validarSeleccionDePuntos()) {      
+    mostrarMensaje('Debe seleccionar un tipo de punto para cada vértice antes de proceder.', 'info');
+    return;  // Detener el proceso si no se han seleccionado todos los tipos de punto
+  }
 
   // Validaciones iniciales
   if (!document.querySelector("#verticeFuente")) {
