@@ -168,7 +168,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
                 long: coordenadas.long,
                 nombre: coordenadas.nombre,
                 ondula: coordenadas.ondula,
-                tipo_p: tipoPuntoSeleccionado,
+                tipo_m: tipoPuntoSeleccionado,
                 x: coordenadas.x,
                 y: coordenadas.y,
                 z: coordenadas.z,
@@ -328,7 +328,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
     // <Punto Nombre="${verticesCompletos[i].nombre}"></Punto>
     datosXml += `
       <Punto Nombre="${verticesCompletos[i]?.name}">
-      <Tipo_Punto>${tipoPunto(verticesCompletos[i].tipo_p)}</Tipo_Punto>      
+      <Tipo_Punto>"${verticesCompletos[i].tipo_m}"</Tipo_Punto>     
         <Epoca_Punto>Época 2018</Epoca_Punto>
         <Altura_Ortométrica>            
             <Valor1>${HGPSFINALArray1[i]}</Valor1>          
@@ -337,52 +337,52 @@ document.querySelector('#calcular').addEventListener('click', async function () 
             <Metodo_Determinación>Geocol</Metodo_Determinación>
         </Altura_Ortométrica>
         <Ondulación_Geoidal>
-            <Valor>${verticesCompletos[i].ondula}</Valor>
+        <Valor>${parseFloat(verticesCompletos[i].ondula).toString().replace(',', '.')}</Valor>
             <Modelo_Geoidal>GEOCOL</Modelo_Geoidal>
         </Ondulación_Geoidal>
         <Fecha_de_Captura>
             <Fecha>${verticesCompletos[i].fecha}</Fecha>          
         </Fecha_de_Captura>
         <Velocidades>          
-            <X>${verticesCompletos[i].velx != undefined ? verticesCompletos[i].velx.toString().replace('.', ',') : verticesCompletos[i].velx}</X>
-            <Y>${verticesCompletos[i].vely != undefined ? verticesCompletos[i].vely.toString().replace('.', ',') : verticesCompletos[i].vely}</Y>
-            <Z>${verticesCompletos[i].velz != undefined ? verticesCompletos[i].velz.toString().replace('.', ',') : verticesCompletos[i].velz}</Z>
+            <X>${verticesCompletos[i].velx != undefined ? verticesCompletos[i].velx.toString().replace(',', '.') : verticesCompletos[i].velx}</X>
+            <Y>${verticesCompletos[i].vely != undefined ? verticesCompletos[i].vely.toString().replace(',', '.') : verticesCompletos[i].vely}</Y>
+            <Z>${verticesCompletos[i].velz != undefined ? verticesCompletos[i].velz.toString().replace(',', '.') : verticesCompletos[i].velz}</Z>
         </Velocidades>
         <Set_de_Coordenadas>
           <Cartesiana3d_referencia>
               <Datum>MAGNA-SIRGAS</Datum>
-              <X>${verticesCompletos[i].xreferencia != undefined ? verticesCompletos[i].xreferencia.toString().replace('.', ',') : verticesCompletos[i].xreferencia}</X>
-              <Y>${verticesCompletos[i].yreferencia != undefined ? verticesCompletos[i].yreferencia.toString().replace('.', ',') : verticesCompletos[i].yreferencia}</Y>
-              <Z>${verticesCompletos[i].zreferencia != undefined ? verticesCompletos[i].zreferencia.toString().replace('.', ',') : verticesCompletos[i].zreferencia}</Z>
+              <X>${verticesCompletos[i].xreferencia != undefined ? verticesCompletos[i].xreferencia.toString().replace(',', '.') : verticesCompletos[i].xreferencia}</X>
+              <Y>${verticesCompletos[i].yreferencia != undefined ? verticesCompletos[i].yreferencia.toString().replace(',', '.') : verticesCompletos[i].yreferencia}</Y>
+              <Z>${verticesCompletos[i].zreferencia != undefined ? verticesCompletos[i].zreferencia.toString().replace(',', '.') : verticesCompletos[i].zreferencia}</Z>
           </Cartesiana3d_referencia>
           <ITRF_EPOCAREFERENCIA>
               <Datum>MAGNA-SIRGAS</Datum>
-              <X>${verticesCompletos[i].xITRF2014 != undefined ? verticesCompletos[i].xITRF2014.toString().replace('.', ',') : verticesCompletos[i].xITRF2014}</X>
-              <Y>${verticesCompletos[i].yITRF2014 != undefined ? verticesCompletos[i].yITRF2014.toString().replace('.', ',') : verticesCompletos[i].yITRF2014}</Y>
-              <Z>${verticesCompletos[i].zITRF2014 != undefined ? verticesCompletos[i].zITRF2014.toString().replace('.', ',') : verticesCompletos[i].zITRF2014}</Z>
+              <X>${verticesCompletos[i].xITRF2014 != undefined ? verticesCompletos[i].xITRF2014.toString().replace(',', '.') : verticesCompletos[i].xITRF2014}</X>
+              <Y>${verticesCompletos[i].yITRF2014 != undefined ? verticesCompletos[i].yITRF2014.toString().replace(',', '.') : verticesCompletos[i].yITRF2014}</Y>
+              <Z>${verticesCompletos[i].zITRF2014 != undefined ? verticesCompletos[i].zITRF2014.toString().replace(',', '.') : verticesCompletos[i].zITRF2014}</Z>
           </ITRF_EPOCAREFERENCIA>
           <Elipsoidal_rastreo>
               <Datum>MAGNA-SIRGAS</Datum>
-              <Latitud>${verticesCompletos[i].lat != undefined ? verticesCompletos[i].lat.toString().replace('.', ',') : verticesCompletos[i].lat}</Latitud>
-              <Longitud>${verticesCompletos[i].long != undefined ? verticesCompletos[i].long.toString().replace('.', ',') : verticesCompletos[i].long}</Longitud>
+              <Latitud>${verticesCompletos[i].lat != undefined ? verticesCompletos[i].lat.toString().replace(',', '.') : verticesCompletos[i].lat}</Latitud>
+              <Longitud>${verticesCompletos[i].long != undefined ? verticesCompletos[i].long.toString().replace(',', '.') : verticesCompletos[i].long}</Longitud>
               <Altura_Elipsoidal>${verticesCompletos[i].altelips}</Altura_Elipsoidal>
           </Elipsoidal_rastreo>
           <Elipsoidal_referencia>
               <Datum>MAGNA-SIRGAS</Datum>
-              <Latitud>${verticesCompletos[i].latReferencia != undefined ? verticesCompletos[i].latReferencia.toString().replace('.', ',') : verticesCompletos[i].latReferencia}</Latitud>
-              <Longitud>${verticesCompletos[i].lonReferencia != undefined ? verticesCompletos[i].lonReferencia.toString().replace('.', ',') : verticesCompletos[i].lonReferencia}</Longitud>            
-              <Altura_Elipsoidal>${verticesCompletos[i].hReferencia != undefined ? verticesCompletos[i].hReferencia.toString().replace('.', ',') : verticesCompletos[i].hReferencia}</Altura_Elipsoidal>
+              <Latitud>${verticesCompletos[i].latReferencia != undefined ? verticesCompletos[i].latReferencia.toString().replace(',', '.') : verticesCompletos[i].latReferencia}</Latitud>
+              <Longitud>${verticesCompletos[i].lonReferencia != undefined ? verticesCompletos[i].lonReferencia.toString().replace(',', '.') : verticesCompletos[i].lonReferencia}</Longitud>            
+              <Altura_Elipsoidal>${verticesCompletos[i].hReferencia != undefined ? verticesCompletos[i].hReferencia.toString().replace(',', '.') : verticesCompletos[i].hReferencia}</Altura_Elipsoidal>
               </Elipsoidal_referencia>
           <Gauss_referencia>
               <Datum>MAGNA-SIRGAS</Datum>
-              <Norte>${verticesCompletos[i].norteKrugger != undefined ? verticesCompletos[i].norteKrugger.toString().replace('.', ',') : verticesCompletos[i].norteKrugger}</Norte>
-              <Este>${verticesCompletos[i].esteKrugger != undefined ? verticesCompletos[i].esteKrugger.toString().replace('.', ',') : verticesCompletos[i].esteKrugger}</Este>
+              <Norte>${verticesCompletos[i].norteKrugger != undefined ? verticesCompletos[i].norteKrugger.toString().replace(',', '.') : verticesCompletos[i].norteKrugger}</Norte>
+              <Este>${verticesCompletos[i].esteKrugger != undefined ? verticesCompletos[i].esteKrugger.toString().replace(',', '.') : verticesCompletos[i].esteKrugger}</Este>
               <Origen>${verticesCompletos[i].originName}</Origen>
           </Gauss_referencia>
           <Origen>
               <Datum>MAGNA-SIRGAS</Datum>
-              <Norte>${verticesCompletos[i].norte != undefined ? verticesCompletos[i].norte.toString().replace('.', ',') : verticesCompletos[i].norte}</Norte>
-              <Este>${verticesCompletos[i].este != undefined ? verticesCompletos[i].este.toString().replace('.', ',') : verticesCompletos[i].este}</Este>            
+              <Norte>${verticesCompletos[i].norte != undefined ? verticesCompletos[i].norte.toString().replace(',', '.') : verticesCompletos[i].norte}</Norte>
+              <Este>${verticesCompletos[i].este != undefined ? verticesCompletos[i].este.toString().replace(',', '.') : verticesCompletos[i].este}</Este>            
           </Origen>
           <Otros>
             <Mascara>${verticesCompletos[i]?.mascara}</Mascara>
