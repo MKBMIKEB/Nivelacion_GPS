@@ -433,6 +433,7 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
   // CALCULO ORTOMETRICA
   for (const vertice of verticesCompletos) {
     // console.log(vertice)
+
     let nombreBase = vertice.nombre.split('-').slice(1).join('-').trim();
 
     if (nombresProcesados.has(nombreBase)) {
@@ -460,7 +461,7 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
     HGPSFINAL_ANTERIOR = HGPSFINAL;
 
 
-
+    console.log('Nombre Base:', nombreBase);
     tabular({ DHI, DNI, DHG, HGP, DHO, DHGC, HGPSFINAL }, vertice, tabla)
   }
   // ============ Fin calculos par tabular3 =========
