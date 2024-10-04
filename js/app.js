@@ -328,13 +328,15 @@ document.querySelector('#calcular').addEventListener('click', async function () 
     // <Punto Nombre="${verticesCompletos[i].nombre}"></Punto>
     datosXml += `
       <Punto Nombre="${verticesCompletos[i]?.name}">
-      <Tipo_Punto>"${verticesCompletos[i].tipo_m}"</Tipo_Punto>     
+      <Tipo_Punto>${verticesCompletos[i].tipo_m}</Tipo_Punto>     
         <Epoca_Punto>Época 2018</Epoca_Punto>
         <Altura_Ortométrica>            
-            <Valor1>${HGPSFINALArray1[i]}</Valor1>          
-            <Valor2>${HGPSFINALArray2[i]}</Valor2>
-            <Valor3>${HGPSFINALArray3[i]}</Valor3>
-            <Metodo_Determinación>Geocol</Metodo_Determinación>
+        <Valor1>${HGPSFINALArray1[i] ? String(HGPSFINALArray1[i]).replace(/\./g, ',') : ''}</Valor1>
+        <Valor2>${HGPSFINALArray2[i] ? String(HGPSFINALArray2[i]).replace(/\./g, ',') : ''}</Valor2>
+        <Valor3>${HGPSFINALArray3[i] ? String(HGPSFINALArray3[i]).replace(/\./g, ',') : ''}</Valor3>
+        
+
+         <Metodo_Determinación>Geocol</Metodo_Determinación>
         </Altura_Ortométrica>
         <Ondulación_Geoidal>
         <Valor>${parseFloat(verticesCompletos[i].ondula).toString().replace(',', '.')}</Valor>
@@ -394,7 +396,8 @@ document.querySelector('#calcular').addEventListener('click', async function () 
             <Gdop>${verticesCompletos[i]?.gdop}</Gdop>            
             <Frecuencia>${verticesCompletos[i]?.frecuencia}</Frecuencia>
             <Efemerides>${verticesCompletos[i]?.efemerides}</Efemerides>
-            <InicioFin>${verticesCompletos[i]?.inicioFin}</InicioFin>
+            <Inicio>${verticesCompletos[i]?.inicioFin.split(' - ')[0]}</Inicio>
+            <Fin>${verticesCompletos[i]?.inicioFin.split(' - ')[1]}</Fin>
             <NombreAntena>${verticesCompletos[i]?.nombreAntena}</NombreAntena>
             <Cq1d>${verticesCompletos[i]?.cq1d}</Cq1d>
             <Cq2d>${verticesCompletos[i]?.cq2d}</Cq2d>
