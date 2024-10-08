@@ -374,7 +374,7 @@ const mostrarMensaje = (mensaje, tipo) => {
 
 function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVertondula, baseVertAltmsn, baseVertAltmsn2, tabla) {
 
-  // console.log(verticesCompletos, baseVertAlt, baseVertAltmsn, baseVertAltmsn2);
+  console.log(verticesCompletos, baseVertAlt, baseVertAltmsn, baseVertAltmsn2);
   let sumatoria = 0;
   let DHG_ANTERIOR_prime = 0;
   // Crear un conjunto para rastrear los identificadores de CA ya procesados
@@ -382,9 +382,10 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
 
   // PROMEDIO DHO
   for (const vert of verticesCompletos) {
-    let nombreBase = vert.nombre.split('-').slice(1).join('-').trim();
-
-    if (nombresProcesados1.has(nombreBase)) {
+    
+    // let nombreBase = vert.nombre.split('-').slice(1).join('-').trim();    
+    let nombreBase = vert.nombre        
+    if (nombresProcesados1.has(nombreBase)) {    
       continue; // Saltar este v
     }
     nombresProcesados1.add(nombreBase);
@@ -431,12 +432,11 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
   const HGPSFINALArray = [];
 
   // CALCULO ORTOMETRICA
-  for (const vertice of verticesCompletos) {
-    // console.log(vertice)
+  for (const vertice of verticesCompletos) {    
 
-    let nombreBase = vertice.nombre.split('-').slice(1).join('-').trim();
-
-    if (nombresProcesados.has(nombreBase)) {
+    // let nombreBase = vertice.nombre.split('-').slice(1).join('-').trim();
+    let nombreBase = vertice.nombre      
+    if (nombresProcesados.has(nombreBase)) {    
       continue; // Saltar este vértice si ya ha sido procesado
     }
 
@@ -461,7 +461,7 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
     HGPSFINAL_ANTERIOR = HGPSFINAL;
 
 
-    console.log('Nombre Base:', nombreBase);
+    // console.log('Nombre Base:', nombreBase);
     tabular({ DHI, DNI, DHG, HGP, DHO, DHGC, HGPSFINAL }, vertice, tabla)
   }
   // ============ Fin calculos par tabular3 =========
@@ -551,8 +551,7 @@ function geocentricas_elipsoidales(xreferencia, yreferencia, zreferencia) {
   var latPrev = 0;
   var iterations = 0;
   var tolerance = 1e-12;
-  var p = Math.sqrt(x * x + y * y);
-  console.log("p", p)
+  var p = Math.sqrt(x * x + y * y);  
   var lat = Math.atan2(z, p * (1 - e2));
   
 
@@ -564,12 +563,11 @@ function geocentricas_elipsoidales(xreferencia, yreferencia, zreferencia) {
     lat = Math.atan2(z + e2 * N * Math.sin(lat), p);
     iterations++;
   }
-  console.log("N", N)
-  console.log("lat", lat)
+  
   var N = a / Math.sqrt(1 - e2 * Math.sin(lat) * Math.sin(lat));
-  console.log("p / Math.cos(lat) - N", p, lat, N)
+  
   var HDEC = p / Math.cos(lat) - N;
-  console.log("HDEC", HDEC)  
+  
   var latDec = lat * 180 / Math.PI;
   var lonDec = lon * 180 / Math.PI;
   const formattedlatDec = parseFloat(latDec.toFixed(9));

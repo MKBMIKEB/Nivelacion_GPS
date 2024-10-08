@@ -54,10 +54,10 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   });
 
   // Validar si todos los tipos de punto han sido seleccionados
-   if (!validarSeleccionDePuntos()) {      
-    mostrarMensaje('Debe seleccionar un tipo de punto para cada vértice antes de proceder.', 'info');
-    return;  // Detener el proceso si no se han seleccionado todos los tipos de punto
-  }
+  //  if (!validarSeleccionDePuntos()) {      
+  //   mostrarMensaje('Debe seleccionar un tipo de punto para cada vértice antes de proceder.', 'info');
+  //   return;  // Detener el proceso si no se han seleccionado todos los tipos de punto
+  // }
 
   // Validaciones iniciales
   if (!document.querySelector("#verticeFuente")) {
@@ -299,7 +299,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   let verticesCompletos2 = [...verticesCompletos];
   let verticesCompletos3 = [...verticesCompletos];
 
-
+ 
 
   // ============ Cálculos para tabular 1,2,3 =========
   verticesCompletos.push({ nombre: baseVertNomen, altelips: baseVertAlt, ondula: baseVertondula });
@@ -318,9 +318,11 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   // ============ Fin tabular diferencias =========
 
 
+  
   HGPSFINALArray1 = validarOrden(HGPSFINALArray1);
   HGPSFINALArray2 = validarOrden(HGPSFINALArray2);
   HGPSFINALArray3 = validarOrden(HGPSFINALArray3);
+  
 
   // CUERPO DEL DOCUMENTO
   datosXml += "<Puntos_Calculados>";
