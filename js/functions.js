@@ -1218,3 +1218,14 @@ const validarOrden = (arreglo) => {
   }
   return newArreglo;
 }
+
+
+const estadarHGPS = (valor) => {
+  if(!Number.isInteger(valor)){
+    valor = valor.toFixed(5);
+    return String(valor).replace(/\./g, ',').split(',');
+  }else {
+    return String(valor).replace(/\./g, ',').split(',');
+  }
+  
+}

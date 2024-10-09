@@ -1,5 +1,6 @@
 localStorage.setItem('verticesOndula', JSON.stringify([]));
 localStorage.setItem('anosPorHtml', JSON.stringify([]));
+let nombreProyectoLabel = "xml";
 
 function crearDropdownParaVertice(vertice) {
   const container = document.getElementById('verticesContainer');
@@ -77,6 +78,8 @@ document.querySelector('#calcular').addEventListener('click', async function () 
 
   const nombreCalculista = document.querySelector('#nombreCalculista').value;
   const nombreProyecto = document.querySelector('#nombreProyecto').value;
+  nombreProyectoLabel = nombreProyecto;
+  
 
   let datosXml = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
                             <Proyecto>
@@ -203,6 +206,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
                 name: coordenada.name,
                 frecuencia: coordenada.frecuencia,
                 efemerides: coordenada.efemerides,
+                calibracionAntena:coordenada.calibracionAntena,
                 inicioFin: coordenada.inicioFin,
                 nombreAntena: coordenada.nombreAntena,
                 cq1d: coordenada.cq1d,
@@ -251,7 +255,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
               </Altura_Ortométrica>
               <Ondulación_Geoidal>
                   <Valor>${baseVertondula}</Valor>
-                  <Modelo_Geoidal />
+                  <Modelo_Geoidal>Geocol2004</Modelo_Geoidal>
               </Ondulación_Geoidal>              
               <Set_de_Coordenadas>
                   <Ellipsoidal>
@@ -272,7 +276,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
               </Altura_Ortométrica>
               <Ondulación_Geoidal>
                   <Valor>${baseVertondula2}</Valor>
-                  <Modelo_Geoidal />
+                  <Modelo_Geoidal>Geocol2004</Modelo_Geoidal>
               </Ondulación_Geoidal>              
               <Set_de_Coordenadas>
                   <Ellipsoidal>
@@ -328,14 +332,17 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   datosXml += "<Puntos_Calculados>";
   for (let i = 0; i < verticesCompletos.length - 1; i++) {
     // <Punto Nombre="${verticesCompletos[i].nombre}"></Punto>
+    // <HGPS1a1>${HGPSFINALArray1[i] ? String(HGPSFINALArray1[i]).replace(/\./g, ',') : ''}</HGPS1a1>        
+    // <HGPS2a2>${HGPSFINALArray2[i] ? String(HGPSFINALArray2[i]).replace(/\./g, ',') : ''}</HGPS2a2>
+    // <HGPS1a2>${HGPSFINALArray3[i] ? String(HGPSFINALArray3[i]).replace(/\./g, ',') : ''}</HGPS1a2>
     datosXml += `
       <Punto Nombre="${verticesCompletos[i]?.name}">
       <Tipo_Punto>${verticesCompletos[i].tipo_m}</Tipo_Punto>     
         <Epoca_Punto>Época 2018</Epoca_Punto>
         <Altura_Ortométrica>            
-        <Valor1>${HGPSFINALArray1[i] ? String(HGPSFINALArray1[i]).replace(/\./g, ',') : ''}</Valor1>
-        <Valor2>${HGPSFINALArray2[i] ? String(HGPSFINALArray2[i]).replace(/\./g, ',') : ''}</Valor2>
-        <Valor3>${HGPSFINALArray3[i] ? String(HGPSFINALArray3[i]).replace(/\./g, ',') : ''}</Valor3>
+        <HGPS1a1>${HGPSFINALArray1[i] ? estadarHGPS(HGPSFINALArray1[i]) : ''}</HGPS1a1>        
+        <HGPS2a2>${HGPSFINALArray2[i] ? estadarHGPS(HGPSFINALArray2[i]) : ''}</HGPS2a2>
+        <HGPS1a2>${HGPSFINALArray3[i] ? estadarHGPS(HGPSFINALArray3[i]) : ''}</HGPS1a2>
         
 
          <Metodo_Determinación>Geocol</Metodo_Determinación>
@@ -398,6 +405,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
             <Gdop>${verticesCompletos[i]?.gdop}</Gdop>            
             <Frecuencia>${verticesCompletos[i]?.frecuencia}</Frecuencia>
             <Efemerides>${verticesCompletos[i]?.efemerides}</Efemerides>
+            <CalibracionAntena>${verticesCompletos[i]?.calibracionAntena}</CalibracionAntena>
             <Inicio>${verticesCompletos[i]?.inicioFin.split(' - ')[0]}</Inicio>
             <Fin>${verticesCompletos[i]?.inicioFin.split(' - ')[1]}</Fin>
             <NombreAntena>${verticesCompletos[i]?.nombreAntena}</NombreAntena>
@@ -424,7 +432,7 @@ function descargarXML(datosXml) {
 
   var link = document.createElement("a");
   link.href = window.URL.createObjectURL(blob);
-  link.download = "proyecto.xml";
+  link.download = nombreProyectoLabel+".xml";
   document.body.appendChild(link);
   link.click();
 }
@@ -910,6 +918,10 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
                 if (elemento.split('<td>').length == 4) {
                   obj.efemerides = elemento.split('<td>')[3].split('</td>')[0];
                 }
+              }
+
+              if (elemento.indexOf("Set de Calibraci&#243;n de Antena:") !== -1) {                
+                obj.calibracionAntena = elemento.split('<td>')[3].split('</td>')[0];
               }
               if (elemento.indexOf("Frecuencia:") !== -1) {
                 if (elemento.split('<td>').length == 4) {
