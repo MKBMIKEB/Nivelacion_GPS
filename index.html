@@ -1,262 +1,266 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>CoordenadasXML</title> 
-    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"> -->
-     <link rel="stylesheet" href="css/icons-1.11.3/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="css/style.css">
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JB8FKBC408"></script>   
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />    
-  </head>
-  <link href="/css/css-bootstrap/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">  
-  <link href="../../css/mapstyle.css" rel="stylesheet" /> 
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CoordenadasXML</title>
+  <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"> -->
+  <link rel="stylesheet" href="css/icons-1.11.3/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="css/style.css">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-JB8FKBC408"></script>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<link href="/css/css-bootstrap/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+<link href="../../css/mapstyle.css" rel="stylesheet" />
 
 
-  <body>    
+<body>
 
-      <!-- As a heading -->
-      <nav class="navbar bg-body-tertiary">
-        <div class="container-fluid">
-            <span class="navbar-brand mb-0 h1">
-                <img src="https://redgeodesica.igac.gov.co/images/nav/logo.png" alt="igac">            
-            </span>
+  <!-- As a heading -->
+  <nav class="navbar bg-body-tertiary">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">
+        <img src="https://redgeodesica.igac.gov.co/images/nav/logo.png" alt="igac">
+      </span>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-3">
+        <div class="mb-3">
+          <label for="nombreProyecto" class="form-label">Proyecto:</label>
+          <input type="text" class="form-control" id="nombreProyecto" aria-describedby="emailHelp">
+
+          <label for="nombreCalculista" class="form-label">Calculista:</label>
+          <input type="text" class="form-control" id="nombreCalculista" aria-describedby="emailHelp">
+
         </div>
-        </nav>
-              
-     <div class="container">
-        <div class="row">
-          <div class="col-sm-3">
-            <div class="mb-3">
-              <label for="nombreProyecto" class="form-label">Proyecto:</label>
-              <input type="text" class="form-control" id="nombreProyecto" aria-describedby="emailHelp">
-              
-              <label for="nombreCalculista" class="form-label">Calculista:</label>
-              <input type="text" class="form-control" id="nombreCalculista" aria-describedby="emailHelp">
-              
-            </div>            
-          </div>
-        </div>
-     </div>
-  
-  
-
-    <div class="container carga-container p-4">        
-        <div class="row">
-
-          <div class="col-sm-6">
-
-            <div class="contenido-formulario">
-              <div class="formulario">
-                <input type="file" id="cargarTexto">
-                <label for="cargarTexto" class="formulario-label">
-                  <i class="bi bi-file-earmark-font" id="icono-archivo"></i>
-                  <span id="texto-archivo">Agregar Archivo  .asc</span>
-                </label>
-              </div>
-            </div>
-            
-            <div id="progress" class="progress mt-5" style="height: 20px;">
-              <div class="progress-bar" role="progressbar" style="width: 10%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>
-
-          </div>
+      </div>
+    </div>
+  </div>
 
 
-            <div class="col-sm-6">
 
-            <div class="contenido-formulario">
-              <div class="formulario">
-                <input type="file" name="files" webkitdirectory directory id="cargarCarpeta" multiple />
-                <label for="cargarCarpeta" class="formulario-label">
-                  <i class="bi bi-folder2-open" id="icono-carpeta"></i>
-                  <span id="texto-carpeta">Cargar logfiles</span>
-                </label>
-            </div>
-            </div>  
+  <div class="container carga-container p-4">
+    <div class="row">
 
-            <div id="progress2" class="progress mt-5" style="height: 20px;">
-              <div  class="progress-bar progress-bar2" role="progressbar" style="width: 10%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>
-            
-          </div>     
-        </div>
-        <hr>
+      <div class="col-sm-6">
 
-
-        <div class="row mt-3">
-          <div class="col-sm-6">
-            <button class="btn btn-outline-primary size-default" id="descargar">
-              <i class="bi bi-cloud-arrow-down"></i>  Descargar ITRF2014
-            </button>
-          </div>
-
-        
-          <div class="col-sm-6">
-            <button class="btn btn-outline-success size-default" id="calcular">
-              <i class="bi bi-calculator"></i> Calcular
-            </button>
+        <div class="contenido-formulario">
+          <div class="formulario">
+            <input type="file" id="cargarTexto">
+            <label for="cargarTexto" class="formulario-label">
+              <i class="bi bi-file-earmark-font" id="icono-archivo"></i>
+              <span id="texto-archivo">Agregar Archivo .asc</span>
+            </label>
           </div>
         </div>
 
-        <div class="row mt-3">         
-          <div class="col-sm-6">
-            
-             <!-- Button trigger modal -->
-            <button type="button" id="elegir-verticel" class="btn btn-outline-info size-default" data-bs-toggle="modal" data-bs-target="#exampleModal">
-              Elegir Vertice   <i class="bi bi-globe-americas"></i> 
-            </button>
+        <div id="progress" class="progress mt-5" style="height: 20px;">
+          <div class="progress-bar" role="progressbar" style="width: 10%;" aria-valuenow="25" aria-valuemin="0"
+            aria-valuemax="100"></div>
+        </div>
 
+      </div>
+
+
+      <div class="col-sm-6">
+
+        <div class="contenido-formulario">
+          <div class="formulario">
+            <input type="file" name="files" webkitdirectory directory id="cargarCarpeta" multiple />
+            <label for="cargarCarpeta" class="formulario-label">
+              <i class="bi bi-folder2-open" id="icono-carpeta"></i>
+              <span id="texto-carpeta">Cargar logfiles</span>
+            </label>
           </div>
         </div>
 
+        <div id="progress2" class="progress mt-5" style="height: 20px;">
+          <div class="progress-bar progress-bar2" role="progressbar" style="width: 10%;" aria-valuenow="25"
+            aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+
+      </div>
+    </div>
+    <hr>
+
+
+    <div class="row mt-3">
+      <div class="col-sm-6">
+        <button class="btn btn-outline-primary size-default" id="descargar">
+          <i class="bi bi-cloud-arrow-down"></i> Descargar ITRF2014
+        </button>
+      </div>
+
+
+      <div class="col-sm-6">
+        <button class="btn btn-outline-success size-default" id="calcular">
+          <i class="bi bi-calculator"></i> Calcular
+        </button>
+      </div>
     </div>
 
-    
-        
+    <div class="row mt-3">
+      <div class="col-sm-6">
 
-    <div class="container p-4">          
-      <div class="row">
-        
-        <div class="col-sm-6">
+        <!-- Button trigger modal -->
+        <button type="button" id="elegir-verticel" class="btn btn-outline-info size-default" data-bs-toggle="modal"
+          data-bs-target="#exampleModal">
+          Elegir Vertice <i class="bi bi-globe-americas"></i>
+        </button>
 
-          <table class="table table-white table-striped">
-            <thead>
-              <tr>
-                <th scope="col">Vértice</th>
-                <th scope="col">Altura Elipsoidal</th>
-                <th scope="col">Ondulación</th>
-                <th scope="col">Altura msnmm</th>
-                <th scope="col">Latitud</th>      
-                <th scope="col">Longitud</th>      
-                <th scope="col">Año</th>    
-                <!-- <th scope="col">Eliminar</th> -->
-              </tr>
-            </thead>
-            <tbody id="tablaEntrada">
-                     
-            </tbody>
-          </table>
-        </div>          
       </div>
+    </div>
 
-      <div id="verticesContainer">
-        <!-- Aquí se agregarán dinámicamente los vértices con sus dropdowns -->
-     </div>
-    
+  </div>
 
-     <hr class="arcoiris"/>
 
-         <div class="titulo">
-             <h2>1 A 1</h2>
-           </div>
-           <!-- Tabla mejorada -->
-           <table class=" table table-white table-striped">
-             <thead>
-               <tr>
-                 <th scope="col">Punto</th>
-                 <th scope="col">Altura Elip (h)</th>
-                 <th scope="col">Altura Geoidal</th>
-                 <th scope="col">Altura Nivelada</th>
-                 <th scope="col">DHi</th>
-                 <th scope="col">DNi</th>
-                 <th scope="col">DHgpsi</th>
-                 <th scope="col">H°gpsi</th>
-                 <th scope="col">DH°gps</th>
-                 <th scope="col">DHgps corregido</th>
-                 <th scope="col">Hgps Final</th>
-               </tr>
-             </thead>
-             <tbody id="calculos">
-                      
-             </tbody>
-           </table>
-     
 
-          <hr class="arcoiris"/>
 
-          <div class="titulo">
-            <h2>2 A 2</h2>
-          </div>
-          <table class="table table-white table-striped ">
-            <thead>
-              <tr>
-                <th scope="col">Punto</th>
-                <th scope="col">Altura Elip (h)</th>
-                <th scope="col">Altura Geoidal</th>
-                <th scope="col">Altura Nivelada</th>
-                <th scope="col">DHi</th>
-                <th scope="col">DNi</th>
-                <th scope="col">DHgpsi</th>
-                <th scope="col">H°gpsi</th>
-                <th scope="col">DH°gps</th>
-                <th scope="col">DHgps corregido</th>
-                <th scope="col">Hgps Final</th>
-              </tr>
-            </thead>
-            <tbody id="calculos2">
-                     
-            </tbody>
-          </table>
-        
-          <hr class="arcoiris"/>
+  <div class="container p-4">
+    <div class="row">
 
-          <div class="titulo">
-            <h2>1 A 2</h2>
-          </div>
-          <table class="table table-white table-striped ">
-            <thead>
-              <tr>
-                <th scope="col">Punto</th>
-                <th scope="col">Altura Elip (h)</th>
-                <th scope="col">Altura Geoidal</th>
-                <th scope="col">Altura Nivelada</th>
-                <th scope="col">DHi</th>
-                <th scope="col">DNi</th>
-                <th scope="col">DHgpsi</th>
-                <th scope="col">H°gpsi</th>
-                <th scope="col">DH°gps</th>
-                <th scope="col">DHgps corregido</th>
-                <th scope="col">Hgps Final</th>
-              </tr>
-            </thead>
-            <tbody id="calculos3">
-                     
-            </tbody>
-          </table>
+      <div class="col-sm-6">
 
-          <hr class="arcoiris"/>
+        <table class="table table-white table-striped">
+          <thead>
+            <tr>
+              <th scope="col">Vértice</th>
+              <th scope="col">Altura Elipsoidal</th>
+              <th scope="col">Ondulación</th>
+              <th scope="col">Altura msnmm</th>
+              <th scope="col">Latitud</th>
+              <th scope="col">Longitud</th>
+              <th scope="col">Año</th>
+              <!-- <th scope="col">Eliminar</th> -->
+            </tr>
+          </thead>
+          <tbody id="tablaEntrada">
 
-          <table class="table table-white table-striped ">
-            <thead>
-              <tr>                 
-                <th scope="col"></th>
-                <th scope="col"></th>
-                <th scope="col"> Combinaciones</th>                
-                <th scope="col"></th>
-                <th scope="col"></th>
-                <th scope="col"></th>                
-                <th scope="col"></th>                
-              </tr>
-              <tr>                 
-                <th scope="col">Vértices</th>
-                <th scope="col">1</th>                
-                <th scope="col">2</th>
-                <th scope="col">3</th>
-                <th scope="col"></th>
-                <th scope="col">Diferencias</th>                
-                <th scope="col"></th>                
-              </tr>
-            </thead>
-            <tbody id="bodyResultados">
-             
-            </tbody>
-          </table>
-        </div>          
+          </tbody>
+        </table>
       </div>
+    </div>
+
+    <div id="verticesContainer">
+      <!-- Aquí se agregarán dinámicamente los vértices con sus dropdowns -->
+    </div>
+
+
+    <hr class="arcoiris" />
+
+    <div class="titulo">
+      <h2>1 A 1</h2>
+    </div>
+    <!-- Tabla mejorada -->
+    <table class=" table table-white table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Punto</th>
+          <th scope="col">Altura Elip (h)</th>
+          <th scope="col">Altura Geoidal</th>
+          <th scope="col">Altura Nivelada</th>
+          <th scope="col">DHi</th>
+          <th scope="col">DNi</th>
+          <th scope="col">DHgpsi</th>
+          <th scope="col">H°gpsi</th>
+          <th scope="col">DH°gps</th>
+          <th scope="col">DHgps corregido</th>
+          <th scope="col">Hgps Final</th>
+        </tr>
+      </thead>
+      <tbody id="calculos">
+
+      </tbody>
+    </table>
+
+
+    <hr class="arcoiris" />
+
+    <div class="titulo">
+      <h2>2 A 2</h2>
+    </div>
+    <table class="table table-white table-striped ">
+      <thead>
+        <tr>
+          <th scope="col">Punto</th>
+          <th scope="col">Altura Elip (h)</th>
+          <th scope="col">Altura Geoidal</th>
+          <th scope="col">Altura Nivelada</th>
+          <th scope="col">DHi</th>
+          <th scope="col">DNi</th>
+          <th scope="col">DHgpsi</th>
+          <th scope="col">H°gpsi</th>
+          <th scope="col">DH°gps</th>
+          <th scope="col">DHgps corregido</th>
+          <th scope="col">Hgps Final</th>
+        </tr>
+      </thead>
+      <tbody id="calculos2">
+
+      </tbody>
+    </table>
+
+    <hr class="arcoiris" />
+
+    <div class="titulo">
+      <h2>1 A 2</h2>
+    </div>
+    <table class="table table-white table-striped ">
+      <thead>
+        <tr>
+          <th scope="col">Punto</th>
+          <th scope="col">Altura Elip (h)</th>
+          <th scope="col">Altura Geoidal</th>
+          <th scope="col">Altura Nivelada</th>
+          <th scope="col">DHi</th>
+          <th scope="col">DNi</th>
+          <th scope="col">DHgpsi</th>
+          <th scope="col">H°gpsi</th>
+          <th scope="col">DH°gps</th>
+          <th scope="col">DHgps corregido</th>
+          <th scope="col">Hgps Final</th>
+        </tr>
+      </thead>
+      <tbody id="calculos3">
+
+      </tbody>
+    </table>
+
+    <hr class="arcoiris" />
+
+    <table class="table table-white table-striped ">
+      <thead>
+        <tr>
+          <th scope="col"></th>
+          <th scope="col"></th>
+          <th scope="col"> Combinaciones</th>
+          <th scope="col"></th>
+          <th scope="col"></th>
+          <th scope="col"></th>
+          <th scope="col"></th>
+        </tr>
+        <tr>
+          <th scope="col">Vértices</th>
+          <th scope="col">1</th>
+          <th scope="col">2</th>
+          <th scope="col">3</th>
+          <th scope="col"></th>
+          <th scope="col">Diferencias</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody id="bodyResultados">
+
+      </tbody>
+    </table>
+  </div>
+  </div>
 
   </div>
 
@@ -265,59 +269,61 @@
     <i class="bi bi-file-earmark-plus"></i>Nuevo</button>
 
   <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">        
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
 
-      <div class="modal-body">            
-              <div id="viewDiv"></div>
-      </div>
-      <div class="modal-footer">
-  
+        <div class="modal-body">
+          <div id="viewDiv"></div>
+        </div>
+        <div class="modal-footer">
+
+        </div>
       </div>
     </div>
   </div>
-</div>
-    
-        
-
-    
 
 
 
 
-    <!-- BOOTSTRAP 5.3.0 -->
-    <script src="js/js-bootstrap/bootstrap.bundle.js"></script>
-    <script src="js/js-bootstrap/bootstrap.min.js"></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+
+
+
+
+  <!-- BOOTSTRAP 5.3.0 -->
+  <script src="js/js-bootstrap/bootstrap.bundle.js"></script>
+  <script src="js/js-bootstrap/bootstrap.min.js"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js" integrity="sha384-fbbOQedDUMZZ5KreZpsbe1LCZPVmfTnH7ois6mU1QK+m14rQ1l2bGBq41eYeM/fS" crossorigin="anonymous"></script>     -->
 
 
-    
-    <!-- JQUERY Y BOOTSTRAP 4.3.1 -->
-     <script src="js/jquery-3.5.1.js"></script>
-    <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+  <!-- JQUERY Y BOOTSTRAP 4.3.1 -->
+  <script src="js/jquery-3.5.1.js"></script>
+  <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script> -->
 
 
-    <!-- TOASTR -->
-    <script src="js/toastr/toastr.js"></script>
-    <link rel="stylesheet" href="js/toastr/toastr.css">
-    
-    <!-- ARCGIS -->
-    <link rel="stylesheet" href="https://js.arcgis.com/4.24/esri/themes/light/main.css"/>
-    <script src="https://js.arcgis.com/4.24/"></script>      
-   
+  <!-- TOASTR -->
+  <script src="js/toastr/toastr.js"></script>
+  <link rel="stylesheet" href="js/toastr/toastr.css">
 
-    <!-- APPLICATION -->
-    <script src="js/visual.js"></script>
-    <script src="js/functions.js"></script>
-    <script src="js/app.js"></script>
+  <!-- ARCGIS -->
+  <link rel="stylesheet" href="https://js.arcgis.com/4.24/esri/themes/light/main.css" />
+  <script src="https://js.arcgis.com/4.24/"></script>
 
 
-  </body>
+  <!-- APPLICATION -->
+  <script src="js/antenas.js"></script>
+  <script src="js/visual.js"></script>
+  <script src="js/functions.js"></script>
+  <script src="js/app.js"></script>
+
+
+</body>
+
 </html>

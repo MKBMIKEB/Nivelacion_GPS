@@ -106,6 +106,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
                           <Latitud>${typeof ver.lat == 'number' ? ver.lat.toFixed(6) : ver.lat}</Latitud>
                           <Longitud>${typeof ver.long == 'number' ? ver.long.toFixed(6) : ver.long}</Longitud>
                           <Ondula>${ver.ondula}</Ondula>
+                          <Antena>${antenaCORS(ver.nombre)}</Antena>
                       </Elipsoidal_rastreo>
                   </Set_de_Coordenadas>
               </Punto>`;
