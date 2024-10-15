@@ -15,7 +15,7 @@ function crearDropdownParaVertice(vertice) {
   select.classList.add('form-control');
   select.setAttribute('data-vertice', vertice.nombre);
 
-  const opciones = ['', 'Fotocontrol', 'Geodésico', 'Auxiliar','Estación'];  // Añadir una opción vacía por defecto
+  const opciones = ['', 'Fotocontrol', 'Geodésico', 'Auxiliar', 'Estación'];  // Añadir una opción vacía por defecto
   opciones.forEach(opcion => {
     const optionElement = document.createElement('option');
     optionElement.value = opcion;
@@ -79,7 +79,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   const nombreCalculista = document.querySelector('#nombreCalculista').value;
   const nombreProyecto = document.querySelector('#nombreProyecto').value;
   nombreProyectoLabel = nombreProyecto;
-  
+
 
   let datosXml = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
                             <Proyecto>
@@ -198,16 +198,18 @@ document.querySelector('#calcular').addEventListener('click', async function () 
                 originName: gauss.originName,
                 mascara: coordenada.mascara,
                 satelites: coordenada.satelites,
+                noUsados: coordenada.noUsados,
                 lecturaAltura: coordenada.lecturaAltura,
                 alturaAntena: coordenada.alturaAntena,
                 tipoSolucion: coordenada.tipoSolucion,
+                distancia: coordenada.distancia,
                 m0: coordenada.m0,
                 gdop: coordenada.gdop,
                 duracion: coordenada.duracion,
                 name: coordenada.name,
                 frecuencia: coordenada.frecuencia,
                 efemerides: coordenada.efemerides,
-                calibracionAntena:coordenada.calibracionAntena,
+                calibracionAntena: coordenada.calibracionAntena,
                 inicioFin: coordenada.inicioFin,
                 nombreAntena: coordenada.nombreAntena,
                 cq1d: coordenada.cq1d,
@@ -304,7 +306,7 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   let verticesCompletos2 = [...verticesCompletos];
   let verticesCompletos3 = [...verticesCompletos];
 
- 
+
 
   // ============ Cálculos para tabular 1,2,3 =========
   verticesCompletos.push({ nombre: baseVertNomen, altelips: baseVertAlt, ondula: baseVertondula });
@@ -323,11 +325,11 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   // ============ Fin tabular diferencias =========
 
 
-  
+
   HGPSFINALArray1 = validarOrden(HGPSFINALArray1);
   HGPSFINALArray2 = validarOrden(HGPSFINALArray2);
   HGPSFINALArray3 = validarOrden(HGPSFINALArray3);
-  
+
 
   // CUERPO DEL DOCUMENTO
   datosXml += "<Puntos_Calculados>";
@@ -399,9 +401,11 @@ document.querySelector('#calcular').addEventListener('click', async function () 
           <Otros>
             <Mascara>${verticesCompletos[i]?.mascara}</Mascara>
             <Satelites>${verticesCompletos[i]?.satelites}</Satelites>
+            <SatelitesNoUsados>${verticesCompletos[i]?.noUsados}</SatelitesNoUsados>
             <LecturaAltura>${verticesCompletos[i]?.lecturaAltura}</LecturaAltura>
             <LecturaAntena>${verticesCompletos[i]?.alturaAntena}</LecturaAntena>
             <TipoSolucion>${verticesCompletos[i]?.tipoSolucion}</TipoSolucion>
+            <Distancia>${verticesCompletos[i]?.distancia}</Distancia>
             <M0>${verticesCompletos[i]?.m0}</M0>
             <Gdop>${verticesCompletos[i]?.gdop}</Gdop>            
             <Frecuencia>${verticesCompletos[i]?.frecuencia}</Frecuencia>
@@ -433,7 +437,7 @@ function descargarXML(datosXml) {
 
   var link = document.createElement("a");
   link.href = window.URL.createObjectURL(blob);
-  link.download = nombreProyectoLabel+".xml";
+  link.download = nombreProyectoLabel + ".xml";
   document.body.appendChild(link);
   link.click();
 }
@@ -886,9 +890,12 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
                   obj.satelites = "Sin información";
                 } else {
                   obj.satelites = elemento.split('<td>')[3].split('</td>')[0];
+                  const seleccionados = elemento.split('<td>')[2].split('</td>')[0].split('/');
+                  const usados = elemento.split('<td>')[3].split('</td>')[0].split('/');                   
+                  obj.noUsados = compararSatelites(seleccionados, usados).join('/')                  
                 }
-              }              
-              if (elemento.indexOf("Lectura de la Altura:") !== -1 || elemento.indexOf("Lectura de Altura:") !== -1) {                
+              }
+              if (elemento.indexOf("Lectura de la Altura:") !== -1 || elemento.indexOf("Lectura de Altura:") !== -1) {
                 obj.lecturaAltura = elemento.split('<td>')[3].split('</td>')[0];
               }
 
@@ -897,6 +904,9 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
               }
               if (elemento.indexOf("Tipo de Soluci&#243;n:") !== -1) {
                 obj.tipoSolucion = elemento.split('<td>')[2].split('</td>')[0];
+              }
+              if (elemento.indexOf("Dist. Geom.:") !== -1) {
+                obj.distancia = elemento.split('<td>')[2].split('</td>')[0];
               }
               if (elemento.indexOf("M0:") !== -1) {
                 obj.cq1d = elemento.split('<td>')[4].split('</td>')[0];
@@ -921,7 +931,7 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
                 }
               }
 
-              if (elemento.indexOf("Set de Calibraci&#243;n de Antena:") !== -1) {                
+              if (elemento.indexOf("Set de Calibraci&#243;n de Antena:") !== -1) {
                 obj.calibracionAntena = elemento.split('<td>')[3].split('</td>')[0];
               }
               if (elemento.indexOf("Frecuencia:") !== -1) {

@@ -1229,3 +1229,7 @@ const estadarHGPS = (valor) => {
   }
   
 }
+
+const compararSatelites = (seleccionados, usados) => {
+  return seleccionados.filter(cadena => !usados.includes(cadena));
+}
