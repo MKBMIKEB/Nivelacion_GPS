@@ -90,7 +90,7 @@ function eliminarEspacios2(linea) {
   for (let i of o) {
     arreglo3 = arreglo3.concat(i.split('\t'));
   }
-  
+
 
   let latDd = dmsToDd(arreglo3[2], arreglo3[3], arreglo3[4], arreglo3[5]);
   let lonDd = dmsToDd(arreglo3[6], arreglo3[7], arreglo3[8], arreglo3[9]);
@@ -382,10 +382,10 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
 
   // PROMEDIO DHO
   for (const vert of verticesCompletos) {
-    
+
     // let nombreBase = vert.nombre.split('-').slice(1).join('-').trim();    
-    let nombreBase = vert.nombre        
-    if (nombresProcesados1.has(nombreBase)) {    
+    let nombreBase = vert.nombre
+    if (nombresProcesados1.has(nombreBase)) {
       continue; // Saltar este v
     }
     nombresProcesados1.add(nombreBase);
@@ -432,17 +432,17 @@ function calculoPorTabular(verticesCompletos, baseVertNomen, baseVertAlt, baseVe
   const HGPSFINALArray = [];
 
   // CALCULO ORTOMETRICA
-  for (const vertice of verticesCompletos) {    
+  for (const vertice of verticesCompletos) {
 
     // let nombreBase = vertice.nombre.split('-').slice(1).join('-').trim();
-    let nombreBase = vertice.nombre      
-    if (nombresProcesados.has(nombreBase)) {    
+    let nombreBase = vertice.nombre
+    if (nombresProcesados.has(nombreBase)) {
       continue; // Saltar este vértice si ya ha sido procesado
     }
 
     nombresProcesados.add(nombreBase);
     let DHI;
-    if (vertice.hReferencia) {      
+    if (vertice.hReferencia) {
       DHI = parseFloat(vertice.hReferencia) - parseFloat(baseVertAlt);
     } else {
       // console.log(vertice.hReferencia, "hreferencia else");
@@ -551,23 +551,23 @@ function geocentricas_elipsoidales(xreferencia, yreferencia, zreferencia) {
   var latPrev = 0;
   var iterations = 0;
   var tolerance = 1e-12;
-  var p = Math.sqrt(x * x + y * y);  
+  var p = Math.sqrt(x * x + y * y);
   var lat = Math.atan2(z, p * (1 - e2));
-  
+
 
 
   // Iterar hasta que la diferencia entre latitudes sucesivas sea menor que la tolerancia
   while (Math.abs(lat - latPrev) > tolerance && iterations < 1000) {
     latPrev = lat;
-    var N = a / Math.sqrt(1 - e2 * Math.sin(lat) * Math.sin(lat));    
+    var N = a / Math.sqrt(1 - e2 * Math.sin(lat) * Math.sin(lat));
     lat = Math.atan2(z + e2 * N * Math.sin(lat), p);
     iterations++;
   }
-  
+
   var N = a / Math.sqrt(1 - e2 * Math.sin(lat) * Math.sin(lat));
-  
+
   var HDEC = p / Math.cos(lat) - N;
-  
+
   var latDec = lat * 180 / Math.PI;
   var lonDec = lon * 180 / Math.PI;
   const formattedlatDec = parseFloat(latDec.toFixed(9));
@@ -575,7 +575,7 @@ function geocentricas_elipsoidales(xreferencia, yreferencia, zreferencia) {
   const formattedHDEC = parseFloat(HDEC.toFixed(5));
   const n = N;
   const u = p;
-  
+
   return { latDec: formattedlatDec, lonDec: formattedlonDec, hReferencia: formattedHDEC }
 }
 // ====== FIN =========
@@ -1221,15 +1221,22 @@ const validarOrden = (arreglo) => {
 
 
 const estadarHGPS = (valor) => {
-  if(!Number.isInteger(valor)){
+  if (!Number.isInteger(valor)) {
     valor = valor.toFixed(5);
     return String(valor).replace(/\./g, ',').split(',');
-  }else {
+  } else {
     return String(valor).replace(/\./g, ',').split(',');
   }
-  
+
 }
 
 const compararSatelites = (seleccionados, usados) => {
   return seleccionados.filter(cadena => !usados.includes(cadena));
+}
+
+const filtrarVertices = (vertices) => {
+  const filtrados = vertices.filter((obj, index, self) =>
+    index === self.findIndex((o) => o.nombre === obj.nombre)
+  );  
+  return filtrados;
 }

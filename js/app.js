@@ -325,22 +325,23 @@ document.querySelector('#calcular').addEventListener('click', async function () 
   // ============ Fin tabular diferencias =========
 
 
+  const verticesUnicos = filtrarVertices(verticesCompletos)
 
-  HGPSFINALArray1 = validarOrden(HGPSFINALArray1);
-  HGPSFINALArray2 = validarOrden(HGPSFINALArray2);
-  HGPSFINALArray3 = validarOrden(HGPSFINALArray3);
+  // HGPSFINALArray1 = validarOrden(HGPSFINALArray1);
+  // HGPSFINALArray2 = validarOrden(HGPSFINALArray2);
+  // HGPSFINALArray3 = validarOrden(HGPSFINALArray3);
 
 
   // CUERPO DEL DOCUMENTO
   datosXml += "<Puntos_Calculados>";
-  for (let i = 0; i < verticesCompletos.length - 1; i++) {
+  for (let i = 0; i < verticesUnicos.length - 1; i++) {
     // <Punto Nombre="${verticesCompletos[i].nombre}"></Punto>
     // <HGPS1a1>${HGPSFINALArray1[i] ? String(HGPSFINALArray1[i]).replace(/\./g, ',') : ''}</HGPS1a1>        
     // <HGPS2a2>${HGPSFINALArray2[i] ? String(HGPSFINALArray2[i]).replace(/\./g, ',') : ''}</HGPS2a2>
-    // <HGPS1a2>${HGPSFINALArray3[i] ? String(HGPSFINALArray3[i]).replace(/\./g, ',') : ''}</HGPS1a2>
+    // <HGPS1a2>${HGPSFINALArray3[i] ? String(HGPSFINALArray3[i]).replace(/\./g, ',') : ''}</HGPS1a2>    
     datosXml += `
-      <Punto Nombre="${verticesCompletos[i]?.name}">
-      <Tipo_Punto>${verticesCompletos[i].tipo_m}</Tipo_Punto>     
+      <Punto Nombre="${verticesUnicos[i]?.nombre}">
+      <Tipo_Punto>${verticesUnicos[i].tipo_m}</Tipo_Punto>     
         <Epoca_Punto>Época 2018</Epoca_Punto>
         <Altura_Ortométrica>            
         <HGPS1a1>${HGPSFINALArray1[i] ? estadarHGPS(HGPSFINALArray1[i]) : ''}</HGPS1a1>        
@@ -351,80 +352,94 @@ document.querySelector('#calcular').addEventListener('click', async function () 
          <Metodo_Determinación>Geocol</Metodo_Determinación>
         </Altura_Ortométrica>
         <Ondulación_Geoidal>
-        <Valor>${parseFloat(verticesCompletos[i].ondula).toString().replace(',', '.')}</Valor>
+        <Valor>${parseFloat(verticesUnicos[i].ondula).toString().replace(',', '.')}</Valor>
             <Modelo_Geoidal>GEOCOL</Modelo_Geoidal>
         </Ondulación_Geoidal>
         <Fecha_de_Captura>
-            <Fecha>${verticesCompletos[i].fecha}</Fecha>          
+            <Fecha>${verticesUnicos[i].fecha}</Fecha>          
         </Fecha_de_Captura>
         <Velocidades>          
-            <X>${verticesCompletos[i].velx != undefined ? verticesCompletos[i].velx.toString().replace(',', '.') : verticesCompletos[i].velx}</X>
-            <Y>${verticesCompletos[i].vely != undefined ? verticesCompletos[i].vely.toString().replace(',', '.') : verticesCompletos[i].vely}</Y>
-            <Z>${verticesCompletos[i].velz != undefined ? verticesCompletos[i].velz.toString().replace(',', '.') : verticesCompletos[i].velz}</Z>
+            <X>${verticesUnicos[i].velx != undefined ? verticesUnicos[i].velx.toString().replace(',', '.') : verticesUnicos[i].velx}</X>
+            <Y>${verticesUnicos[i].vely != undefined ? verticesUnicos[i].vely.toString().replace(',', '.') : verticesUnicos[i].vely}</Y>
+            <Z>${verticesUnicos[i].velz != undefined ? verticesUnicos[i].velz.toString().replace(',', '.') : verticesUnicos[i].velz}</Z>
         </Velocidades>
         <Set_de_Coordenadas>
           <Cartesiana3d_referencia>
               <Datum>MAGNA-SIRGAS</Datum>
-              <X>${verticesCompletos[i].xreferencia != undefined ? verticesCompletos[i].xreferencia.toString().replace(',', '.') : verticesCompletos[i].xreferencia}</X>
-              <Y>${verticesCompletos[i].yreferencia != undefined ? verticesCompletos[i].yreferencia.toString().replace(',', '.') : verticesCompletos[i].yreferencia}</Y>
-              <Z>${verticesCompletos[i].zreferencia != undefined ? verticesCompletos[i].zreferencia.toString().replace(',', '.') : verticesCompletos[i].zreferencia}</Z>
+              <X>${verticesUnicos[i].xreferencia != undefined ? verticesUnicos[i].xreferencia.toString().replace(',', '.') : verticesUnicos[i].xreferencia}</X>
+              <Y>${verticesUnicos[i].yreferencia != undefined ? verticesUnicos[i].yreferencia.toString().replace(',', '.') : verticesUnicos[i].yreferencia}</Y>
+              <Z>${verticesUnicos[i].zreferencia != undefined ? verticesUnicos[i].zreferencia.toString().replace(',', '.') : verticesUnicos[i].zreferencia}</Z>
           </Cartesiana3d_referencia>
           <ITRF_EPOCAREFERENCIA>
               <Datum>MAGNA-SIRGAS</Datum>
-              <X>${verticesCompletos[i].xITRF2014 != undefined ? verticesCompletos[i].xITRF2014.toString().replace(',', '.') : verticesCompletos[i].xITRF2014}</X>
-              <Y>${verticesCompletos[i].yITRF2014 != undefined ? verticesCompletos[i].yITRF2014.toString().replace(',', '.') : verticesCompletos[i].yITRF2014}</Y>
-              <Z>${verticesCompletos[i].zITRF2014 != undefined ? verticesCompletos[i].zITRF2014.toString().replace(',', '.') : verticesCompletos[i].zITRF2014}</Z>
+              <X>${verticesUnicos[i].xITRF2014 != undefined ? verticesUnicos[i].xITRF2014.toString().replace(',', '.') : verticesUnicos[i].xITRF2014}</X>
+              <Y>${verticesUnicos[i].yITRF2014 != undefined ? verticesUnicos[i].yITRF2014.toString().replace(',', '.') : verticesUnicos[i].yITRF2014}</Y>
+              <Z>${verticesUnicos[i].zITRF2014 != undefined ? verticesUnicos[i].zITRF2014.toString().replace(',', '.') : verticesUnicos[i].zITRF2014}</Z>
           </ITRF_EPOCAREFERENCIA>
           <Elipsoidal_rastreo>
               <Datum>MAGNA-SIRGAS</Datum>
-              <Latitud>${verticesCompletos[i].lat != undefined ? verticesCompletos[i].lat.toString().replace(',', '.') : verticesCompletos[i].lat}</Latitud>
-              <Longitud>${verticesCompletos[i].long != undefined ? verticesCompletos[i].long.toString().replace(',', '.') : verticesCompletos[i].long}</Longitud>
-              <Altura_Elipsoidal>${verticesCompletos[i].altelips}</Altura_Elipsoidal>
+              <Latitud>${verticesUnicos[i].lat != undefined ? verticesUnicos[i].lat.toString().replace(',', '.') : verticesUnicos[i].lat}</Latitud>
+              <Longitud>${verticesUnicos[i].long != undefined ? verticesUnicos[i].long.toString().replace(',', '.') : verticesUnicos[i].long}</Longitud>
+              <Altura_Elipsoidal>${verticesUnicos[i].altelips}</Altura_Elipsoidal>
           </Elipsoidal_rastreo>
           <Elipsoidal_referencia>
               <Datum>MAGNA-SIRGAS</Datum>
-              <Latitud>${verticesCompletos[i].latReferencia != undefined ? verticesCompletos[i].latReferencia.toString().replace(',', '.') : verticesCompletos[i].latReferencia}</Latitud>
-              <Longitud>${verticesCompletos[i].lonReferencia != undefined ? verticesCompletos[i].lonReferencia.toString().replace(',', '.') : verticesCompletos[i].lonReferencia}</Longitud>            
-              <Altura_Elipsoidal>${verticesCompletos[i].hReferencia != undefined ? verticesCompletos[i].hReferencia.toString().replace(',', '.') : verticesCompletos[i].hReferencia}</Altura_Elipsoidal>
+              <Latitud>${verticesUnicos[i].latReferencia != undefined ? verticesUnicos[i].latReferencia.toString().replace(',', '.') : verticesUnicos[i].latReferencia}</Latitud>
+              <Longitud>${verticesUnicos[i].lonReferencia != undefined ? verticesUnicos[i].lonReferencia.toString().replace(',', '.') : verticesUnicos[i].lonReferencia}</Longitud>            
+              <Altura_Elipsoidal>${verticesUnicos[i].hReferencia != undefined ? verticesUnicos[i].hReferencia.toString().replace(',', '.') : verticesUnicos[i].hReferencia}</Altura_Elipsoidal>
               </Elipsoidal_referencia>
           <Gauss_referencia>
               <Datum>MAGNA-SIRGAS</Datum>
-              <Norte>${verticesCompletos[i].norteKrugger != undefined ? verticesCompletos[i].norteKrugger.toString().replace(',', '.') : verticesCompletos[i].norteKrugger}</Norte>
-              <Este>${verticesCompletos[i].esteKrugger != undefined ? verticesCompletos[i].esteKrugger.toString().replace(',', '.') : verticesCompletos[i].esteKrugger}</Este>
-              <Origen>${verticesCompletos[i].originName}</Origen>
+              <Norte>${verticesUnicos[i].norteKrugger != undefined ? verticesUnicos[i].norteKrugger.toString().replace(',', '.') : verticesUnicos[i].norteKrugger}</Norte>
+              <Este>${verticesUnicos[i].esteKrugger != undefined ? verticesUnicos[i].esteKrugger.toString().replace(',', '.') : verticesUnicos[i].esteKrugger}</Este>
+              <Origen>${verticesUnicos[i].originName}</Origen>
           </Gauss_referencia>
           <Origen>
               <Datum>MAGNA-SIRGAS</Datum>
-              <Norte>${verticesCompletos[i].norte != undefined ? verticesCompletos[i].norte.toString().replace(',', '.') : verticesCompletos[i].norte}</Norte>
-              <Este>${verticesCompletos[i].este != undefined ? verticesCompletos[i].este.toString().replace(',', '.') : verticesCompletos[i].este}</Este>            
-          </Origen>
-          <Otros>
-            <Mascara>${verticesCompletos[i]?.mascara}</Mascara>
-            <Satelites>${verticesCompletos[i]?.satelites}</Satelites>
-            <SatelitesNoUsados>${verticesCompletos[i]?.noUsados}</SatelitesNoUsados>
-            <LecturaAltura>${verticesCompletos[i]?.lecturaAltura}</LecturaAltura>
-            <LecturaAntena>${verticesCompletos[i]?.alturaAntena}</LecturaAntena>
-            <TipoSolucion>${verticesCompletos[i]?.tipoSolucion}</TipoSolucion>
-            <Distancia>${verticesCompletos[i]?.distancia}</Distancia>
-            <M0>${verticesCompletos[i]?.m0}</M0>
-            <Gdop>${verticesCompletos[i]?.gdop}</Gdop>            
-            <Frecuencia>${verticesCompletos[i]?.frecuencia}</Frecuencia>
-            <Efemerides>${verticesCompletos[i]?.efemerides}</Efemerides>
-            <CalibracionAntena>${verticesCompletos[i]?.calibracionAntena}</CalibracionAntena>
-            <Inicio>${verticesCompletos[i]?.inicioFin.split(' - ')[0]}</Inicio>
-            <Fin>${verticesCompletos[i]?.inicioFin.split(' - ')[1]}</Fin>
-            <NombreAntena>${verticesCompletos[i]?.nombreAntena}</NombreAntena>
-            <Cq1d>${verticesCompletos[i]?.cq1d}</Cq1d>
-            <Cq2d>${verticesCompletos[i]?.cq2d}</Cq2d>
-            <Cq3d>${verticesCompletos[i]?.cq3d}</Cq3d>
-            <Saltos>${verticesCompletos[i]?.saltos}</Saltos>
-          </Otros>
+              <Norte>${verticesUnicos[i].norte != undefined ? verticesUnicos[i].norte.toString().replace(',', '.') : verticesUnicos[i].norte}</Norte>
+              <Este>${verticesUnicos[i].este != undefined ? verticesUnicos[i].este.toString().replace(',', '.') : verticesUnicos[i].este}</Este>            
+          </Origen>       
         </Set_de_Coordenadas>
       </Punto>    
       `;
   }
 
   datosXml += "</Puntos_Calculados>";
+
+  // CUERPO DEL DOCUMENTO
+  datosXml += "<LogInfo>";
+  for (let i = 0; i < verticesCompletos.length - 1; i++) {
+    datosXml += `
+        <Punto Nombre="${verticesCompletos[i]?.name}">
+        <Tipo_Punto>${verticesCompletos[i].tipo_m}</Tipo_Punto>             
+          <Set_de_Coordenadas>       
+            <Otros>
+              <Mascara>${verticesCompletos[i]?.mascara}</Mascara>
+              <Satelites>${verticesCompletos[i]?.satelites}</Satelites>
+              <SatelitesNoUsados>${verticesCompletos[i]?.noUsados}</SatelitesNoUsados>
+              <LecturaAltura>${verticesCompletos[i]?.lecturaAltura}</LecturaAltura>
+              <LecturaAntena>${verticesCompletos[i]?.alturaAntena}</LecturaAntena>
+              <TipoSolucion>${verticesCompletos[i]?.tipoSolucion}</TipoSolucion>
+              <Distancia>${verticesCompletos[i]?.distancia}</Distancia>
+              <M0>${verticesCompletos[i]?.m0}</M0>
+              <Gdop>${verticesCompletos[i]?.gdop}</Gdop>            
+              <Frecuencia>${verticesCompletos[i]?.frecuencia}</Frecuencia>
+              <Efemerides>${verticesCompletos[i]?.efemerides}</Efemerides>
+              <CalibracionAntena>${verticesCompletos[i]?.calibracionAntena}</CalibracionAntena>
+              <Inicio>${verticesCompletos[i]?.inicioFin.split(' - ')[0]}</Inicio>
+              <Fin>${verticesCompletos[i]?.inicioFin.split(' - ')[1]}</Fin>
+              <NombreAntena>${verticesCompletos[i]?.nombreAntena}</NombreAntena>
+              <Cq1d>${verticesCompletos[i]?.cq1d}</Cq1d>
+              <Cq2d>${verticesCompletos[i]?.cq2d}</Cq2d>
+              <Cq3d>${verticesCompletos[i]?.cq3d}</Cq3d>
+              <Saltos>${verticesCompletos[i]?.saltos}</Saltos>
+            </Otros>
+          </Set_de_Coordenadas>
+        </Punto>    
+        `;
+  }
+
+  datosXml += "</LogInfo>";
   datosXml += "</Proyecto>";
   // Descargar el XML
   descargarXML(datosXml);
@@ -891,8 +906,8 @@ document.getElementById("cargarCarpeta").addEventListener("change", function (ev
                 } else {
                   obj.satelites = elemento.split('<td>')[3].split('</td>')[0];
                   const seleccionados = elemento.split('<td>')[2].split('</td>')[0].split('/');
-                  const usados = elemento.split('<td>')[3].split('</td>')[0].split('/');                   
-                  obj.noUsados = compararSatelites(seleccionados, usados).join('/')                  
+                  const usados = elemento.split('<td>')[3].split('</td>')[0].split('/');
+                  obj.noUsados = compararSatelites(seleccionados, usados).join('/')
                 }
               }
               if (elemento.indexOf("Lectura de la Altura:") !== -1 || elemento.indexOf("Lectura de Altura:") !== -1) {
